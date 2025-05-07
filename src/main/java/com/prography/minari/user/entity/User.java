@@ -1,4 +1,4 @@
-package com.prography.minari.user;
+package com.prography.minari.user.entity;
 
 import com.prography.minari.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
