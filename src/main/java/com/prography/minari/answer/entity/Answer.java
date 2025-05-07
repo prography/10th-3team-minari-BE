@@ -1,4 +1,4 @@
-package com.prography.minari.answer;
+package com.prography.minari.answer.entity;
 
 import com.prography.minari.common.entity.BaseTimeEntity;
 import com.prography.minari.question.Question;

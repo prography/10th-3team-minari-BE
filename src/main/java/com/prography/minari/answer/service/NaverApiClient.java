@@ -1,0 +1,45 @@
+package com.prography.minari.answer.service;
+
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+
+@Component
+public class NaverApiClient implements SttApiClient {
+    private WebClient webClient;
+
+    @Value("${naver.client.id}")
+    private String clientId;
+    @Value("${naver.client.secret}")
+    private String clientSecret;
+
+    public NaverApiClient() {
+        this.webClient = WebClient.builder()
+                .baseUrl("https://naveropenapi.apigw.ntruss.com")
+                .build();
+    }
+
+
+    @Override
+    public String convertToText(MultipartFile voiceFile) {
+        try {
+            return webClient.post()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/recog/v1/stt")
+                            .queryParam("lang", "Kor")
+                            .build())
+                    .header("X-NCP-APIGW-API-KEY-ID", clientId)
+                    .header("X-NCP-APIGW-API-KEY", clientSecret)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .bodyValue(voiceFile.getBytes())
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (Exception e) {
+            throw new RuntimeException("STT API 호출 실패", e);
+        }
+    }
+}
