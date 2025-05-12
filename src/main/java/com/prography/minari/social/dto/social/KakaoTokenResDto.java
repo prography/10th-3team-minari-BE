@@ -1,4 +1,4 @@
-package com.prography.minari.user.dto.social;
+package com.prography.minari.social.dto.social;
 
 public record KakaoTokenResDto(String access_token,
                                String token_type,
