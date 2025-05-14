@@ -1,4 +1,4 @@
-package com.prography.minari.answer.service;
+package com.prography.minari.answer.service.impl;
 
 import org.springframework.web.multipart.MultipartFile;
 

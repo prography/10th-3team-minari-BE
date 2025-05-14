@@ -1,12 +1,13 @@
-package com.prography.minari.answer.service;
+package com.prography.minari.answer.service.impl;
 
+import com.prography.minari.common.aop.ImplService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
+@ImplService
 @RequiredArgsConstructor
-public class SttProcessingService {
+public class SttProcessor {
     private final SttApiClient sttApiClient;
 
     public String convertToText(MultipartFile file) {
