@@ -2,7 +2,7 @@ package com.prography.minari.answer;
 
 import com.prography.minari.common.entity.BaseTimeEntity;
 import com.prography.minari.question.Question;
-import com.prography.minari.user.User;
+import com.prography.minari.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
