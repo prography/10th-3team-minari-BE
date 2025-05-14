@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class AnswerResponse {
+public class InterviewContentResponse {
     private String answer;
     private String question;
     private String reply;

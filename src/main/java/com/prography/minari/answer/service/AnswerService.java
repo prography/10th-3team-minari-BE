@@ -1,7 +1,7 @@
 package com.prography.minari.answer.service;
 
 import com.prography.minari.answer.entity.Answer;
-import com.prography.minari.answer.service.dto.response.AnswerResponse;
+import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import com.prography.minari.answer.service.impl.AnswerWriter;
 import com.prography.minari.answer.service.impl.SttProcessor;
 import com.prography.minari.question.entity.Question;
@@ -22,7 +22,7 @@ public class AnswerService {
     private final UserReader userReader;
     private final QuestionReader questionReader;
 
-    public AnswerResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
+    public InterviewContentResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
         User user = userReader.read(userId);
         String speech = sttProcessor.convertToText(file);
         Question question = questionReader.read(questionId);
@@ -31,9 +31,9 @@ public class AnswerService {
                 .user(user)
                 .question(question)
                 .build());
-        return AnswerResponse.builder()
-                .answer(speech)
-                .reply(question.getAnswer())
+        return InterviewContentResponse.builder()
+                .answer(question.getAnswer())
+                .reply(speech)
                 .question(question.getContent())
                 .build();
     }
