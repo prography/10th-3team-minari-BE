@@ -1,4 +1,4 @@
-package com.prography.minari.user;
+package com.prography.minari.user.entity;
 
 import com.prography.minari.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -15,6 +15,8 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false,name = "email")
     private String email;
+    @Column(nullable = false,name = "password")
     private String password;
 }
