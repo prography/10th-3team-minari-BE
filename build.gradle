@@ -44,8 +44,9 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher:{version}")
 	testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.11")
 
-	//webflux
+	// webflux
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 }
 
 tasks.named('test') {
