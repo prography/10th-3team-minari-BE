@@ -1,7 +1,9 @@
 package com.prography.minari.social.service;
 
+import com.prography.minari.user.dto.UserLoginResDto;
+
 public interface SocialService {
 
-    Object join(String code);
+    UserLoginResDto login(String code);
 
 }

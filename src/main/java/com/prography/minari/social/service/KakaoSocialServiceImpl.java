@@ -4,11 +4,17 @@ import com.prography.minari.social.dto.social.KakaoTokenInfoResDto;
 import com.prography.minari.social.dto.social.KakaoTokenResDto;
 import com.prography.minari.social.dto.social.KakaoUserInfoResDto;
 import com.prography.minari.user.UserRepository;
+import com.prography.minari.user.dto.UserLoginResDto;
+import com.prography.minari.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Optional;
+
+import static com.prography.minari.social.dto.enums.SocialType.KAKAO;
 
 @Service("kakao")
 @RequiredArgsConstructor
@@ -26,7 +32,7 @@ public class KakaoSocialServiceImpl implements SocialService {
     private final UserRepository userRepository;
 
     @Override
-    public String join(String code) {
+    public UserLoginResDto login(String code) {
 
         // 토큰 받기
         KakaoTokenResDto kakaoTokenResDto =  requestToken(code);
@@ -34,8 +40,17 @@ public class KakaoSocialServiceImpl implements SocialService {
         KakaoTokenInfoResDto kakaoTokenInfoResDto = getTokenInfo(kakaoTokenResDto.access_token());
         // 사용자 정보 가져오기
         KakaoUserInfoResDto kakaoUserInfoResDto = requestKakaoUserInfo(kakaoTokenInfoResDto.id(), kakaoTokenResDto.access_token());
+        String name = Optional.ofNullable(kakaoUserInfoResDto.kakao_account().profile().nickname())
+                .orElse("미나리🌿");
+        String image = Optional.ofNullable(kakaoUserInfoResDto.kakao_account().profile().profile_image_url())
+                .orElse("https://picsum.photos/640/640");
+        Long socialId = kakaoUserInfoResDto.id();
 
-        return "siu";
+        // 사용자 정보로 기존 회원 조회, 없으면 새 User 객체 생성
+        User user = userRepository.findBySocialTypeAndSocialId(KAKAO, socialId)
+                .orElseGet(() -> userRepository.save(User.create("", KAKAO, socialId, image, name)));
+
+        return UserLoginResDto.from(user);
     }
 
     // 토큰 받기 https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token

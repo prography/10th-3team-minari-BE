@@ -2,13 +2,13 @@ package com.prography.minari.user.dto;
 
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.entity.User;
-import io.micrometer.common.util.StringUtils;
 
-public record UserLoginResDto(
-        Long id, String email, SocialType socialType, String socialId, String name, String image)
+public record UserFindResDto(
+        Long id, String email, SocialType socialType, String socialId, String name, String image
+)
 {
-    public static UserLoginResDto from(User user) {
-        return new UserLoginResDto(
+    public static UserFindResDto from(User user) {
+        return new UserFindResDto(
                 user.getId(),
                 user.getEmail(),
                 user.getSocialType(),
@@ -16,9 +16,5 @@ public record UserLoginResDto(
                 user.getName(),
                 user.getImage()
         );
-    }
-
-    public boolean isNotRegistered() {
-        return StringUtils.isEmpty(email);
     }
 }
