@@ -48,7 +48,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// postgresql
-	implementation 'org.postgresql:postgresql:42.7.2'
+	implementation 'org.postgresql:postgresql:42.7.5'
+
 }
 
 tasks.named('test') {
