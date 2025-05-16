@@ -27,17 +27,7 @@ public class UserController {
 
     @GetMapping("/users/oauth/{social}")
     public ResponseEntity oauth(@RequestParam("code")String code, @PathVariable("social") String social) {
-
         UserLoginResDto userLoginResDto = socialServiceMap.get(social).login(code);
-
-        // 신규 회원일 경우, 회원 등록 절차를 위한 redirect
-        if(userLoginResDto.isNotRegistered()) {
-            return ResponseEntity
-                    .status(HttpStatus.FOUND)
-                    .location(URI.create("/")) // 리다이렉트할 경로
-                    .build();
-        }
-
         return ResponseEntity.ok(userLoginResDto);
     }
 
