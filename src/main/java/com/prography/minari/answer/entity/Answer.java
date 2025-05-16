@@ -1,15 +1,15 @@
-package com.prography.minari.answer;
+package com.prography.minari.answer.entity;
 
 import com.prography.minari.common.entity.BaseTimeEntity;
-import com.prography.minari.question.Question;
+import com.prography.minari.question.entity.Question;
 import com.prography.minari.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Builder
 @Entity
 @Table(name = "ANSWERS")
 public class Answer extends BaseTimeEntity {
@@ -17,6 +17,7 @@ public class Answer extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false,name = "reply")
     private String reply;
 
     @ManyToOne(fetch = FetchType.LAZY)

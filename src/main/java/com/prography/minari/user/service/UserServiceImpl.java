@@ -1,14 +1,11 @@
 package com.prography.minari.user.service;
 
-import com.prography.minari.social.service.SocialService;
-import com.prography.minari.user.UserRepository;
 import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.entity.User;
+import com.prography.minari.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)

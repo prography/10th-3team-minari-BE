@@ -3,9 +3,9 @@ package com.prography.minari.social.service;
 import com.prography.minari.social.dto.social.KakaoTokenInfoResDto;
 import com.prography.minari.social.dto.social.KakaoTokenResDto;
 import com.prography.minari.social.dto.social.KakaoUserInfoResDto;
-import com.prography.minari.user.UserRepository;
 import com.prography.minari.user.dto.UserLoginResDto;
 import com.prography.minari.user.entity.User;
+import com.prography.minari.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,13 +20,13 @@ import static com.prography.minari.social.dto.enums.SocialType.KAKAO;
 @RequiredArgsConstructor
 public class KakaoSocialServiceImpl implements SocialService {
 
-    @Value("${oauth.kakao.REST_API_KEY}")
+    @Value("${oauth.kakao.REST_API_KEY:default}")
     private String CLIENT_ID;
 
-    @Value("${oauth.kakao.REDIRECT_URI}")
+    @Value("${oauth.kakao.REDIRECT_URI:default}")
     private String REDIRECT_URI;
 
-    @Value("${oauth.kakao.REST_SECRET_KEY}")
+    @Value("${oauth.kakao.REST_SECRET_KEY:default}")
     private String CLIENT_SECRET_KEY;
 
     private final UserRepository userRepository;

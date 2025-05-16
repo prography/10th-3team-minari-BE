@@ -1,4 +1,4 @@
-package com.prography.minari.question;
+package com.prography.minari.question.entity;
 
 import com.prography.minari.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -15,7 +15,10 @@ public class Question extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false,name = "content")
     private String content;
+    @Column(nullable = false,name = "answer")
     private String answer;
+    @Column(nullable = false,name = "tag")
     private String tag;
 }
