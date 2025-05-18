@@ -50,7 +50,7 @@ public class KakaoSocialServiceImpl implements SocialService {
 
         // 사용자 정보로 기존 회원 조회, 없으면 새 User 객체 생성
         User user = userRepository.findBySocialTypeAndSocialId(KAKAO, socialId)
-                .orElseGet(() -> userRepository.save(User.create("", KAKAO, socialId, image, name)));
+                .orElseGet(() -> userRepository.save(User.create("", KAKAO, socialId, name, image)));
 
         return UserLoginResDto.from(user);
     }
