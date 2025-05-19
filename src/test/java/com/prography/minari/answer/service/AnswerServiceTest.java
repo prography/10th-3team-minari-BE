@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AnswerServiceTest {
     @Test
-    void 답변_로직() {
+    void 답변_조회_테스트() {
         // given
 
         // when

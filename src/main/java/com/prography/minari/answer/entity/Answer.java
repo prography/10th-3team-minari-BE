@@ -27,4 +27,6 @@ public class Answer extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     private Question question;
+
+    private boolean success;
 }
