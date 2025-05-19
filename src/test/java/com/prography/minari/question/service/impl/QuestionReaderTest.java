@@ -2,6 +2,8 @@ package com.prography.minari.question.service.impl;
 
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector;
+import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.repository.QuestionRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -45,7 +47,8 @@ class QuestionReaderTest {
                 .sample();
         Question save = questionRepository.save(sample);
         // when
-        Question question = questionReader.read(save.getId());
+        Question question = questionReader.read(save.getId())
+                .orElseThrow(()->new ApiException(ErrorCode.ENTITY_NOT_FOUND));
         // then
         assertAll(()->assertEquals(save, question));
 

@@ -1,14 +1,14 @@
 package com.prography.minari.answer.service;
 
 import com.prography.minari.answer.entity.Answer;
+import com.prography.minari.answer.service.dto.SttConvertResponse;
 import com.prography.minari.answer.service.dto.SttStatus;
-import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
+import com.prography.minari.answer.service.dto.response.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import com.prography.minari.answer.service.impl.AnswerReader;
 import com.prography.minari.answer.service.impl.AnswerWriter;
 import com.prography.minari.answer.service.impl.SttProcessor;
 import com.prography.minari.common.execption.ApiException;
-import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
@@ -18,7 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+
+import static com.prography.minari.common.execption.ErrorCode.ENTITY_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -30,21 +34,44 @@ public class AnswerService {
     private final UserReader userReader;
     private final QuestionReader questionReader;
 
-    public InterviewContentResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
-        User user = userReader.read(userId);
-        String speech = sttProcessor.convertToText(file);
+    public SttConvertResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
+        User user = userReader.read(userId)
+                .orElseThrow(() -> new ApiException(ENTITY_NOT_FOUND));
         Question question = questionReader.read(questionId)
-                .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
-        answerWriter.write(Answer.builder()
-                .reply(speech)
-                .user(user)
-                .question(question)
-                .build());
-        return InterviewContentResponse.builder()
-                .answer(question.getAnswer())
-                .reply(speech)
-                .question(question.getContent())
-                .build();
+                .orElseThrow(() -> new ApiException(ENTITY_NOT_FOUND));
+        try {
+            String speech = sttProcessor.convertToText(file);
+            log.info("STT 변환 성공 - time: {}, userId: {}, questionId: {}, text: {}",
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    userId,
+                    questionId,
+                    speech);
+            answerWriter.write(Answer.builder()
+                    .success(true)
+                    .reply(speech)
+                    .user(user)
+                    .question(question)
+                    .build());
+            return SttConvertResponse.builder()
+                    .success(true)
+                    .build();
+        } catch (Exception e) {
+            log.warn("STT 변환 실패 - time: {}, userId: {}, questionId: {}, error: {}",
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                    userId,
+                    questionId,
+                    e.getMessage(),
+                    e);
+            answerWriter.write(Answer.builder()
+                    .success(false)
+                    .reply(null)
+                    .user(user)
+                    .question(question)
+                    .build());
+            return SttConvertResponse.builder()
+                    .success(false)
+                    .build();
+        }
     }
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {

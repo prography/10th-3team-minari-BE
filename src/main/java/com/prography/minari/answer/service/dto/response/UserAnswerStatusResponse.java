@@ -1,5 +1,6 @@
-package com.prography.minari.answer.service.dto;
+package com.prography.minari.answer.service.dto.response;
 
+import com.prography.minari.answer.service.dto.SttStatus;
 import lombok.Builder;
 import lombok.Getter;
 
