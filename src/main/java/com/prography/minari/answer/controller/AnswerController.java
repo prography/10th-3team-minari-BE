@@ -2,8 +2,8 @@ package com.prography.minari.answer.controller;
 
 import com.prography.minari.answer.service.AnswerService;
 import com.prography.minari.answer.service.dto.SttConvertResponse;
-import com.prography.minari.answer.service.dto.response.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
+import com.prography.minari.answer.service.dto.response.UserAnswerStatusResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +18,17 @@ public class AnswerController {
     // STT변환 API
     @PostMapping("/{userId}/questions/{questionId}")
     public ResponseEntity<Boolean> convertToText(@RequestParam("file") MultipartFile files,
-                                                                  @PathVariable Long questionId,
-                                                                  @PathVariable Long userId) {
+                                                 @PathVariable Long questionId,
+                                                 @PathVariable Long userId) {
         SttConvertResponse sttConvertResponse = answerService.writeUserSpeech(files, userId, questionId);
         return ResponseEntity.ok(sttConvertResponse.isSuccess());
+    }
+
+    @GetMapping("/{userId}/questions/{questionId}/result")
+    public ResponseEntity<InterviewContentResponse> convertToText(@PathVariable Long questionId,
+                                                                  @PathVariable Long userId) {
+        InterviewContentResponse interviewContentResponse = answerService.getUserQuestionResult(userId, questionId);
+        return ResponseEntity.ok(interviewContentResponse);
     }
 
 

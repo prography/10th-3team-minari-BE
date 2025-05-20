@@ -15,4 +15,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     Optional<Answer> findByUserIdAndQuestionId(@Param("userId") Long userId, @Param("questionId") Long questionId);
 
     Long user(User user);
+
+    @Query("select a from Answer a join fetch a.question where a.user.id = :userId and a.question.id = :questionId")
+    Optional<Answer> findByUserIdAndQuestionIdFetch(Long userId, Long questionId);
 }
