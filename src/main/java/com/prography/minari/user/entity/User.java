@@ -31,6 +31,8 @@ public class User extends BaseTimeEntity {
 
     private String image;
 
+    private Boolean registered;
+
     public static User create(String email, SocialType socialType, Long socialId, String name, String image) {
         User user = new User();
         user.email = email;
@@ -38,6 +40,7 @@ public class User extends BaseTimeEntity {
         user.socialId = socialId;
         user.name = name;
         user.image = image;
+        user.registered = false;
         return user;
     }
 

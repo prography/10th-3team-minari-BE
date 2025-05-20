@@ -5,7 +5,7 @@ import com.prography.minari.user.entity.User;
 import io.micrometer.common.util.StringUtils;
 
 public record UserLoginResDto(
-        Long id, String email, SocialType socialType, String socialId, String name, String image)
+        Long id, String email, SocialType socialType, String socialId, String name, String image, Boolean registered)
 {
     public static UserLoginResDto from(User user) {
         return new UserLoginResDto(
@@ -14,11 +14,9 @@ public record UserLoginResDto(
                 user.getSocialType(),
                 String.valueOf(user.getSocialId()), // socialId가 String이면 그대로, Long이면 변환
                 user.getName(),
-                user.getImage()
+                user.getImage(),
+                user.getRegistered()
         );
     }
 
-    public boolean isNotRegistered() {
-        return StringUtils.isEmpty(email);
-    }
 }

@@ -8,6 +8,8 @@ import com.prography.minari.user.entity.User;
 import com.prography.minari.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -48,7 +50,7 @@ public class KakaoSocialServiceImpl implements SocialService {
 
         // 사용자 정보로 기존 회원 조회, 없으면 새 User 객체 생성
         User user = userRepository.findBySocialTypeAndSocialId(KAKAO, socialId)
-                .orElseGet(() -> userRepository.save(User.create("", KAKAO, socialId, image, name)));
+                .orElseGet(() -> userRepository.save(User.create("", KAKAO, socialId, name, image)));
 
         return UserLoginResDto.from(user);
     }
@@ -59,7 +61,7 @@ public class KakaoSocialServiceImpl implements SocialService {
                 .baseUrl("https://kauth.kakao.com").build()
                 .post()
                 .uri("/oauth/token")
-                .header("Content-Type", "application/x-www-form-urlencoded")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(BodyInserters.fromFormData("grant_type", "authorization_code")
                         .with("client_id", CLIENT_ID)
                         .with("redirect_uri", REDIRECT_URI)
@@ -77,8 +79,8 @@ public class KakaoSocialServiceImpl implements SocialService {
                 .build()
                 .get()
                 .uri("/v1/user/access_token_info")
-                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
-                .header("Authorization", "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE + ";charset=UTF-8")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
                 .bodyToMono(KakaoTokenInfoResDto.class)
                 .block();
@@ -95,8 +97,8 @@ public class KakaoSocialServiceImpl implements SocialService {
                         .queryParam("target_id_type", "user_id")
                         .queryParam("target_id", userId)
                         .build())
-                .header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
-                .header("Authorization", "Bearer " + accessToken)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE + ";charset=UTF-8")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .body(BodyInserters.fromFormData("property_keys", "[\"kakao_account.profile\"]"))
                 .retrieve()
                 .bodyToMono(KakaoUserInfoResDto.class)
