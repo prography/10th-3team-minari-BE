@@ -5,7 +5,7 @@ import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntr
 import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.answer.repository.AnswerRepository;
 import com.prography.minari.answer.service.dto.SttStatus;
-import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
+import com.prography.minari.answer.service.dto.response.UserAnswerStatusResponse;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.repository.QuestionRepository;
 import com.prography.minari.user.entity.User;

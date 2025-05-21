@@ -1,7 +1,8 @@
 package com.prography.minari.answer.controller;
 
 import com.prography.minari.answer.service.AnswerService;
-import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
+import com.prography.minari.answer.service.dto.SttConvertResponse;
+import com.prography.minari.answer.service.dto.response.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,11 @@ public class AnswerController {
 
     // STT변환 API
     @PostMapping("/{userId}/questions/{questionId}")
-    public ResponseEntity<InterviewContentResponse> convertToText(@RequestParam("file") MultipartFile files,
+    public ResponseEntity<Boolean> convertToText(@RequestParam("file") MultipartFile files,
                                                                   @PathVariable Long questionId,
                                                                   @PathVariable Long userId) {
-        InterviewContentResponse interviewContentResponse = answerService.writeUserSpeech(files, userId, questionId);
-        return ResponseEntity.ok(interviewContentResponse);
+        SttConvertResponse sttConvertResponse = answerService.writeUserSpeech(files, userId, questionId);
+        return ResponseEntity.ok(sttConvertResponse.isSuccess());
     }
 
 

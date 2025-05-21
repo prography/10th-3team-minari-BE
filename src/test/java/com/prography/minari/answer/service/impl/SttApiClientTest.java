@@ -63,7 +63,7 @@ class SttApiClientTest {
         String result = sttApiClient.convertToText(mockFile);
 
         // then
-        assertEquals(expectedText, result);
+        assertEquals("테스트입니다", result);
     }
 
     @Test
