@@ -72,22 +72,11 @@ public class AnswerService {
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {
         Optional<Answer> optionalAnswer = answerReader.readByUserIdAndQuestionId(userId, questionId);
-        // 답변이 아직 없다면 STT 진행 중으로 간주
-        if (optionalAnswer.isEmpty()) {
-            return UserAnswerStatusResponse.builder()
-                    .status(SttStatus.PROCESS)
-                    .build();
-        }
-        Answer answer = optionalAnswer.get();
-        // 답변이 있고 STT 성공이면 SUCCESS
-        if (answer.isSuccess()) {
-            return UserAnswerStatusResponse.builder()
-                    .status(SttStatus.SUCCESS)
-                    .build();
-        }
-        // 답변이 있지만 실패 상태면 ERROR
+        SttStatus sttStatus = optionalAnswer
+                .map(answer -> answer.isSuccess() ? SttStatus.SUCCESS : SttStatus.ERROR)
+                .orElse(SttStatus.PROCESS);
         return UserAnswerStatusResponse.builder()
-                .status(SttStatus.ERROR)
+                .status(sttStatus)
                 .build();
     }
 }
