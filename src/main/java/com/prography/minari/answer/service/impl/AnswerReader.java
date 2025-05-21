@@ -20,4 +20,8 @@ public class AnswerReader {
     public Optional<Answer> readByUserIdAndQuestionId(Long userId, Long questionId) {
         return answerRepository.findByUserIdAndQuestionId(userId, questionId);
     }
+
+    public Optional<Answer>readWithQuestionByUserIdAndQuestionId(Long userId,Long questionId) {
+        return answerRepository.findByUserIdAndQuestionIdFetch(userId, questionId);
+    }
 }
