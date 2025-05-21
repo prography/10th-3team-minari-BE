@@ -1,5 +1,6 @@
 package com.prography.minari.social.service;
 
+import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.social.dto.social.KakaoTokenInfoResDto;
 import com.prography.minari.social.dto.social.KakaoTokenResDto;
 import com.prography.minari.social.dto.social.KakaoUserInfoResDto;
@@ -33,6 +34,8 @@ public class KakaoSocialServiceImpl implements SocialService {
 
     private final UserRepository userRepository;
 
+    private final JwtUtil jwtUtil;
+
     @Override
     public UserLoginResDto login(String code) {
 
@@ -52,7 +55,10 @@ public class KakaoSocialServiceImpl implements SocialService {
         User user = userRepository.findBySocialTypeAndSocialId(KAKAO, socialId)
                 .orElseGet(() -> userRepository.save(User.create("", KAKAO, socialId, name, image)));
 
-        return UserLoginResDto.from(user);
+        // access token 발급. TODO 차후에 Security 도입 시 로직 수정해야 함.
+        String accessToken = jwtUtil.createToken(user.getId().toString());
+
+        return UserLoginResDto.from(user, accessToken);
     }
 
     // 토큰 받기 https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
