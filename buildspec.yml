@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "ssm에서 ecr_uri조회"
+      - export ecr_uri=$(aws ssm get-parameter --name "/minari/prod/ECR_URI" --query "Parameter.Value" --output text)
+      - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ecr_uri}
+  build:
+    commands:
+      - echo "도커 이미지 빌드"
+      - docker build -t minari .
+      - docker tag minari:latest ${ecr_uri}:latest
+
+  post_build:
+    commands:
+      - echo "ECR 이미지 push"
+      - docker push ${ecr_uri}:latest
+
+artifacts:
+  files:
+    - appspec.yml
+    - scripts/**/*
