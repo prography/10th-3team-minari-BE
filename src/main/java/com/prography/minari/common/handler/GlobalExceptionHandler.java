@@ -16,8 +16,9 @@ import java.security.SignatureException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
-    public ApiResponse handleApiException(ApiException e) {
-        return ApiResponse.fail();
+    public ResponseEntity handleApiException(ApiException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.fail(e.getErrorCode()));
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
