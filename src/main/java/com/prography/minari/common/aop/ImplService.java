@@ -9,5 +9,5 @@ import java.lang.annotation.*;
 @Documented
 @Component
 public @interface ImplService {
-
+    String value() default "";
 }

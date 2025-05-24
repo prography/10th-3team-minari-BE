@@ -18,4 +18,8 @@ public record KakaoUserInfoResDto(
             Boolean is_default_image,
             Boolean is_default_nickname
     ) {}
+
+    public UserInfoDto to() {
+        return new UserInfoDto(id, kakao_account.profile.nickname, kakao_account.profile.profile_image_url);
+    }
 }
