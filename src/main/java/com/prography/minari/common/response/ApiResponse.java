@@ -17,7 +17,7 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> fail(T result) {
-        return new ApiResponse<>(201, "불가능한 요청입니다.", result);
+        return new ApiResponse<>(400, "불가능한 요청입니다.", result);
     }
 
     public static ApiResponse<Void> fail() {
@@ -26,6 +26,14 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> error(T result) {
         return new ApiResponse<>(500, "에러가 발생했습니다.", result);
+    }
+
+    public static <T> ApiResponse<T> unauthorized(T result) {
+        return new ApiResponse<>(401, "인증되지 않은 클라이언트입니다.", result);
+    }
+
+    public static <T> ApiResponse<T> forbidden(T result) {
+        return new ApiResponse<>(403, "권한이 없는 클라이언트입니다.", result);
     }
 
     public static ApiResponse<Void> error() {
