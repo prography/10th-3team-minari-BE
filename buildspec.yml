@@ -1,20 +1,29 @@
 version: 0.2
 
 phases:
+  install:
+    commands:
+      - echo "✅ 프로젝트 의존성 다운로드 및 빌드 시작"
+      - ./gradlew clean build -x test
+
   pre_build:
     commands:
-      - echo "ssm에서 ecr_uri조회"
+      - echo "✅ SSM에서 ECR URI 조회"
       - export ecr_uri=$(aws ssm get-parameter --name "/minari/prod/ECR_URI" --query "Parameter.Value" --output text)
+      - echo "✅ ECR 로그인"
       - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ecr_uri}
+      - echo "📦 빌드된 JAR 확인"
+      - ls -alh build/libs
+
   build:
     commands:
-      - echo "도커 이미지 빌드"
+      - echo "🐳 도커 이미지 빌드"
       - docker build -t minari .
       - docker tag minari:latest ${ecr_uri}:latest
 
   post_build:
     commands:
-      - echo "ECR 이미지 push"
+      - echo "⬆️ ECR 이미지 Push"
       - docker push ${ecr_uri}:latest
 
 artifacts:
