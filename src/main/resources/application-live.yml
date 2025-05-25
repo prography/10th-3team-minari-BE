@@ -13,17 +13,17 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  oauth:
-    kakao:
-      REST_API_KEY: ${KAKAO_REST_API_KEY}
-      REST_SECRET_KEY: ${KAKAO_SECRET_KEY}
-      REDIRECT_URI: ${KAKAO_REDIRECT_URI}
+oauth:
+  kakao:
+    REST_API_KEY: ${KAKAO_REST_API_KEY}
+    REST_SECRET_KEY: ${KAKAO_SECRET_KEY}
+    REDIRECT_URI: ${KAKAO_REDIRECT_URI}
 
-  naver:
-    client:
-      id: ${NAVER_CLIENT_ID}
-      secret: ${NAVER_CLIENT_SECRET}
+naver:
+  client:
+    id: ${NAVER_CLIENT_ID}
+    secret: ${NAVER_CLIENT_SECRET}
 
-  jwt:
-    secret: ${JWT_SECRET}
-    expiration: 3600000
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 3600000
