@@ -1,14 +1,17 @@
 package com.prography.minari.user.dto;
 
+import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.entity.User;
 import io.micrometer.common.util.StringUtils;
 
 public record UserLoginResDto(
-        Long id, String email, SocialType socialType, String socialId, String name, String image, Boolean registered)
+        String accessToken, Long id, String email, SocialType socialType, String socialId, String name, String image, Boolean registered)
 {
-    public static UserLoginResDto from(User user) {
+
+    public static UserLoginResDto from(User user, String accessToken) {
         return new UserLoginResDto(
+                accessToken,
                 user.getId(),
                 user.getEmail(),
                 user.getSocialType(),
