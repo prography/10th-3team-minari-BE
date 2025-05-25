@@ -1,5 +1,6 @@
 package com.prography.minari.social.service;
 
+import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.social.dto.social.UserInfoDto;
 import com.prography.minari.social.service.impl.SocialReader;
@@ -18,6 +19,7 @@ public class SocialService {
 
     private final Map<String, SocialReader> socialReaderMap;
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
     public UserLoginResDto login(SocialType socialType, String code) {
 
@@ -39,7 +41,10 @@ public class SocialService {
         User user = userRepository.findBySocialTypeAndSocialId(socialType, socialId)
                 .orElseGet(() -> userRepository.save(User.create("", socialType, socialId, name, image)));
 
-        return UserLoginResDto.from(user);
+        // jwt 생성
+        String jwt = jwtUtil.createToken(user.getId().toString());
+
+        return UserLoginResDto.from(user, jwt);
     }
 
 }
