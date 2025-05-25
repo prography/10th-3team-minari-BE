@@ -18,8 +18,8 @@ public class UserController {
     private final SocialService socialService;
 
     @GetMapping("/users/oauth/{social}")
-    public ResponseEntity oauth(@RequestParam("code")String code, @PathVariable("social") String socialType) {
-        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code);
+    public ResponseEntity oauth(@RequestParam("code") String code, @RequestParam("redirect-uri") String redirectUri, @PathVariable("social") String socialType) {
+        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri);
         return ResponseEntity.ok(userLoginResDto);
     }
 

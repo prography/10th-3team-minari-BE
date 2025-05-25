@@ -5,6 +5,7 @@ import com.prography.minari.social.dto.social.KakaoTokenInfoResDto;
 import com.prography.minari.social.dto.social.KakaoTokenResDto;
 import com.prography.minari.social.dto.social.KakaoUserInfoResDto;
 import com.prography.minari.social.dto.social.UserInfoDto;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,7 +25,7 @@ public class KakaoSocialReader implements SocialReader {
     private String CLIENT_SECRET_KEY;
 
     @Override
-    public String readAccessToken(String code) {
+    public String readAccessToken(String code, String redirectUri) {
             return WebClient.builder()
                     .baseUrl("https://kauth.kakao.com").build()
                     .post()
@@ -32,7 +33,7 @@ public class KakaoSocialReader implements SocialReader {
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                     .body(BodyInserters.fromFormData("grant_type", "authorization_code")
                             .with("client_id", CLIENT_ID)
-                            .with("redirect_uri", REDIRECT_URI)
+                            .with("redirect_uri", StringUtils.isNotEmpty(redirectUri) ? redirectUri : REDIRECT_URI)
                             .with("code", code)
                             .with("client_secret", CLIENT_SECRET_KEY))
                     .retrieve()

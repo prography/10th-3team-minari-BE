@@ -21,13 +21,13 @@ public class SocialService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    public UserLoginResDto login(SocialType socialType, String code) {
+    public UserLoginResDto login(SocialType socialType, String code, String redirectUri) {
 
         // 소셜 로그인 구현체 주입
         SocialReader socialReader = socialReaderMap.get(socialType.getValue());
 
         // 토큰 받기
-        String accessToken = socialReader.readAccessToken(code);
+        String accessToken = socialReader.readAccessToken(code, redirectUri);
 
         // 사용자 정보 가져오기
         UserInfoDto userInfoDto = socialReader.readUserInfo(accessToken);

@@ -5,7 +5,7 @@ import com.prography.minari.user.entity.User;
 
 public interface SocialReader {
 
-    String readAccessToken(String code);
+    String readAccessToken(String code, String redirectUri);
 
     UserInfoDto readUserInfo(String accessToken);
 
