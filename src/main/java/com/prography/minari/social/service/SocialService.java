@@ -30,18 +30,13 @@ public class SocialService {
         String accessToken = socialReader.readAccessToken(code);
 
         // 사용자 정보 가져오기
-        UserInfoDto UserInfoDto = socialReader.readUserInfo(accessToken);
-
-        // 사용자 정보 추출
-        String name   = Optional.ofNullable(UserInfoDto.nickname()).orElse("미나리🌿");                     // 소셜 서비스에서 이름을 제공하지 않는 경우, 기본값 할당
-        String image  = Optional.ofNullable(UserInfoDto.image()).orElse("https://picsum.photos/640/640"); // 소셜 서비스에서 이미지를 제공하지 않는 경우, 기본값 할당
-        Long socialId = UserInfoDto.socialId();                                                                 // 소셜 ID
+        UserInfoDto userInfoDto = socialReader.readUserInfo(accessToken);
 
         // 사용자 정보로 기존 회원 조회, 없으면 새 User 객체 생성
-        User user = userRepository.findBySocialTypeAndSocialId(socialType, socialId)
-                .orElseGet(() -> userRepository.save(User.create("", socialType, socialId, name, image)));
+        User user = userRepository.findBySocialTypeAndSocialId(socialType, userInfoDto.socialId())
+                .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
 
-        // jwt 생성
+        // jwt 생성 TODO Spring Security 도입시, 차후에 제거될 예정
         String jwt = jwtUtil.createToken(user.getId().toString());
 
         return UserLoginResDto.from(user, jwt);
