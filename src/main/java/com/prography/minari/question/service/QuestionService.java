@@ -15,7 +15,7 @@ public class QuestionService {
     private final QuestionReader questionReader;
 
     public String readContents(Long id) {
-        Question question = questionReader.read(id).orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
+        Question question = questionReader.read(id).orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
         return question.getContent();
     }
 }

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
+import static com.prography.minari.common.execption.ErrorCode.*;
+
 @Component
 @Slf4j
 public class JwtUtil {
@@ -50,19 +52,19 @@ public class JwtUtil {
                     .parseClaimsJws(token);
         } catch(ExpiredJwtException e) {
             log.warn("토큰이 만료되었습니다.");
-            throw new ApiException("JWT001");
+            throw new ApiException(JWT_EXPIRED_EXCEPTION);
         } catch(SignatureException e) {
             log.warn("유효하지 않은 서명입니다.");
-            throw new ApiException("JWT002");
+            throw new ApiException(JWT_INVALID_SIGNATURE_EXCEPTION);
         } catch(UnsupportedJwtException e) {
             log.warn("지원하지 않는 JWT 포맷입니다.");
-            throw new ApiException("JWT003");
+            throw new ApiException(JWT_UNSUPPORT_FORMAT_EXCEPTION);
         } catch(MalformedJwtException e) {
             log.warn("잘못된 JWT 형식입니다.");
-            throw new ApiException("JWT004");
+            throw new ApiException(JWT_WRONG_FORM_EXCEPTION);
         } catch(IllegalStateException e) {
             log.warn("JWT 파싱 중 예상치 못한 상태 오류가 발생했습니다. 설정 또는 키 값이 올바른지 확인하세요.");
-            throw new ApiException("JWT005");
+            throw new ApiException(JWT_EXCEPTION);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.prography.minari.question.controller;
 
+import com.prography.minari.question.controller.docs.QuestionApiDocs;
 import com.prography.minari.question.service.QuestionService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-public class QuestionController {
+public class QuestionController implements QuestionApiDocs {
     private final QuestionService questionService;
     @GetMapping("/questions/{questionId}/contents")
     public String getQuestion(@PathVariable Long questionId) {

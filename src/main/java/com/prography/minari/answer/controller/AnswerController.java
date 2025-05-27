@@ -1,5 +1,6 @@
 package com.prography.minari.answer.controller;
 
+import com.prography.minari.answer.controller.docs.AnswerApiDocs;
 import com.prography.minari.answer.service.AnswerService;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
@@ -11,15 +12,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-public class AnswerController {
+public class AnswerController implements AnswerApiDocs {
     private final AnswerService answerService;
 
     // STT변환 API
     @PostMapping("/{userId}/questions/{questionId}")
-    public ResponseEntity<InterviewContentResponse> convertToText(@RequestParam("file") MultipartFile files,
+    public ResponseEntity<InterviewContentResponse> convertToText(@RequestParam("file") MultipartFile file,
                                                                   @PathVariable Long questionId,
                                                                   @PathVariable Long userId) {
-        InterviewContentResponse interviewContentResponse = answerService.writeUserSpeech(files, userId, questionId);
+        InterviewContentResponse interviewContentResponse = answerService.writeUserSpeech(file, userId, questionId);
         return ResponseEntity.ok(interviewContentResponse);
     }
 
