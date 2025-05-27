@@ -1,25 +1,29 @@
 package com.prography.minari.common.execption;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public enum ErrorCode {
-    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력입니다."),
-    ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다."),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.");
+    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력입니다.","C001"),
+    ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다.","C002"),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.","C003"),
+    QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다.","Q001"),
+    JWT_EXPIRED_EXCEPTION(HttpStatus.NOT_FOUND, "토큰이 만료되었습니다.","JWT001"),
+    JWT_INVALID_SIGNATURE_EXCEPTION(HttpStatus.NOT_FOUND, "유효하지 않은 서명입니다.","JWT002"),
+    JWT_UNSUPPORT_FORMAT_EXCEPTION(HttpStatus.NOT_FOUND, "지원하지 않는 JWT 포맷입니다.","JWT003"),
+    JWT_WRONG_FORM_EXCEPTION(HttpStatus.NOT_FOUND, "잘못된 JWT 형식입니다.","JWT004"),
+    JWT_EXCEPTION(HttpStatus.NOT_FOUND, "JWT 파싱 중 예상치 못한 상태 오류가 발생했습니다. 설정 또는 키 값이 올바른지 확인하세요.","JWT005");
 
     private final HttpStatus status;
     private final String message;
+    private final String code;
 
-    ErrorCode(HttpStatus status, String message) {
+    ErrorCode(HttpStatus status, String message,String code) {
         this.status = status;
         this.message = message;
+        this.code = code;
     }
 
-    public HttpStatus getStatus() {
-        return status;
-    }
 
-    public String getMessage() {
-        return message;
-    }
 }

@@ -34,7 +34,7 @@ public class AnswerService {
         User user = userReader.read(userId);
         String speech = sttProcessor.convertToText(file);
         Question question = questionReader.read(questionId)
-                .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
         answerWriter.write(Answer.builder()
                 .reply(speech)
                 .user(user)
