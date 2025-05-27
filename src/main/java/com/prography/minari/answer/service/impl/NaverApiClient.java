@@ -11,9 +11,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class NaverApiClient implements SttApiClient {
     private WebClient webClient;
 
-    @Value("${naver.client.id}")
+    @Value("${naver.client.id:default}")
     private String clientId;
-    @Value("${naver.client.secret}")
+    @Value("${naver.client.secret:default}")
     private String clientSecret;
 
     public NaverApiClient() {

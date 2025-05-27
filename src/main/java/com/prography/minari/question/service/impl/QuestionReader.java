@@ -7,14 +7,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @ImplService
 @RequiredArgsConstructor
 public class QuestionReader {
     private final QuestionRepository questionRepository;
 
     @Transactional(readOnly = true)
-    public Question read(Long id) {
-        return questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found"));
+    public Optional<Question> read(Long id) {
+        return questionRepository.findById(id);
     }
 }

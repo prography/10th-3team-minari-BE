@@ -19,7 +19,7 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,name = "email")
+    @Column(name = "email")
     private String email;
 
     @Enumerated(value = STRING)
