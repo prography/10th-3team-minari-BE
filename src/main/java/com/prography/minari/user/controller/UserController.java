@@ -1,19 +1,13 @@
 package com.prography.minari.user.controller;
 
+import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.social.service.SocialService;
-import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.dto.UserLoginResDto;
 import com.prography.minari.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.util.Map;
-
-import static org.springframework.http.HttpStatus.FOUND;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,11 +15,11 @@ import static org.springframework.http.HttpStatus.FOUND;
 public class UserController {
 
     private final UserService userService;
-    private final Map<String, SocialService> socialServiceMap;
+    private final SocialService socialService;
 
     @GetMapping("/users/oauth/{social}")
-    public ResponseEntity oauth(@RequestParam("code")String code, @PathVariable("social") String social) {
-        UserLoginResDto userLoginResDto = socialServiceMap.get(social).login(code);
+    public ResponseEntity oauth(@RequestParam("code") String code, @RequestParam("redirect-uri") String redirectUri, @PathVariable("social") String socialType) {
+        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri);
         return ResponseEntity.ok(userLoginResDto);
     }
 

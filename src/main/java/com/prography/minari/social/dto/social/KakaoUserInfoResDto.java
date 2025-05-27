@@ -1,5 +1,7 @@
 package com.prography.minari.social.dto.social;
 
+import io.micrometer.common.util.StringUtils;
+
 public record KakaoUserInfoResDto(
         Long id,
         String connected_at,
@@ -18,4 +20,11 @@ public record KakaoUserInfoResDto(
             Boolean is_default_image,
             Boolean is_default_nickname
     ) {}
+
+    public UserInfoDto to() {
+        return new UserInfoDto(
+                id,
+                StringUtils.isNotBlank(kakao_account.profile.nickname) ? kakao_account.profile.nickname : "미나리🌿",
+                StringUtils.isNotBlank(kakao_account.profile.profile_image_url) ? kakao_account.profile.profile_image_url : "https://picsum.photos/640/640");
+    }
 }
