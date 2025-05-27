@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @ImplService("kakao")
-public class KakaoSocialReader implements SocialReader {
+public class KakaoSocialClient implements SocialClient {
 
     @Value("${oauth.kakao.REST_API_KEY:default}")
     private String CLIENT_ID;
