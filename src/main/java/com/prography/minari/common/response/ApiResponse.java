@@ -17,4 +17,11 @@ public class ApiResponse<T> {
         this.result = result;
     }
 
+    public String getCode() {
+        return code;
+    }
+
+    public T getResult() {
+        return result;
+    }
 }
