@@ -8,8 +8,8 @@ public class ApiResponse<T> {
         return new ApiResponse<>("200", result);
     }
 
-    public static <T> ApiResponse<T> fail(String code) {
-        return new ApiResponse<>(code, null);
+    public static <T> ApiResponse<T> fail(String code, T result) {
+        return new ApiResponse<>(code, result);
     }
 
     private ApiResponse(String code, T result) {

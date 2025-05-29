@@ -9,6 +9,7 @@ import com.prography.minari.user.dto.UserLoginResDto;
 import com.prography.minari.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/users/mail-verification")
-    public ResponseEntity emailVerification(@RequestBody MailVerificationReqDto mailVerificationReqDto) {
+    public ResponseEntity emailVerification(@RequestBody @Validated MailVerificationReqDto mailVerificationReqDto) {
         mailService.sendAuthMail(mailVerificationReqDto);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
