@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 
 import static com.prography.minari.common.execption.ErrorCode.*;
 
@@ -22,6 +23,7 @@ public class GoogleMailClient {
 
     private final JavaMailSender javaMailSender;
 
+    @Async
     public void sendMail(MailRequest mailRequest) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
