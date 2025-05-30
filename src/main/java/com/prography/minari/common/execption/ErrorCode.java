@@ -2,6 +2,7 @@ package com.prography.minari.common.execption;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Getter
 public enum ErrorCode {
@@ -13,7 +14,11 @@ public enum ErrorCode {
     JWT_INVALID_SIGNATURE_EXCEPTION(HttpStatus.NOT_FOUND, "유효하지 않은 서명입니다.","JWT002"),
     JWT_UNSUPPORT_FORMAT_EXCEPTION(HttpStatus.NOT_FOUND, "지원하지 않는 JWT 포맷입니다.","JWT003"),
     JWT_WRONG_FORM_EXCEPTION(HttpStatus.NOT_FOUND, "잘못된 JWT 형식입니다.","JWT004"),
-    JWT_EXCEPTION(HttpStatus.NOT_FOUND, "JWT 파싱 중 예상치 못한 상태 오류가 발생했습니다. 설정 또는 키 값이 올바른지 확인하세요.","JWT005");
+    JWT_EXCEPTION(HttpStatus.NOT_FOUND, "JWT 파싱 중 예상치 못한 상태 오류가 발생했습니다. 설정 또는 키 값이 올바른지 확인하세요.","JWT005"),
+    EMAIL_INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "잘못된 이메일 주소입니다.", "MAIL001"),
+    EMAIL_MESSAGE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 메시지 생성 중 오류가 발생했습니다.", "MAIL002"),
+    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다.", "MAIL003"),
+    METHOD_ARGUMENT_NOT_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "", "VALIDATION");
 
     private final HttpStatus status;
     private final String message;
