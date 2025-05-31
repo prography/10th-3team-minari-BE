@@ -11,6 +11,7 @@ import com.prography.minari.user.service.impl.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,11 @@ public class QuestionService {
     public String readContents(Long id) {
         Question question = questionReader.read(id).orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
         return question.getContent();
+    }
+
+    public List<String> readTags(Long questionId) {
+        Question question = questionReader.read(questionId).orElseThrow(()->new ApiException(ErrorCode.QUESTION_NOT_FOUND));
+        return question.getShuffledTags(3);
     }
 
     public DailyUserQuestionResDto readDaily(Long userId) {
