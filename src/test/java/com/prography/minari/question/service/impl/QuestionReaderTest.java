@@ -77,7 +77,6 @@ class QuestionReaderTest {
         );
     }
 
-    @Test
     @RepeatedTest(5)
     void 데일리_문제조회_테스트() {
         // given
