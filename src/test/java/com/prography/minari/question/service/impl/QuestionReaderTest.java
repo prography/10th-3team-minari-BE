@@ -11,6 +11,7 @@ import com.prography.minari.user.entity.User;
 import com.prography.minari.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -77,6 +78,7 @@ class QuestionReaderTest {
     }
 
     @Test
+    @RepeatedTest(5)
     void 데일리_문제조회_테스트() {
         // given
         ArbitraryBuilder<Question> builder = fixtureMonkey.giveMeBuilder(Question.class);
