@@ -1,14 +1,13 @@
 package com.prography.minari.answer.service.impl;
 
 import com.prography.minari.common.aop.ImplService;
+import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.execption.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,38 +21,40 @@ public class SttProcessor {
     private final SttApiClient sttApiClient;
 
     public String convertToText(MultipartFile file) {
-        try {
-            AudioFormat format = getAudioFormat(file);
-            List<byte[]> rawChunks = splitWavToExactMinutes(file, format);
-            List<String> texts = rawChunks.stream()
-                    .map(chunk -> {
-                        try {
-                            byte[] wavChunk = toAutioFormatBytes(chunk, format);
-                            return sttApiClient.convertToText(wavChunk);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
+        AudioFormat format = getAudioFormat(file);
+        List<byte[]> rawChunks = splitWavToExactMinutes(file, format);
+        List<String> texts = rawChunks.stream()
+                .map(chunk -> {
+                    try {
+                        byte[] wavChunk = toAutioFormatBytes(chunk, format);
+                        return sttApiClient.convertToText(wavChunk);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
 
-            return texts.stream()
-                    .filter(s -> !s.isBlank())
-                    .map(s -> s.endsWith(".") ? s : s + ".")
-                    .collect(Collectors.joining(" "));
+        return texts.stream()
+                .filter(s -> !s.isBlank())
+                .map(s -> s.endsWith(".") ? s : s + ".")
+                .collect(Collectors.joining(" "));
 
-        } catch (Exception e) {
-            throw new RuntimeException("STT 변환 실패", e);
-        }
     }
 
-    private AudioFormat getAudioFormat(MultipartFile file) throws Exception {
+    private AudioFormat getAudioFormat(MultipartFile file) {
         try (InputStream is = new BufferedInputStream(file.getInputStream());
              AudioInputStream fullStream = AudioSystem.getAudioInputStream(is)) {
             return fullStream.getFormat();
+        } catch (UnsupportedAudioFileException e) {
+            log.error("지원하지 않는 오디오 포맷: {}",e.getMessage());
+            throw new ApiException(ErrorCode.AUDIO_UNSUPPORT_FORMAT_EXCEPTION);
+        } catch (IOException e) {
+            log.error("오디오 파일 처리 중 IO 오류 발생: {}",e.getMessage());
+            throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private List<byte[]> splitWavToExactMinutes(MultipartFile file, AudioFormat format) throws Exception {
+    private List<byte[]> splitWavToExactMinutes(MultipartFile file, AudioFormat format) {
         try (InputStream is = new BufferedInputStream(file.getInputStream());
              AudioInputStream fullStream = AudioSystem.getAudioInputStream(is)) {
 
@@ -83,6 +84,12 @@ public class SttProcessor {
             }
 
             return chunks;
+        }catch (UnsupportedAudioFileException e) {
+            log.error("지원하지 않는 오디오 포맷: {}",e.getMessage());
+            throw new ApiException(ErrorCode.AUDIO_UNSUPPORT_FORMAT_EXCEPTION);
+        } catch (IOException e) {
+            log.error("오디오 파일 처리 중 IO 오류 발생: {}",e.getMessage());
+            throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
