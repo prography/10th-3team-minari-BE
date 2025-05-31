@@ -1,5 +1,7 @@
 package com.prography.minari.question.controller;
 
+import com.prography.minari.common.response.ApiResponse;
+import com.prography.minari.question.DailyUserQuestionResDto;
 import com.prography.minari.question.controller.docs.QuestionApiDocs;
 import com.prography.minari.question.service.QuestionService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,5 +19,10 @@ public class QuestionController implements QuestionApiDocs {
     @GetMapping("/questions/{questionId}/contents")
     public String getQuestion(@PathVariable Long questionId) {
         return questionService.readContents(questionId);
+    }
+
+    @GetMapping("/users/{userId}/questions")
+    public ApiResponse<DailyUserQuestionResDto> getDailyQuestion(@PathVariable("userId")Long userId){
+        return ApiResponse.success(questionService.readDaily(userId));
     }
 }
