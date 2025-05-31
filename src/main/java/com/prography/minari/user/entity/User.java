@@ -72,6 +72,15 @@ public class User extends BaseTimeEntity {
         return user;
     }
 
+    public void join(Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, PreferredPart preferredPart) {
+        this.isSubscribed = isSubscribed;
+        this.emailSendTime = emailSendTime;
+        this.studyExperienceLevel = studyExperienceLevel;
+        this.workExperienceLevel = workExperienceLevel;
+        this.preferredPart = preferredPart;
+        this.isRegistered = true;
+    }
+
     public List<Domain> getPreferDomains() {
         return preferDomains.stream()
                 .map(PreferDomain::getName)
