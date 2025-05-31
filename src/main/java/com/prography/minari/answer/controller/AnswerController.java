@@ -18,12 +18,11 @@ public class AnswerController implements AnswerApiDocs {
     // STT변환 API
     @PostMapping("/{userId}/questions/{questionId}")
     public ResponseEntity<InterviewContentResponse> convertToText(@RequestParam("file") MultipartFile file,
-                                                                  @PathVariable Long questionId,
-                                                                  @PathVariable Long userId) {
+                                                                  @PathVariable("questionId") Long questionId,
+                                                                  @PathVariable("userId") Long userId) {
         InterviewContentResponse interviewContentResponse = answerService.writeUserSpeech(file, userId, questionId);
         return ResponseEntity.ok(interviewContentResponse);
     }
-
 
     // STT변환진행상태조회
     @GetMapping("/{userId}/questions/{questionId}/status")
