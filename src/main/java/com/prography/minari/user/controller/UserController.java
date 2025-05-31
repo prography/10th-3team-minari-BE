@@ -5,6 +5,8 @@ import com.prography.minari.mail.dto.MailVerificationReqDto;
 import com.prography.minari.mail.service.MailService;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.social.service.SocialService;
+import com.prography.minari.user.dto.UserJoinReqDto;
+import com.prography.minari.user.dto.UserJoinResDto;
 import com.prography.minari.user.dto.UserLoginResDto;
 import com.prography.minari.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,12 @@ public class UserController {
     public ResponseEntity emailVerification(@RequestBody @Validated MailVerificationReqDto mailVerificationReqDto) {
         mailService.sendAuthMail(mailVerificationReqDto);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @PostMapping("/users/join")
+    public ResponseEntity join(@RequestBody @Validated UserJoinReqDto userJoinReqDto) {
+        UserJoinResDto dto = userService.join(userJoinReqDto);
+        return ResponseEntity.ok(ApiResponse.success(dto));
     }
 
     @GetMapping("/users/{id}")
