@@ -1,5 +1,6 @@
 package com.prography.minari.user.dto;
 
+import com.prography.minari.common.entity.Domain;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.enums.EmailSendTime;
 import com.prography.minari.user.enums.ExperienceLevel;
@@ -16,7 +17,7 @@ public record UserJoinResDto(
         EmailSendTime emailSendTime,
         ExperienceLevel studyExperienceLevel,
         ExperienceLevel workExperienceLevel,
-        PreferredPart preferredPart
+        Domain domain
 ) {
     public static UserJoinResDto from(User user) {
         return new UserJoinResDto(
@@ -30,7 +31,7 @@ public record UserJoinResDto(
                 user.getEmailSendTime(),
                 user.getStudyExperienceLevel(),
                 user.getWorkExperienceLevel(),
-                user.getPreferredPart()
+                user.getDomain()
         );
     }
 }

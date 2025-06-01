@@ -33,7 +33,7 @@ public class UserService {
                 userJoinReqDto.emailSendTime(),
                 userJoinReqDto.studyExperienceLevel(),
                 userJoinReqDto.workExperienceLevel(),
-                userJoinReqDto.preferredPart()
+                userJoinReqDto.domain()
         );
 
         return UserJoinResDto.from(joinUser);

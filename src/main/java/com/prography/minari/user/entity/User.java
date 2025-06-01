@@ -55,7 +55,7 @@ public class User extends BaseTimeEntity {
     private ExperienceLevel workExperienceLevel;
 
     @Enumerated(value = STRING)
-    private PreferredPart preferredPart;
+    private Domain domain;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id") // FK를 이쪽에서 관리
@@ -72,12 +72,12 @@ public class User extends BaseTimeEntity {
         return user;
     }
 
-    public void join(Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, PreferredPart preferredPart) {
+    public void join(Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, Domain domain) {
         this.isSubscribed = isSubscribed;
         this.emailSendTime = emailSendTime;
         this.studyExperienceLevel = studyExperienceLevel;
         this.workExperienceLevel = workExperienceLevel;
-        this.preferredPart = preferredPart;
+        this.domain = domain;
         this.isRegistered = true;
     }
 
