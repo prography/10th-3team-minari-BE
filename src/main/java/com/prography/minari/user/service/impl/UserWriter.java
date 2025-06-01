@@ -5,7 +5,6 @@ import com.prography.minari.common.entity.Domain;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.enums.EmailSendTime;
 import com.prography.minari.user.enums.ExperienceLevel;
-import com.prography.minari.user.enums.PreferredPart;
 import com.prography.minari.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;

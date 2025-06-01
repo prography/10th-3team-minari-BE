@@ -4,7 +4,6 @@ import com.prography.minari.common.entity.Domain;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.enums.EmailSendTime;
 import com.prography.minari.user.enums.ExperienceLevel;
-import com.prography.minari.user.enums.PreferredPart;
 
 public record UserJoinResDto(
         Long id,
