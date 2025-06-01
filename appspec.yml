@@ -1,9 +1,5 @@
 version: 0.0
 os: linux
-files:
-  - source: /
-    destination: /home/ubuntu/minari
-
 hooks:
   AfterInstall:
     - location: scripts/deploy.sh
