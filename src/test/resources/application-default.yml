@@ -23,7 +23,9 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
-
+jwt:
+  secret: asdasdasadwdwqdasdasdsadassadasdsadasd
+  expiration: 1213123
 naver:
   client:
     id: test

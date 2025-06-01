@@ -1,11 +1,18 @@
 package com.prography.minari.user.entity;
 
 import com.prography.minari.common.entity.BaseTimeEntity;
+import com.prography.minari.common.entity.Domain;
 import com.prography.minari.social.dto.enums.SocialType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import static jakarta.persistence.EnumType.STRING;
 
@@ -33,6 +40,10 @@ public class User extends BaseTimeEntity {
 
     private Boolean registered;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id") // FK를 이쪽에서 관리
+    private List<PreferDomain> preferDomains = new ArrayList<>();
+
     public static User create(String email, SocialType socialType, Long socialId, String name, String image) {
         User user = new User();
         user.email = email;
@@ -44,4 +55,15 @@ public class User extends BaseTimeEntity {
         return user;
     }
 
+    public List<Domain> getPreferDomains() {
+        return preferDomains.stream()
+                .map(PreferDomain::getName)
+                .toList();
+    }
+
+    public Long getDaysSinceJoined() {
+        LocalDate now = LocalDateTime.now().toLocalDate();
+        LocalDate created = getCreatedDateTime().toLocalDate();
+        return ChronoUnit.DAYS.between(created, now);
+    }
 }
