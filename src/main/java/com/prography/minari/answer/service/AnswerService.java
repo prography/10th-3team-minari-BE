@@ -32,19 +32,15 @@ public class AnswerService {
 
     public InterviewContentResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
         User user = userReader.read(userId);
-        String speech = sttProcessor.convertToText(file);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
+        String speech = sttProcessor.convertToText(file);
         answerWriter.write(Answer.builder()
                 .reply(speech)
                 .user(user)
                 .question(question)
                 .build());
-        return InterviewContentResponse.builder()
-                .answer(question.getAnswer())
-                .reply(speech)
-                .question(question.getContent())
-                .build();
+        return InterviewContentResponse.of(question.getAnswer(), question.getContent(), speech);
     }
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {

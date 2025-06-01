@@ -50,6 +50,8 @@ class SttApiClientTest {
         MultipartFile mockFile = new MockMultipartFile(
                 "file", "test.wav", "audio/wav", "dummy audio".getBytes()
         );
+
+        byte[] bytes = mockFile.getBytes();
         String expectedText = "{\"text\":\"테스트입니다\"}";
 
         mockWebServer.enqueue(new MockResponse()
@@ -60,7 +62,7 @@ class SttApiClientTest {
                 .setBody(expectedText));
 
         // when
-        String result = sttApiClient.convertToText(mockFile);
+        String result = sttApiClient.convertToText(bytes);
 
         // then
         assertEquals(expectedText, result);
@@ -78,7 +80,7 @@ class SttApiClientTest {
 
     @Test
     @DisplayName("")
-    void STT호출테스트_API_400_서버에러_테스트() {
+    void STT호출테스트_API_400_서버에러_테스트() throws IOException {
         // given
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(400)
@@ -88,10 +90,10 @@ class SttApiClientTest {
         MultipartFile mockFile = new MockMultipartFile(
                 "file", "test.wav", "audio/wav", "dummy audio".getBytes()
         );
-
+        byte[] bytes = mockFile.getBytes();
         // when & then
         RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                sttApiClient.convertToText(mockFile)
+                sttApiClient.convertToText(bytes)
         );
         assertTrue(ex.getMessage().contains("STT API 호출 "));
     }

@@ -1,6 +1,7 @@
 package com.prography.minari.answer.service.impl;
 
 
+import com.prography.minari.answer.service.dto.SttResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -24,9 +25,9 @@ public class NaverApiClient implements SttApiClient {
 
 
     @Override
-    public String convertToText(MultipartFile voiceFile) {
+    public String convertToText(byte[] voiceFile) {
         try {
-            return webClient.post()
+            SttResponseDto.Naver block = webClient.post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/recog/v1/stt")
                             .queryParam("lang", "Kor")
@@ -34,10 +35,11 @@ public class NaverApiClient implements SttApiClient {
                     .header("X-NCP-APIGW-API-KEY-ID", clientId)
                     .header("X-NCP-APIGW-API-KEY", clientSecret)
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .bodyValue(voiceFile.getBytes())
+                    .bodyValue(voiceFile)
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToMono(SttResponseDto.Naver.class)
                     .block();
+            return block.getText();
         } catch (Exception e) {
             throw new RuntimeException("STT API 호출 실패", e);
         }
