@@ -1,7 +1,7 @@
 package com.prography.minari.question.controller;
 
 import com.prography.minari.common.response.ApiResponse;
-import com.prography.minari.question.DailyUserQuestionResDto;
+import com.prography.minari.question.dto.DailyUserQuestionResDto;
 import com.prography.minari.question.controller.docs.QuestionApiDocs;
 import com.prography.minari.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;

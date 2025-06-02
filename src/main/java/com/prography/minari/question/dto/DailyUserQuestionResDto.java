@@ -1,4 +1,4 @@
-package com.prography.minari.question;
+package com.prography.minari.question.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
