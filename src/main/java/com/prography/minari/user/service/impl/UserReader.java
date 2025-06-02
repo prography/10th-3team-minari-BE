@@ -8,10 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @ImplService
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserReader {
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
     public User read(Long userId) {
         return userRepository.findById(userId).orElseThrow(()->new RuntimeException("User not found"));
     }

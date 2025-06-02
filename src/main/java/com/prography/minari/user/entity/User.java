@@ -3,6 +3,8 @@ package com.prography.minari.user.entity;
 import com.prography.minari.common.entity.BaseTimeEntity;
 import com.prography.minari.common.entity.Domain;
 import com.prography.minari.social.dto.enums.SocialType;
+import com.prography.minari.user.enums.EmailSendTime;
+import com.prography.minari.user.enums.ExperienceLevel;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -38,7 +40,21 @@ public class User extends BaseTimeEntity {
 
     private String image;
 
-    private Boolean registered;
+    private boolean isRegistered;
+
+    private boolean isSubscribed;
+
+    @Enumerated(value = STRING)
+    private EmailSendTime emailSendTime;
+
+    @Enumerated(value = STRING)
+    private ExperienceLevel studyExperienceLevel;
+
+    @Enumerated(value = STRING)
+    private ExperienceLevel workExperienceLevel;
+
+    @Enumerated(value = STRING)
+    private Domain domain;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id") // FK를 이쪽에서 관리
@@ -51,8 +67,17 @@ public class User extends BaseTimeEntity {
         user.socialId = socialId;
         user.name = name;
         user.image = image;
-        user.registered = false;
+        user.isRegistered = false;
         return user;
+    }
+
+    public void join(Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, Domain domain) {
+        this.isSubscribed = isSubscribed;
+        this.emailSendTime = emailSendTime;
+        this.studyExperienceLevel = studyExperienceLevel;
+        this.workExperienceLevel = workExperienceLevel;
+        this.domain = domain;
+        this.isRegistered = true;
     }
 
     public List<Domain> getPreferDomains() {
