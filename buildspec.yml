@@ -9,7 +9,9 @@ phases:
   pre_build:
     commands:
       - echo "✅ SSM에서 ECR URI 조회"
-      - export ecr_uri=$(aws.ssm get-parameter --name "/minari/prod/ECR_URI" --query "Parameter.Value" --output text)
+      - export ecr_uri=$(aws ssm get-parameter --name "/minari/prod/ECR_URI" --query "Parameter.Value" --output text)
+      - echo "📡 ECR URI: ${ecr_uri}"
+      - if [ -z "$ecr_uri" ]; then echo "❌ ecr_uri is empty! (SSM 접근 실패 또는 파라미터 없음)"; exit 1; fi
       - echo "✅ ECR 로그인"
       - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ecr_uri}
       - echo "📦 빌드된 JAR 확인"
