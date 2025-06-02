@@ -40,9 +40,9 @@ public class User extends BaseTimeEntity {
 
     private String image;
 
-    private Boolean isRegistered;
+    private boolean isRegistered;
 
-    private Boolean isSubscribed;
+    private boolean isSubscribed;
 
     @Enumerated(value = STRING)
     private EmailSendTime emailSendTime;
