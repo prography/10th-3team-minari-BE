@@ -9,11 +9,13 @@ phases:
   pre_build:
     commands:
       - echo "✅ SSM에서 ECR URI 조회"
-      - export ecr_uri=$(aws ssm get-parameter --name "/minari/prod/ECR_URI" --query "Parameter.Value" --output text)
+      - export ecr_uri=$(aws.ssm get-parameter --name "/minari/prod/ECR_URI" --query "Parameter.Value" --output text)
       - echo "✅ ECR 로그인"
       - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${ecr_uri}
       - echo "📦 빌드된 JAR 확인"
       - ls -alh build/libs
+      - echo "🔐 scripts/deploy.sh 실행 권한 부여"
+      - chmod +x scripts/deploy.sh
 
   build:
     commands:
