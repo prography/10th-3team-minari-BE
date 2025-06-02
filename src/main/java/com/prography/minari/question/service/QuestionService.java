@@ -3,7 +3,7 @@ package com.prography.minari.question.service;
 import com.prography.minari.common.entity.Domain;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
-import com.prography.minari.question.DailyUserQuestionResDto;
+import com.prography.minari.question.dto.DailyUserQuestionResDto;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
@@ -11,7 +11,6 @@ import com.prography.minari.user.service.impl.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
