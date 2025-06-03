@@ -1,16 +1,15 @@
 version: 0.0
 os: linux
 files:
-  - source: /
-    destination: /home/ubuntu
+  - source: scripts
+    destination: /home/ubuntu/scripts
 
 hooks:
+  BeforeInstall:
+    - location: scripts/set-permissions.sh
+      timeout: 60
+      runas: ubuntu
   AfterInstall:
     - location: scripts/deploy.sh
       timeout: 300
-      runas: ubuntu
-
-  AfterAllowTraffic:
-    - location: scripts/after_deploy.sh
-      timeout: 60
       runas: ubuntu
