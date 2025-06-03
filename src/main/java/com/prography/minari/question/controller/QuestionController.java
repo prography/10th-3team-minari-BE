@@ -1,6 +1,6 @@
 package com.prography.minari.question.controller;
 
-import com.prography.minari.common.response.ApiResponse;
+import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.question.dto.DailyUserQuestionResDto;
 import com.prography.minari.question.controller.docs.QuestionApiDocs;
 import com.prography.minari.question.service.QuestionService;
@@ -19,17 +19,17 @@ public class QuestionController implements QuestionApiDocs {
     private final QuestionService questionService;
 
     @GetMapping("/questions/{questionId}/contents")
-    public String getQuestion(@PathVariable Long questionId) {
-        return questionService.readContents(questionId);
+    public CommonResponse<String> getQuestion(@PathVariable Long questionId) {
+        return CommonResponse.success(questionService.readContents(questionId));
     }
 
     @GetMapping("/users/{userId}/questions")
-    public ApiResponse<DailyUserQuestionResDto> getDailyQuestion(@PathVariable("userId") Long userId) {
-        return ApiResponse.success(questionService.readDaily(userId));
+    public CommonResponse<String> getDailyQuestion(@PathVariable("userId") Long userId) {
+        return CommonResponse.success(questionService.readDaily(userId));
     }
 
     @GetMapping("/questions/{questionId}/tag")
-    public ApiResponse<List<String>> getTags(@PathVariable("questionId") Long questionId) {
-        return ApiResponse.success(questionService.readTags(questionId));
+    public CommonResponse<List<String>> getTags(@PathVariable("questionId") Long questionId) {
+        return CommonResponse.success(questionService.readTags(questionId));
     }
 }

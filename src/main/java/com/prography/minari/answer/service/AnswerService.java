@@ -30,7 +30,7 @@ public class AnswerService {
     private final UserReader userReader;
     private final QuestionReader questionReader;
 
-    public InterviewContentResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
+    public void writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
@@ -40,7 +40,6 @@ public class AnswerService {
                 .user(user)
                 .question(question)
                 .build());
-        return InterviewContentResponse.of(question.getAnswer(), question.getContent(), speech);
     }
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {
@@ -51,5 +50,13 @@ public class AnswerService {
         return UserAnswerStatusResponse.builder()
                 .status(sttStatus)
                 .build();
+    }
+
+    public InterviewContentResponse getAnswer(Long questionId, Long userId) {
+        Question question = questionReader.read(questionId)
+                .orElseThrow(()->new ApiException(ErrorCode.ENTITY_NOT_FOUND));
+        Answer answer = answerReader.readByUserIdAndQuestionId(userId, questionId)
+                .orElseThrow(()->new ApiException(ErrorCode.ENTITY_NOT_FOUND));
+        return InterviewContentResponse.of(question.getAnswer(), question.getContent(), answer.getReply());
     }
 }

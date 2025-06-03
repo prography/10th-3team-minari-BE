@@ -23,10 +23,33 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
+  mail:
+    host: smtp.gmail.com       # SMTP 서버 호스트
+    port: 587                  # SMTP 서버 포트
+    username: testestest    # SMTP 서버 로그인 아이디
+    password: testestest # SMTP 서버 로그인 비밀번호
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+      protocol: smtp
+      default-encoding: UTF-8
+  thymeleaf:
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 jwt:
-  secret: asdasdasadwdwqdasdasdsadassadasdsadasd
-  expiration: 1213123
+  secret: jwtsecretjwtsecretjwtsecretjwtsecretjwtsecret
+  expiration: 3600000
 naver:
   client:
-    id: test
-    secret: test
+    id: thisisnotidㅋ
+    secret: thisisnotsecretㅋ

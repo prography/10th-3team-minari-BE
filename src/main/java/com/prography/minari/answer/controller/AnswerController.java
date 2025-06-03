@@ -4,8 +4,8 @@ import com.prography.minari.answer.controller.docs.AnswerApiDocs;
 import com.prography.minari.answer.service.AnswerService;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
+import com.prography.minari.common.response.CommonResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,18 +17,24 @@ public class AnswerController implements AnswerApiDocs {
 
     // STT변환 API
     @PostMapping("/{userId}/questions/{questionId}")
-    public ResponseEntity<InterviewContentResponse> convertToText(@RequestParam("file") MultipartFile file,
-                                                                  @PathVariable("questionId") Long questionId,
-                                                                  @PathVariable("userId") Long userId) {
-        InterviewContentResponse interviewContentResponse = answerService.writeUserSpeech(file, userId, questionId);
-        return ResponseEntity.ok(interviewContentResponse);
+    public CommonResponse<String> convertToText(@RequestParam("file") MultipartFile file,
+                                                @PathVariable("questionId") Long questionId,
+                                                @PathVariable("userId") Long userId) {
+        answerService.writeUserSpeech(file, userId, questionId);
+        return CommonResponse.ok();
     }
 
     // STT변환진행상태조회
     @GetMapping("/{userId}/questions/{questionId}/status")
-    public ResponseEntity<UserAnswerStatusResponse> getAnswerStatus(@PathVariable Long questionId,
+    public CommonResponse<UserAnswerStatusResponse> getAnswerStatus(@PathVariable Long questionId,
                                                                     @PathVariable Long userId) {
         UserAnswerStatusResponse statusResponse = answerService.getSttProcessStatus(userId, questionId);
-        return ResponseEntity.ok(statusResponse);
+        return CommonResponse.success(statusResponse);
+    }
+
+    @GetMapping("/{userId}/questions/{questionId}")
+    public CommonResponse<InterviewContentResponse> getAnswer(@PathVariable("questionId") Long questionId,
+                                                              @PathVariable("userId") Long userId){
+        return CommonResponse.success(answerService.getAnswer(questionId,userId));
     }
 }

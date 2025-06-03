@@ -1,6 +1,6 @@
 package com.prography.minari.user.controller;
 
-import com.prography.minari.common.response.ApiResponse;
+import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.mail.dto.MailVerificationReqDto;
 import com.prography.minari.mail.service.MailService;
 import com.prography.minari.social.dto.enums.SocialType;
@@ -33,13 +33,13 @@ public class UserController {
     @PostMapping("/users/mail-verification")
     public ResponseEntity emailVerification(@RequestBody @Validated MailVerificationReqDto mailVerificationReqDto) {
         mailService.sendAuthMail(mailVerificationReqDto);
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return ResponseEntity.ok(CommonResponse.success(null));
     }
 
     @PostMapping("/users/join")
     public ResponseEntity join(@RequestBody @Validated UserJoinReqDto userJoinReqDto) {
         UserJoinResDto dto = userService.join(userJoinReqDto);
-        return ResponseEntity.ok(ApiResponse.success(dto));
+        return ResponseEntity.ok(CommonResponse.success(dto));
     }
 
     @GetMapping("/users/{id}")

@@ -30,13 +30,13 @@ public class QuestionService {
         return question.getShuffledTags(3);
     }
 
-    public DailyUserQuestionResDto readDaily(Long userId) {
+    public String readDaily(Long userId) {
         User user = userReader.read(userId);
         Long daysBetween = user.getDaysSinceJoined();
         List<Domain> domains = user.getPreferDomains();
         Optional<Question> question = questionReader.readDaily(user, domains, daysBetween);
         return question
-                .map(q -> new DailyUserQuestionResDto(q.getId(), q.getContent()))
+                .map(Question::getContent)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
     }
 }

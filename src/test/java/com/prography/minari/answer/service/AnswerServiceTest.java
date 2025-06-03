@@ -6,6 +6,7 @@ import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.answer.repository.AnswerRepository;
 import com.prography.minari.answer.service.dto.SttStatus;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
+import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.repository.QuestionRepository;
 import com.prography.minari.user.entity.User;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -117,5 +119,28 @@ class AnswerServiceTest {
 
         // then
         assertAll(() -> assertEquals(SttStatus.PROCESS, status.getStatus()));
+    }
+
+    @Test
+    void 사용자_정답조회테스트() {
+        // given
+        User user = fixtureMonkey.giveMeOne(User.class);
+        User saveUser = userRepository.save(user);
+        Question question = fixtureMonkey.giveMeOne(Question.class);
+        Question saveQuestion = questionRepository.save(question);
+        Answer answer = fixtureMonkey.giveMeBuilder(Answer.class)
+                .set("question", saveQuestion)
+                .set("user", saveUser)
+                .setNotNull("reply")
+                .sample();
+        answerRepository.save(answer);
+
+        // when
+        InterviewContentResponse actual = answerService.getAnswer(saveQuestion.getId(), saveUser.getId());
+        // then
+        assertAll(
+                () -> assertThat(actual.getReply()).isEqualTo(answer.getReply())
+        );
+
     }
 }
