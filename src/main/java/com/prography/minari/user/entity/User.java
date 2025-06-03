@@ -71,7 +71,8 @@ public class User extends BaseTimeEntity {
         return user;
     }
 
-    public void join(Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, Domain domain) {
+    public void join(String email, Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, Domain domain) {
+        this.email = email;
         this.isSubscribed = isSubscribed;
         this.emailSendTime = emailSendTime;
         this.studyExperienceLevel = studyExperienceLevel;

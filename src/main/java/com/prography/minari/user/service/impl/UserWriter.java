@@ -16,8 +16,8 @@ public class UserWriter {
 
     private final UserRepository userRepository;
 
-    public User join(User user, Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, Domain domain) {
-        user.join(isSubscribed, emailSendTime, studyExperienceLevel, workExperienceLevel, domain);
+    public User join(User user, String email, Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, Domain domain) {
+        user.join(email, isSubscribed, emailSendTime, studyExperienceLevel, workExperienceLevel, domain);
         return userRepository.save(user);
     }
 
