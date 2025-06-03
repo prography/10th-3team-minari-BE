@@ -19,12 +19,12 @@ public class QuestionController implements QuestionApiDocs {
     private final QuestionService questionService;
 
     @GetMapping("/questions/{questionId}/contents")
-    public String getQuestion(@PathVariable Long questionId) {
-        return questionService.readContents(questionId);
+    public CommonResponse<String> getQuestion(@PathVariable Long questionId) {
+        return CommonResponse.success(questionService.readContents(questionId));
     }
 
     @GetMapping("/users/{userId}/questions")
-    public CommonResponse<DailyUserQuestionResDto> getDailyQuestion(@PathVariable("userId") Long userId) {
+    public CommonResponse<String> getDailyQuestion(@PathVariable("userId") Long userId) {
         return CommonResponse.success(questionService.readDaily(userId));
     }
 
