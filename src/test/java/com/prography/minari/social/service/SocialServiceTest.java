@@ -80,7 +80,7 @@ class SocialServiceTest {
                 .sample();
 
         User returnUser = User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image());
-        returnUser.join(true, AM_08, UNDER_1YEAR, NONE, BACKEND);
+        returnUser.join("minari@gmail.com", true, AM_08, UNDER_1YEAR, NONE, BACKEND);
 
         when(userRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, userInfoDto.socialId()))
                 .thenReturn(Optional.of(returnUser));
