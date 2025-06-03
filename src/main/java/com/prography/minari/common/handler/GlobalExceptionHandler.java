@@ -2,10 +2,7 @@ package com.prography.minari.common.handler;
 
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
-import com.prography.minari.common.response.ApiResponse;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import com.prography.minari.common.response.CommonResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -13,15 +10,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.security.SignatureException;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity handleApiException(ApiException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.fail(e.getErrorCode(), null));
+                .body(CommonResponse.fail(e.getErrorCode(), null));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -31,7 +26,7 @@ public class GlobalExceptionHandler {
         String errorMessage = (fieldError != null) ? fieldError.getDefaultMessage() : "유효성 검사에 실패했습니다.";
 
         return ResponseEntity.badRequest()
-                .body(ApiResponse.fail(ErrorCode.METHOD_ARGUMENT_NOT_VALIDATION_EXCEPTION.getCode(), errorMessage));
+                .body(CommonResponse.fail(ErrorCode.METHOD_ARGUMENT_NOT_VALIDATION_EXCEPTION.getCode(), errorMessage));
     }
 
 }
