@@ -30,6 +30,7 @@ phases:
       - docker push ${ecr_uri}:latest
 
 artifacts:
+  base-directory: .
   files:
     - appspec.yml
     - scripts/**/*
