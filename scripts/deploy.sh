@@ -17,6 +17,10 @@ export JWT_SECRET=$(aws ssm get-parameter --name "/minari/jwt/secret" --with-dec
 
 export ECR_URI=$(aws ssm get-parameter --name "/minari/prod/ECR_URI" --query "Parameter.Value" --output text)
 
+export MAIL_USERNAME=$(aws ssm get-parameter --name "/minari/mail/username" --query "Parameter.Value" --output text)
+export MAIL_PASSWORD=$(aws ssm get-parameter --name "/minari/mail/password" --query "Parameter.Value" --output text)
+
+
 echo "🔑 ECR 로그인"
 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $ECR_URI
 
@@ -38,5 +42,7 @@ docker run -d --name minari \
   -e NAVER_CLIENT_ID=$NAVER_CLIENT_ID \
   -e NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET \
   -e JWT_SECRET=$JWT_SECRET \
+  -e MAIL_USERNAME=$MAIL_USERNAME \
+  -e MAIL_PASSWORD=$MAIL_PASSWORD \
   -p 8080:8080 \
   $ECR_URI:latest
