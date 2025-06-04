@@ -43,7 +43,7 @@ public interface QuestionApiDocs {
             )
     })
     @GetMapping("/users/{userId}/questions")
-    CommonResponse<String> getDailyQuestion(
+    CommonResponse<Long> getDailyQuestion(
             @Parameter(description = "사용자 ID", required = true)
             @PathVariable("userId") Long userId
     );
