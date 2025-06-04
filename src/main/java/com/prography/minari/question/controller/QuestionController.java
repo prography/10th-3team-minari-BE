@@ -24,7 +24,7 @@ public class QuestionController implements QuestionApiDocs {
     }
 
     @GetMapping("/users/{userId}/questions")
-    public CommonResponse<String> getDailyQuestion(@PathVariable("userId") Long userId) {
+    public CommonResponse<Long> getDailyQuestion(@PathVariable("userId") Long userId) {
         return CommonResponse.success(questionService.readDaily(userId));
     }
 

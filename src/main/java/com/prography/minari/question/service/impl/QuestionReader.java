@@ -24,6 +24,7 @@ public class QuestionReader {
     }
 
     public Optional<Question> readDaily(User user, List<Domain> domains, long day) {
-        return Optional.ofNullable(questionRepository.findDailyUnsolvedQuestionByDomains(user.getId(), domains, PageRequest.of((int) day, 1)).getContent().getFirst());
+        return Optional.ofNullable(questionRepository.findDailyUnsolvedQuestionByDomains(user.getId(), domains, PageRequest.of((int) day, 1))
+                .getContent().getFirst());
     }
 }
