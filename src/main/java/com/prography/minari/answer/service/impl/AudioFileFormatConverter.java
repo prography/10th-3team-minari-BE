@@ -24,12 +24,10 @@ public class AudioFileFormatConverter {
     private static final String OUTPUT_DIR = BASE_DIR + "/output/";
 
     public byte[] convertToWavAsByte(MultipartFile file) {
-        // 0. 디렉토리 경로 설정
         File inputDir = new File(INPUT_DIR);
         File outputDir = new File(OUTPUT_DIR);
 
         try {
-            // 1. 디렉토리 존재 확인 및 생성
             if (!inputDir.exists() && !inputDir.mkdirs()) {
                 log.error("입력 디렉토리를 생성할 수 없습니다: {}", inputDir.getAbsolutePath());
                 throw new ApiException(INTERNAL_SERVER_ERROR);
@@ -39,7 +37,6 @@ public class AudioFileFormatConverter {
                 throw new ApiException(INTERNAL_SERVER_ERROR);
             }
 
-            // 2. 파일명 검증 및 설정
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null || !originalFilename.endsWith(".webm")) {
                 log.warn("지원하지 않는 파일 형식: {}", originalFilename);
@@ -53,11 +50,9 @@ public class AudioFileFormatConverter {
             File inputFile = new File(inputDir, inputFileName);
             File outputFile = new File(outputDir, outputFileName);
 
-            // 3. 업로드 파일 저장
             file.transferTo(inputFile);
             log.info("업로드 파일 저장 완료: {}", inputFile.getAbsolutePath());
 
-            // 4. ffmpeg 명령 실행
             String cmd = String.format(
                     "docker run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s",
                     new File(".").getAbsolutePath(), inputFileName, outputFileName
@@ -82,7 +77,6 @@ public class AudioFileFormatConverter {
                 throw new ApiException(INTERNAL_SERVER_ERROR);
             }
 
-            // 5. 변환된 파일 읽기
             byte[] wavData = Files.readAllBytes(outputFile.toPath());
             log.info("WAV 변환 완료: {} ({} bytes)", outputFile.getName(), wavData.length);
 
@@ -92,11 +86,10 @@ public class AudioFileFormatConverter {
             log.error("I/O 오류 발생: {}", e.getMessage(), e);
             throw new ApiException(INTERNAL_SERVER_ERROR);
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // 인터럽트 상태 복원
+            Thread.currentThread().interrupt();
             log.error("ffmpeg 프로세스 대기 중 인터럽트 발생", e);
             throw new ApiException(INTERNAL_SERVER_ERROR);
         } finally {
-            // 안전하게 임시 파일 삭제
             Arrays.stream(Objects.requireNonNull(inputDir.listFiles()))
                     .filter(f -> f.getName().endsWith(".webm"))
                     .forEach(f -> {

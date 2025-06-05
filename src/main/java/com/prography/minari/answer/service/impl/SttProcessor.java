@@ -58,9 +58,9 @@ public class SttProcessor {
         try (AudioInputStream fullStream = AudioSystem.getAudioInputStream(
                 new BufferedInputStream(new ByteArrayInputStream(file)))) {
 
-            float frameRate = format.getFrameRate();     // 예: 44100.0
-            int frameSize = format.getFrameSize();       // 예: 4 (16bit stereo)
-            int bytesPerMinute = (int) (frameRate * frameSize * 60); // 1분 분량
+            float frameRate = format.getFrameRate();
+            int frameSize = format.getFrameSize();
+            int bytesPerMinute = (int) (frameRate * frameSize * 60);
 
             log.info("오디오 분할 시작 - frameRate: {}, frameSize: {}, bytesPerMinute: {}, 총 파일 크기: {} bytes",
                     frameRate, frameSize, bytesPerMinute, file.length);
@@ -75,7 +75,6 @@ public class SttProcessor {
             while ((bytesRead = fullStream.read(buffer, offset, buffer.length - offset)) != -1) {
                 offset += bytesRead;
 
-                // 1분 분량이 꽉 찼을 때만 추가
                 if (offset == buffer.length) {
                     chunks.add(Arrays.copyOf(buffer, buffer.length));
                     log.debug("1분 청크 분리 완료: {} bytes (chunk #{})", buffer.length, ++chunkCount);
@@ -83,7 +82,6 @@ public class SttProcessor {
                 }
             }
 
-            // 남은 데이터도 마지막 청크로 추가
             if (offset > 0) {
                 chunks.add(Arrays.copyOf(buffer, offset));
                 log.debug("마지막 청크 분리 완료: {} bytes (chunk #{})", offset, ++chunkCount);
