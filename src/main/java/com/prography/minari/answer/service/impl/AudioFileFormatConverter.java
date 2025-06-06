@@ -20,16 +20,19 @@ import static com.prography.minari.common.execption.ErrorCode.INTERNAL_SERVER_ER
 @ImplService
 @RequiredArgsConstructor
 public class AudioFileFormatConverter {
+
     @Value("${spring.profiles.active:local}")
     private String activeProfile;
 
-    private static final String BASE_DIR = System.getProperty("user.dir");
-    private static final String INPUT_DIR = BASE_DIR + "/input/";
-    private static final String OUTPUT_DIR = BASE_DIR + "/output/";
+    private static final String CONTAINER_INPUT_DIR = "/input/";
+    private static final String CONTAINER_OUTPUT_DIR = "/output/";
+
+    private static final String LOCAL_INPUT_DIR = System.getProperty("user.dir") + "/input/";
+    private static final String LOCAL_OUTPUT_DIR = System.getProperty("user.dir") + "/output/";
 
     public byte[] convertToWavAsByte(MultipartFile file) {
-        File inputDir = new File(INPUT_DIR);
-        File outputDir = new File(OUTPUT_DIR);
+        File inputDir = new File(getInputDir());
+        File outputDir = new File(getOutputDir());
 
         try {
             if (!inputDir.exists() && !inputDir.mkdirs()) {
@@ -58,8 +61,8 @@ public class AudioFileFormatConverter {
             log.info("업로드 파일 저장 완료: {}", inputFile.getAbsolutePath());
 
             String cmd = String.format(
-                    getFFMPEGDockerPathByProfile(),
-                    new File(".").getAbsolutePath(), inputFileName, outputFileName
+                    getFFMPEGDockerCmdTemplate(),
+                    getVolumeMountBaseDir(), inputFileName, outputFileName
             );
 
             log.info("실행할 ffmpeg 명령어: {}", cmd);
@@ -94,22 +97,36 @@ public class AudioFileFormatConverter {
             log.error("ffmpeg 프로세스 대기 중 인터럽트 발생", e);
             throw new ApiException(INTERNAL_SERVER_ERROR);
         } finally {
-            Arrays.stream(Objects.requireNonNull(inputDir.listFiles()))
-                    .filter(f -> f.getName().endsWith(".webm"))
-                    .forEach(f -> {
-                        if (f.delete()) log.debug("입력 파일 삭제 완료: {}", f.getName());
-                    });
-            Arrays.stream(Objects.requireNonNull(outputDir.listFiles()))
-                    .filter(f -> f.getName().endsWith(".wav"))
-                    .forEach(f -> {
-                        if (f.delete()) log.debug("출력 파일 삭제 완료: {}", f.getName());
-                    });
+            deleteTempFiles(inputDir, ".webm");
+            deleteTempFiles(outputDir, ".wav");
         }
     }
-    private String getFFMPEGDockerPathByProfile() {
-        if(activeProfile.equals("local")) {
-            return "docker run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s";
-        }
-        return "/usr/bin/docker run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s";
+
+    private String getInputDir() {
+        return isLocalProfile() ? LOCAL_INPUT_DIR: CONTAINER_INPUT_DIR ;
+    }
+
+    private String getOutputDir() {
+        return isLocalProfile() ?  LOCAL_OUTPUT_DIR: CONTAINER_OUTPUT_DIR;
+    }
+
+    private String getVolumeMountBaseDir() {
+        return isLocalProfile() ? "." : System.getProperty("user.dir");
+    }
+
+    private boolean isLocalProfile() {
+        return "local".equals(activeProfile);
+    }
+
+    private String getFFMPEGDockerCmdTemplate() {
+        return "docker run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s";
+    }
+
+    private void deleteTempFiles(File dir, String extension) {
+        Arrays.stream(Objects.requireNonNull(dir.listFiles()))
+                .filter(f -> f.getName().endsWith(extension))
+                .forEach(f -> {
+                    if (f.delete()) log.debug("파일 삭제 완료: {}", f.getName());
+                });
     }
 }
