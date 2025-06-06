@@ -4,6 +4,7 @@ import com.prography.minari.common.aop.ImplService;
 import com.prography.minari.common.execption.ApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -19,6 +20,9 @@ import static com.prography.minari.common.execption.ErrorCode.INTERNAL_SERVER_ER
 @ImplService
 @RequiredArgsConstructor
 public class AudioFileFormatConverter {
+    @Value("${spring.profiles.active:local}")
+    private String activeProfile;
+
     private static final String BASE_DIR = System.getProperty("user.dir");
     private static final String INPUT_DIR = BASE_DIR + "/input/";
     private static final String OUTPUT_DIR = BASE_DIR + "/output/";
@@ -54,7 +58,7 @@ public class AudioFileFormatConverter {
             log.info("업로드 파일 저장 완료: {}", inputFile.getAbsolutePath());
 
             String cmd = String.format(
-                    "docker run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s",
+                    getFFMPEGDockerPathByProfile(),
                     new File(".").getAbsolutePath(), inputFileName, outputFileName
             );
 
@@ -101,5 +105,11 @@ public class AudioFileFormatConverter {
                         if (f.delete()) log.debug("출력 파일 삭제 완료: {}", f.getName());
                     });
         }
+    }
+    private String getFFMPEGDockerPathByProfile() {
+        if(activeProfile.equals("local")) {
+            return "docker run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s";
+        }
+        return "/usr/bin/docker run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s";
     }
 }
