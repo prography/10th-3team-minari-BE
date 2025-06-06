@@ -3,9 +3,11 @@ package com.prography.minari.user.dto;
 import com.prography.minari.common.entity.Domain;
 import com.prography.minari.user.enums.EmailSendTime;
 import com.prography.minari.user.enums.ExperienceLevel;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
 public record UserJoinReqDto(
+        @Email String email,
         @NotNull Long userId,
         @NotNull Boolean isSubscribed,
         @NotNull EmailSendTime emailSendTime,

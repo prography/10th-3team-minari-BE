@@ -29,6 +29,7 @@ public class UserService {
         // 회원가입
         User joinUser = userWriter.join(
                 findUser,
+                userJoinReqDto.email(),
                 userJoinReqDto.isSubscribed(),
                 userJoinReqDto.emailSendTime(),
                 userJoinReqDto.studyExperienceLevel(),
