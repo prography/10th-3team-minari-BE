@@ -24,8 +24,8 @@ public class AudioFileFormatConverter {
     @Value("${spring.profiles.active:local}")
     private String activeProfile;
 
-    private static final String CONTAINER_INPUT_DIR = "/input/";
-    private static final String CONTAINER_OUTPUT_DIR = "/output/";
+    private static final String CONTAINER_INPUT_DIR = "/data/input/";
+    private static final String CONTAINER_OUTPUT_DIR = "/data/output/";
 
     private static final String LOCAL_INPUT_DIR = System.getProperty("user.dir") + "/input/";
     private static final String LOCAL_OUTPUT_DIR = System.getProperty("user.dir") + "/output/";
@@ -118,8 +118,12 @@ public class AudioFileFormatConverter {
         return "local".equals(activeProfile);
     }
 
+    private String dockerPath() {
+        return isLocalProfile() ? "docker" : "/usr/bin/docker";
+    }
+
     private String getFFMPEGDockerCmdTemplate() {
-        return "docker run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s";
+        return dockerPath() + " run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s";
     }
 
     private void deleteTempFiles(File dir, String extension) {
