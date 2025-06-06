@@ -62,7 +62,7 @@ public class AudioFileFormatConverter {
                     new File(".").getAbsolutePath(), inputFileName, outputFileName
             );
 
-            log.debug("실행할 ffmpeg 명령어: {}", cmd);
+            log.info("실행할 ffmpeg 명령어: {}", cmd);
 
             ProcessBuilder pb = new ProcessBuilder("bash", "-c", cmd);
             pb.redirectErrorStream(true);
@@ -71,7 +71,7 @@ public class AudioFileFormatConverter {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    log.debug("ffmpeg >> {}", line);
+                    log.info("ffmpeg >> {}", line);
                 }
             }
 
