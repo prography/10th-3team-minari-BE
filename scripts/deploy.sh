@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+echo "🗑️ 모든 도커 이미지 삭제 시작"
+docker ps -aq | xargs -r docker rm -f
+docker images -aq | xargs -r docker rmi -f
+echo "✅ 도커 이미지 삭제 완료"
+
 echo "🔐 SSM에서 설정값 조회"
 export SPRING_DATASOURCE_URL=$(aws ssm get-parameter --name "/minari/db/url" --with-decryption --query "Parameter.Value" --output text)
 export SPRING_DATASOURCE_USERNAME=$(aws ssm get-parameter --name "/minari/db/username" --with-decryption --query "Parameter.Value" --output text)
@@ -20,14 +25,13 @@ export ECR_URI=$(aws ssm get-parameter --name "/minari/prod/ECR_URI" --query "Pa
 export MAIL_USERNAME=$(aws ssm get-parameter --name "/minari/mail/username" --query "Parameter.Value" --output text)
 export MAIL_PASSWORD=$(aws ssm get-parameter --name "/minari/mail/password" --query "Parameter.Value" --output text)
 
-
 echo "🔑 ECR 로그인"
 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $ECR_URI
 
 echo "📥 도커 이미지 Pull"
 docker pull $ECR_URI:latest
 
-echo "ffmpeg 도커이미지 pull"
+echo "🎞️ ffmpeg 도커 이미지 pull"
 docker run -it --rm linuxserver/ffmpeg:latest -version
 
 echo "🧼 기존 컨테이너 정리"
