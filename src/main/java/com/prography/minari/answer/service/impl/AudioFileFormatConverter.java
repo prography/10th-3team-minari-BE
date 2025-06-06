@@ -93,8 +93,8 @@ public class AudioFileFormatConverter {
             log.error("ffmpeg 프로세스 대기 중 인터럽트 발생", e);
             throw new ApiException(INTERNAL_SERVER_ERROR);
         } finally {
-            /*deleteTempFiles(inputDir, ".webm");
-            deleteTempFiles(outputDir, ".wav");*/
+            deleteTempFiles(inputDir, ".webm");
+            deleteTempFiles(outputDir, ".wav");
         }
     }
 
