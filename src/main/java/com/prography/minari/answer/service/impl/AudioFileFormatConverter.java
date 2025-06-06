@@ -24,11 +24,11 @@ public class AudioFileFormatConverter {
     @Value("${spring.profiles.active:local}")
     private String activeProfile;
 
-    private static final String CONTAINER_INPUT_DIR = "/data/input/";
-    private static final String CONTAINER_OUTPUT_DIR = "/data/output/";
+    private static final String HOST_SHARED_DIR = "/home/ubuntu/minari-data";
+    private static final String LOCAL_DIR = System.getProperty("user.dir");
 
-    private static final String LOCAL_INPUT_DIR = System.getProperty("user.dir") + "/input/";
-    private static final String LOCAL_OUTPUT_DIR = System.getProperty("user.dir") + "/output/";
+    private static final String INPUT_RELATIVE_PATH = "/input/";
+    private static final String OUTPUT_RELATIVE_PATH = "/output/";
 
     public byte[] convertToWavAsByte(MultipartFile file) {
         File inputDir = new File(getInputDir());
@@ -60,11 +60,7 @@ public class AudioFileFormatConverter {
             file.transferTo(inputFile);
             log.info("업로드 파일 저장 완료: {}", inputFile.getAbsolutePath());
 
-            String cmd = String.format(
-                    getFFMPEGDockerCmdTemplate(),
-                    getVolumeMountBaseDir(), inputFileName, outputFileName
-            );
-
+            String cmd = buildFFmpegCommand(inputFileName, outputFileName);
             log.info("실행할 ffmpeg 명령어: {}", cmd);
 
             ProcessBuilder pb = new ProcessBuilder("bash", "-c", cmd);
@@ -103,27 +99,37 @@ public class AudioFileFormatConverter {
     }
 
     private String getInputDir() {
-        return isLocalProfile() ? LOCAL_INPUT_DIR: CONTAINER_INPUT_DIR ;
+        return getBaseDir() + INPUT_RELATIVE_PATH;
     }
 
     private String getOutputDir() {
-        return isLocalProfile() ?  LOCAL_OUTPUT_DIR: CONTAINER_OUTPUT_DIR;
+        return getBaseDir() + OUTPUT_RELATIVE_PATH;
     }
 
-    private String getVolumeMountBaseDir() {
-        return isLocalProfile() ? "." : System.getProperty("user.dir");
+    private String getBaseDir() {
+        return isLocalProfile() ? LOCAL_DIR : HOST_SHARED_DIR;
+    }
+
+    private String buildFFmpegCommand(String inputFileName, String outputFileName) {
+        String dockerBin = isLocalProfile() ? "docker" : "/usr/bin/docker";
+        String hostPath = getBaseDir();
+
+        return String.format(
+                "%s run --rm %s -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s",
+                dockerBin,
+                isLiveProfile() ? "-v /var/run/docker.sock:/var/run/docker.sock" : "",
+                hostPath,
+                inputFileName,
+                outputFileName
+        );
     }
 
     private boolean isLocalProfile() {
-        return "local".equals(activeProfile);
+        return "local".equalsIgnoreCase(activeProfile);
     }
 
-    private String dockerPath() {
-        return isLocalProfile() ? "docker" : "/usr/bin/docker";
-    }
-
-    private String getFFMPEGDockerCmdTemplate() {
-        return dockerPath() + " run --rm -v %s:/data linuxserver/ffmpeg:latest -i /data/input/%s /data/output/%s";
+    private boolean isLiveProfile() {
+        return "live".equalsIgnoreCase(activeProfile);
     }
 
     private void deleteTempFiles(File dir, String extension) {
