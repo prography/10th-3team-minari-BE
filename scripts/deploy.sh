@@ -27,6 +27,9 @@ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS
 echo "📥 도커 이미지 Pull"
 docker pull $ECR_URI:latest
 
+echo "ffmpeg 도커이미지 pull"
+docker run -it --rm linuxserver/ffmpeg:latest -version
+
 echo "🧼 기존 컨테이너 정리"
 docker stop minari || true
 docker rm minari || true

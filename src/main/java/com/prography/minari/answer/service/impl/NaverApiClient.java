@@ -2,12 +2,14 @@ package com.prography.minari.answer.service.impl;
 
 
 import com.prography.minari.answer.service.dto.SttResponseDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@Slf4j
 @Component
 public class NaverApiClient implements SttApiClient {
     private WebClient webClient;
@@ -27,6 +29,7 @@ public class NaverApiClient implements SttApiClient {
     @Override
     public String convertToText(byte[] voiceFile) {
         try {
+            log.info("Converting text to Naver");
             SttResponseDto.Naver block = webClient.post()
                     .uri(uriBuilder -> uriBuilder
                             .path("/recog/v1/stt")
