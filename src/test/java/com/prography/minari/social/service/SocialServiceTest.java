@@ -59,11 +59,13 @@ class SocialServiceTest {
                 .orElseGet(() -> userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
 
         // then
-        assertEquals(KAKAO, savedUser.getSocialType());
-        assertEquals(userInfoDto.socialId(), savedUser.getSocialId());
-        assertEquals(userInfoDto.nickname(), savedUser.getName());
-        assertEquals(userInfoDto.image(), savedUser.getImage());
-        assertFalse(savedUser.isRegistered());
+        assertAll(
+                () -> assertEquals(KAKAO, savedUser.getSocialType()),
+                () -> assertEquals(userInfoDto.socialId(), savedUser.getSocialId()),
+                () -> assertEquals(userInfoDto.nickname(), savedUser.getName()),
+                () -> assertEquals(userInfoDto.image(), savedUser.getImage()),
+                () -> assertFalse(savedUser.isRegistered())
+        );
         verify(userRepository).save(ArgumentMatchers.<User>any());
 
 
@@ -90,16 +92,18 @@ class SocialServiceTest {
                 .orElseGet(() -> userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
 
         // then
-        assertEquals(expectedUser.getEmail(), returnUser.getEmail());
-        assertEquals(expectedUser.getSocialId(), returnUser.getSocialId());
-        assertEquals(expectedUser.getName(), returnUser.getName());
-        assertEquals(expectedUser.getImage(), returnUser.getImage());
-        assertEquals(expectedUser.getEmailSendTime(), returnUser.getEmailSendTime());
-        assertEquals(expectedUser.getStudyExperienceLevel(), returnUser.getStudyExperienceLevel());
-        assertEquals(expectedUser.getWorkExperienceLevel(), returnUser.getWorkExperienceLevel());
-        assertEquals(expectedUser.getDomain(), returnUser.getDomain());
-        assertEquals(expectedUser.isRegistered(), returnUser.isRegistered());
-        assertEquals(expectedUser.isSubscribed(), returnUser.isSubscribed());
+        assertAll(
+                () -> assertEquals(expectedUser.getEmail(), returnUser.getEmail()),
+                () -> assertEquals(expectedUser.getSocialId(), returnUser.getSocialId()),
+                () -> assertEquals(expectedUser.getName(), returnUser.getName()),
+                () -> assertEquals(expectedUser.getImage(), returnUser.getImage()),
+                () -> assertEquals(expectedUser.getEmailSendTime(), returnUser.getEmailSendTime()),
+                () -> assertEquals(expectedUser.getStudyExperienceLevel(), returnUser.getStudyExperienceLevel()),
+                () -> assertEquals(expectedUser.getWorkExperienceLevel(), returnUser.getWorkExperienceLevel()),
+                () -> assertEquals(expectedUser.getDomain(), returnUser.getDomain()),
+                () -> assertEquals(expectedUser.isRegistered(), returnUser.isRegistered()),
+                () -> assertEquals(expectedUser.isSubscribed(), returnUser.isSubscribed())
+        );
         verify(userRepository, never()).save(ArgumentMatchers.<User>any());
     }
 

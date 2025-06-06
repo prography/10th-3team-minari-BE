@@ -43,12 +43,13 @@ public class UserServiceTest {
         // then
         assertNotNull(expectedDto);
 
-        assertEquals(true, expectedDto.isRegistered());
-        assertEquals(userJoinReqDto.emailSendTime(), expectedDto.emailSendTime());
-        assertEquals(userJoinReqDto.studyExperienceLevel(), expectedDto.studyExperienceLevel());
-        assertEquals(userJoinReqDto.workExperienceLevel(), expectedDto.workExperienceLevel());
-        assertEquals(userJoinReqDto.domain(), expectedDto.domain());
-
+        assertAll(
+                () -> assertTrue(expectedDto.isRegistered()),
+                () -> assertEquals(userJoinReqDto.emailSendTime(), expectedDto.emailSendTime()),
+                () -> assertEquals(userJoinReqDto.studyExperienceLevel(), expectedDto.studyExperienceLevel()),
+                () -> assertEquals(userJoinReqDto.workExperienceLevel(), expectedDto.workExperienceLevel()),
+                () -> assertEquals(userJoinReqDto.domain(), expectedDto.domain())
+        );
     }
 
 }
