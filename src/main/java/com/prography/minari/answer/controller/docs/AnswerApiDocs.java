@@ -3,6 +3,7 @@ package com.prography.minari.answer.controller.docs;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import com.prography.minari.common.response.CommonResponse;
+import com.prography.minari.question.controller.dto.req.ConvertSttMemoRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,9 +21,10 @@ public interface AnswerApiDocs {
     CommonResponse<String> convertToText(
             @Parameter(description = "음성 파일") @RequestParam("file") MultipartFile file,
             @Parameter(description = "질문 ID") @PathVariable Long questionId,
-            @Parameter(description = "사용자 ID") @PathVariable Long userId
+            @Parameter(description = "사용자 ID") @PathVariable Long userId,
+            @RequestBody ConvertSttMemoRequest request
 
-    );
+            );
 
     @Operation(summary = "STT 변환상태 조회", description = "STT 변환 상태 또는 답변 여부를 확인합니다.")
     @ApiResponses(value = {

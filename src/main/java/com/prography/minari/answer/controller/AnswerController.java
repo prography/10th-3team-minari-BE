@@ -5,6 +5,7 @@ import com.prography.minari.answer.service.AnswerService;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import com.prography.minari.common.response.CommonResponse;
+import com.prography.minari.question.controller.dto.req.ConvertSttMemoRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +20,10 @@ public class AnswerController implements AnswerApiDocs {
     @PostMapping("/{userId}/questions/{questionId}")
     public CommonResponse<String> convertToText(@RequestParam("file") MultipartFile file,
                                                 @PathVariable("questionId") Long questionId,
-                                                @PathVariable("userId") Long userId) {
-        answerService.writeUserSpeech(file, userId, questionId);
+                                                @PathVariable("userId") Long userId,
+                                                @RequestBody ConvertSttMemoRequest request
+    ) {
+        answerService.writeUserSpeech(file, userId, questionId,request.getMemo());
         return CommonResponse.ok();
     }
 

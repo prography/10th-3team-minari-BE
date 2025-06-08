@@ -34,7 +34,7 @@ public class AnswerService {
     private final QuestionReader questionReader;
     private final AudioFileFormatConverter audioFileFormatConverter;
 
-    public void writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
+    public void writeUserSpeech(MultipartFile file, Long userId, Long questionId, String memo) {
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
@@ -58,6 +58,7 @@ public class AnswerService {
                     .user(user)
                     .question(question)
                     .success(success)
+                    .memo(memo)
                     .build());
         }
     }
