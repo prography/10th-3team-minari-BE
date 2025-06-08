@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
@@ -25,6 +26,21 @@ public class NaverApiClient implements SttApiClient {
                 .build();
     }
 
+    @Override
+    public Mono<String> convertToTextNonBlock(byte[] voiceFile) {
+        return webClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/recog/v1/stt")
+                        .queryParam("lang", "Kor")
+                        .build())
+                .header("X-NCP-APIGW-API-KEY-ID", clientId)
+                .header("X-NCP-APIGW-API-KEY", clientSecret)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .bodyValue(voiceFile)
+                .retrieve()
+                .bodyToMono(SttResponseDto.Naver.class)
+                .map(SttResponseDto.Naver::getText);
+    }
 
     @Override
     public String convertToText(byte[] voiceFile) {
