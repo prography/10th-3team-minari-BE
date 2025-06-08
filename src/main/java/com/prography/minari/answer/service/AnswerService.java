@@ -35,16 +35,29 @@ public class AnswerService {
     private final AudioFileFormatConverter audioFileFormatConverter;
 
     public void writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
-        User user = userReader.read(userId);
-        Question question = questionReader.read(questionId)
-                .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
-        byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
-        String speech = sttProcessor.convertToText(inputStream);
-        answerWriter.write(Answer.builder()
-                .reply(speech)
-                .user(user)
-                .question(question)
-                .build());
+        String speech = null;
+        User user = null;
+        Question question = null;
+        boolean success = true;
+
+        try {
+            byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
+            speech = sttProcessor.convertToText(inputStream);
+            user = userReader.read(userId);
+            question = questionReader.read(questionId)
+                    .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
+        } catch (ApiException e) {
+            success = false;
+            throw e;
+        } finally {
+            // 예외가 발생하든 말든 항상 기록
+            answerWriter.write(Answer.builder()
+                    .reply(speech)
+                    .user(user)
+                    .question(question)
+                    .success(success)
+                    .build());
+        }
     }
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {
