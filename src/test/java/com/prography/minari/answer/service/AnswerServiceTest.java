@@ -24,7 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class AnswerServiceTest {
+class
+AnswerServiceTest {
     @Autowired
     private AnswerRepository answerRepository;
     @Autowired
@@ -56,6 +57,7 @@ class AnswerServiceTest {
         User saveUser = userRepository.save(fixtureMonkey.giveMeBuilder(User.class)
                 .set("id", null)
                 .setNull("email")
+                .setNotNull("preferDomains")
                 .sample());
         answerRepository.save(fixtureMonkey.giveMeBuilder(Answer.class)
                 .set("id", null)
@@ -84,6 +86,7 @@ class AnswerServiceTest {
         User saveUser = userRepository.save(fixtureMonkey.giveMeBuilder(User.class)
                 .set("id", null)
                 .setNull("email")
+                .setNotNull("preferDomains")
                 .sample());
         answerRepository.save(fixtureMonkey.giveMeBuilder(Answer.class)
                 .set("id", null)
@@ -112,6 +115,7 @@ class AnswerServiceTest {
         User saveUser = userRepository.save(fixtureMonkey.giveMeBuilder(User.class)
                 .set("id", null)
                 .setNull("email")
+                .setNotNull("preferDomains")
                 .sample());
 
         // when
@@ -124,7 +128,11 @@ class AnswerServiceTest {
     @Test
     void 사용자_정답조회테스트() {
         // given
-        User user = fixtureMonkey.giveMeOne(User.class);
+        User user = fixtureMonkey.giveMeBuilder(User.class)
+                .set("id", null)
+                .setNull("email")
+                .setNotNull("preferDomains")
+                .sample();
         User saveUser = userRepository.save(user);
         Question question = fixtureMonkey.giveMeOne(Question.class);
         Question saveQuestion = questionRepository.save(question);

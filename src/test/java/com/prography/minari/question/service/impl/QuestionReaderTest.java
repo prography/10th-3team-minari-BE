@@ -106,7 +106,7 @@ class QuestionReaderTest {
 
         User user = fixtureMonkey.giveMeBuilder(User.class)
                 .set("createdDateTime", LocalDateTime.now())
-                .set("preferDomains",list)
+                .setNotNull("domain")
                 .sample();
         User saveUser = userRepository.save(user);
 

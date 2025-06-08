@@ -33,8 +33,7 @@ public class QuestionService {
     public Long readDaily(Long userId) {
         User user = userReader.read(userId);
         Long daysBetween = user.getDaysSinceJoined();
-        List<Domain> domains = user.getPreferDomains();
-        Optional<Question> question = questionReader.readDaily(user, domains, daysBetween);
+        Optional<Question> question = questionReader.readDaily(user, user.getPreferDomains(), daysBetween);
         return question
                 .map(Question::getId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
