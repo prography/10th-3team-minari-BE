@@ -5,16 +5,18 @@ import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.sound.sampled.*;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Slf4j
 @ImplService
@@ -25,21 +27,26 @@ public class SttProcessor {
     public String convertToText(byte[] file) {
         AudioFormat format = getAudioFormat(file);
         List<byte[]> rawChunks = splitWavToExactMinutes(file, format);
-        List<String> texts = Flux.fromIterable(rawChunks)
-                .flatMapSequential(chunk -> {
-                    try {
-                        byte[] wavChunk = toAutioFormatBytes(chunk, format);
-                        return sttApiClient.convertToTextNonBlock(wavChunk); // Mono<String>
-                    } catch (Exception e) {
-                        return Mono.error(e);
-                    }
-                })
-                .filter(s -> !s.isBlank())
-                .map(s -> s.endsWith(".") ? s : s + ".")
-                .collectList()
-                .block();
+        try {
+            List<String> texts = Flux.fromIterable(rawChunks)
+                    .flatMapSequential(chunk -> {
+                        try {
+                            byte[] wavChunk = toAutioFormatBytes(chunk, format);
+                            return sttApiClient.convertToTextNonBlock(wavChunk); // Mono<String>
+                        } catch (Exception e) {
+                            return Mono.error(e);
+                        }
+                    })
+                    .filter(s -> !s.isBlank())
+                    .map(s -> s.endsWith(".") ? s : s + ".")
+                    .collectList()
+                    .block(); // 이 부분에서 예외가 던져짐
 
-        return String.join(" ", texts);
+            return String.join(" ", Objects.requireNonNull(texts));
+        } catch (RuntimeException e) {
+            // 필요 시 예외를 감싸서 던지기
+            throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR); // 사용자 정의 예외가 더 좋음
+        }
     }
 
     private AudioFormat getAudioFormat(byte[] wavData) {

@@ -6,7 +6,6 @@ import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntr
 import com.prography.minari.common.entity.Domain;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.repository.QuestionRepository;
-import com.prography.minari.user.entity.PreferDomain;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -80,9 +79,9 @@ class QuestionReaderTest {
     @RepeatedTest(5)
     void 데일리_문제조회_테스트() {
         // given
-        ArbitraryBuilder<Question> builder = fixtureMonkey.giveMeBuilder(Question.class);
+        ArbitraryBuilder<Question> builder = fixtureMonkey.giveMeBuilder(Question.class).setNotNull("domain");
 
-        List<Question> questions = IntStream.range(0, 5)
+        List<Question> questions = IntStream.range(0, 20)
                 .mapToObj(i -> {
                     ArbitraryBuilder<Question> customized = builder
                             .set("createdDateTime", LocalDateTime.now().plusDays(i));
@@ -98,11 +97,6 @@ class QuestionReaderTest {
                             return list.subList(0, Math.min(3, list.size())); // 예: 최대 3개
                         }
                 ));
-        List<PreferDomain> list = domains.stream().map(domain -> {
-            return PreferDomain.builder()
-                    .name(domain)
-                    .build();
-        }).toList();
 
         User user = fixtureMonkey.giveMeBuilder(User.class)
                 .set("createdDateTime", LocalDateTime.now())
