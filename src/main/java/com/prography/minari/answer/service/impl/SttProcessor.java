@@ -27,26 +27,23 @@ public class SttProcessor {
     public String convertToText(byte[] file) {
         AudioFormat format = getAudioFormat(file);
         List<byte[]> rawChunks = splitWavToExactMinutes(file, format);
-        try {
-            List<String> texts = Flux.fromIterable(rawChunks)
-                    .flatMapSequential(chunk -> {
-                        try {
-                            byte[] wavChunk = toAutioFormatBytes(chunk, format);
-                            return sttApiClient.convertToTextNonBlock(wavChunk); // Mono<String>
-                        } catch (Exception e) {
-                            return Mono.error(e);
-                        }
-                    })
-                    .filter(s -> !s.isBlank())
-                    .map(s -> s.endsWith(".") ? s : s + ".")
-                    .collectList()
-                    .block(); // 이 부분에서 예외가 던져짐
+        List<String> texts = Flux.fromIterable(rawChunks)
+                .flatMapSequential(chunk -> {
+                    byte[] wavChunk = null;
+                    try {
+                        wavChunk = toAutioFormatBytes(chunk, format);
+                    } catch (IOException e) {
+                        log.error("오디오 포맷 변환중 에러발생: {}", e.getMessage());
+                        throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR);
+                    }
+                    return sttApiClient.convertToTextNonBlock(wavChunk); // Mono<String>
+                })
+                .filter(s -> !s.isBlank())
+                .map(s -> s.endsWith(".") ? s : s + ".")
+                .collectList()
+                .block(); // 이 부분에서 예외가 던져짐
 
-            return String.join(" ", Objects.requireNonNull(texts));
-        } catch (RuntimeException e) {
-            // 필요 시 예외를 감싸서 던지기
-            throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR); // 사용자 정의 예외가 더 좋음
-        }
+        return String.join(" ", Objects.requireNonNull(texts));
     }
 
     private AudioFormat getAudioFormat(byte[] wavData) {
@@ -108,7 +105,7 @@ public class SttProcessor {
     }
 
     private byte[] toAutioFormatBytes(byte[] rawData, AudioFormat format) throws IOException {
-        log.info("오디오 형식({}) 추가",format);
+        log.info("오디오 형식({}) 추가", format);
         try (
                 ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream()
