@@ -27,27 +27,27 @@ public class UserController {
     private final MailService mailService;
 
     @GetMapping("/users/oauth/{social}")
-    public CommonResponse oauth(@RequestParam("code") String code, @RequestParam("redirect-uri") String redirectUri, @PathVariable("social") String socialType) {
+    public ResponseEntity oauth(@RequestParam("code") String code, @RequestParam("redirect-uri") String redirectUri, @PathVariable("social") String socialType) {
         UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri);
-        return CommonResponse.success(userLoginResDto);
+        return ResponseEntity.ok(CommonResponse.success(userLoginResDto));
     }
 
     @PostMapping("/users/mail-verification")
-    public CommonResponse emailVerification(@RequestBody @Validated MailVerificationReqDto mailVerificationReqDto) {
+    public ResponseEntity emailVerification(@RequestBody @Validated MailVerificationReqDto mailVerificationReqDto) {
         mailService.sendAuthMail(mailVerificationReqDto);
-        return CommonResponse.ok();
+        return ResponseEntity.ok(CommonResponse.ok());
     }
 
     @PostMapping("/users/join")
-    public CommonResponse join(@RequestBody @Validated UserJoinReqDto userJoinReqDto) {
+    public ResponseEntity join(@RequestBody @Validated UserJoinReqDto userJoinReqDto) {
         UserJoinResDto userJoinResDto = userService.join(userJoinReqDto);
-        return CommonResponse.success(userJoinResDto);
+        return ResponseEntity.ok(CommonResponse.success(userJoinResDto));
     }
 
     @GetMapping("/users/{id}")
-    public CommonResponse<UserFindResDto> findByUserId(@PathVariable("id") Long id) {
+    public ResponseEntity findByUserId(@PathVariable("id") Long id) {
         UserFindResDto userFindResDto = userService.findById(id);
-        return CommonResponse.success(userFindResDto);
+        return ResponseEntity.ok(CommonResponse.success(userFindResDto));
     }
 
 }
