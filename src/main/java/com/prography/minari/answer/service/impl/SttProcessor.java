@@ -34,7 +34,7 @@ public class SttProcessor {
                         wavChunk = toAutioFormatBytes(chunk, format);
                     } catch (IOException e) {
                         log.error("오디오 포맷 변환중 에러발생: {}", e.getMessage());
-                        throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR);
+                        return Flux.error(new ApiException(ErrorCode.INTERNAL_SERVER_ERROR));
                     }
                     return sttApiClient.convertToTextNonBlock(wavChunk); // Mono<String>
                 })
