@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -26,7 +27,7 @@ public interface QuestionApiDocs {
             )
     })
     @GetMapping("/questions/{questionId}/contents")
-    CommonResponse<String> getQuestion(
+    ResponseEntity<CommonResponse<String>> getQuestion(
             @Parameter(description = "조회할 질문의 ID", required = true)
             @PathVariable Long questionId
     );
@@ -43,7 +44,7 @@ public interface QuestionApiDocs {
             )
     })
     @GetMapping("/users/{userId}/questions")
-    CommonResponse<Long> getDailyQuestion(
+    ResponseEntity<CommonResponse<Long>> getDailyQuestion(
             @Parameter(description = "사용자 ID", required = true)
             @PathVariable("userId") Long userId
     );
@@ -60,7 +61,7 @@ public interface QuestionApiDocs {
             )
     })
     @GetMapping("/questions/{questionId}/tag")
-    CommonResponse<List<String>> getTags(
+    ResponseEntity<CommonResponse<List<String>>> getTags(
             @Parameter(description = "질문 ID", required = true)
             @PathVariable("questionId") Long questionId
     );
