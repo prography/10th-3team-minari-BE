@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +19,7 @@ public interface AnswerApiDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "변환 성공"),
     })
-    CommonResponse<String> convertToText(
+    ResponseEntity<CommonResponse<String>> convertToText(
             @Parameter(description = "음성 파일") @RequestParam("file") MultipartFile file,
             @Parameter(description = "질문 ID") @PathVariable Long questionId,
             @Parameter(description = "사용자 ID") @PathVariable Long userId,
@@ -30,7 +31,7 @@ public interface AnswerApiDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
     })
-    CommonResponse<UserAnswerStatusResponse> getAnswerStatus(
+    ResponseEntity<CommonResponse<UserAnswerStatusResponse>> getAnswerStatus(
             @Parameter(description = "사용자 ID") @PathVariable Long userId,
             @Parameter(description = "질문 ID") @PathVariable Long questionId
     );
@@ -47,7 +48,7 @@ public interface AnswerApiDocs {
             }
     )
     @GetMapping("/{userId}/questions/{questionId}")
-    CommonResponse<InterviewContentResponse> getAnswer(
+    ResponseEntity<CommonResponse<InterviewContentResponse>> getAnswer(
             @Parameter(description = "사용자 ID", required = true)
             @PathVariable("userId") Long userId,
 
