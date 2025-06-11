@@ -72,6 +72,9 @@ dependencies {
 	//ffmpeg
 	implementation("ws.schild:jave-core:3.3.1")
 
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 }
 
 tasks.named('test') {
