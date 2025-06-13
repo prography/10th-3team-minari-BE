@@ -49,7 +49,7 @@ class AnswerWriterTest {
         User user = fixtureMonkey.giveMeBuilder(User.class)
                 .set("id", null)
                 .setNotNull("email")
-                .setNotNull("password")
+                .setNotNull("domain")
                 .sample();
         User saveUser = userRepository.save(user);
         Question question = fixtureMonkey.giveMeBuilder(Question.class)

@@ -1,5 +1,7 @@
 package com.prography.minari.answer.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prography.minari.answer.service.dto.SttResponseDto;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
@@ -47,25 +49,29 @@ class SttApiClientTest {
     @Test
     void convertToText_shouldReturnRecognizedText() throws IOException {
         // given
+        ObjectMapper o = new ObjectMapper();
         MultipartFile mockFile = new MockMultipartFile(
                 "file", "test.wav", "audio/wav", "dummy audio".getBytes()
         );
 
         byte[] bytes = mockFile.getBytes();
-        String expectedText = "{\"text\":\"테스트입니다\"}";
+        String expectValue = "테스트입니다";
+        SttResponseDto.Naver expected = SttResponseDto.Naver.builder()
+                .text(expectValue)
+                .build();
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .setHeader("Content-Type", "application/json")
                 .setHeader("X-NCP-APIGW-API-KEY-ID", "test_id")
                 .setHeader("X-NCP-APIGW-API-KEY", "test-secret")
-                .setBody(expectedText));
+                .setBody(o.writeValueAsString(expected)));
 
         // when
         String result = sttApiClient.convertToText(bytes);
 
         // then
-        assertEquals(expectedText, result);
+        assertEquals(expectValue, result);
     }
 
     @Test
