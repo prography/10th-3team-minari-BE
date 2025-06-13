@@ -6,6 +6,7 @@ import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.enums.EmailSendTime;
 import com.prography.minari.user.enums.ExperienceLevel;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,10 +57,6 @@ public class User extends BaseTimeEntity {
     @Enumerated(value = STRING)
     private Domain domain;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "user_id") // FK를 이쪽에서 관리
-    private List<PreferDomain> preferDomains = new ArrayList<>();
-
     public static User create(String email, SocialType socialType, Long socialId, String name, String image) {
         User user = new User();
         user.email = email;
@@ -81,15 +78,13 @@ public class User extends BaseTimeEntity {
         this.isRegistered = true;
     }
 
-    public List<Domain> getPreferDomains() {
-        return preferDomains.stream()
-                .map(PreferDomain::getName)
-                .toList();
-    }
-
     public Long getDaysSinceJoined() {
         LocalDate now = LocalDateTime.now().toLocalDate();
         LocalDate created = getCreatedDateTime().toLocalDate();
         return ChronoUnit.DAYS.between(created, now);
+    }
+
+    public List<Domain>getPreferDomains() {
+        return List.of(domain,Domain.CS);
     }
 }

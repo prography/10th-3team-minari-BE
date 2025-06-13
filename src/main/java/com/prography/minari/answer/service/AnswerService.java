@@ -19,8 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Optional;
 
 @Service
@@ -34,7 +32,7 @@ public class AnswerService {
     private final QuestionReader questionReader;
     private final AudioFileFormatConverter audioFileFormatConverter;
 
-    public void writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
+    public void writeUserSpeech(MultipartFile file, Long userId, Long questionId, String memo) {
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
@@ -42,12 +40,8 @@ public class AnswerService {
         boolean success = true;
         String speech = null;
         try {
-            long l = System.currentTimeMillis();
             byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
-            System.out.println(System.currentTimeMillis() - l);
-            l = System.currentTimeMillis();
             speech = sttProcessor.convertToText(inputStream);
-            System.out.println(System.currentTimeMillis() - l);
         } catch (ApiException e) {
             success = false;
             throw e;
@@ -58,6 +52,7 @@ public class AnswerService {
                     .user(user)
                     .question(question)
                     .success(success)
+                    .memo(memo)
                     .build());
         }
     }

@@ -5,16 +5,18 @@ import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.sound.sampled.*;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Slf4j
 @ImplService
@@ -27,19 +29,21 @@ public class SttProcessor {
         List<byte[]> rawChunks = splitWavToExactMinutes(file, format);
         List<String> texts = Flux.fromIterable(rawChunks)
                 .flatMapSequential(chunk -> {
+                    byte[] wavChunk = null;
                     try {
-                        byte[] wavChunk = toAutioFormatBytes(chunk, format);
-                        return sttApiClient.convertToTextNonBlock(wavChunk); // Mono<String>
-                    } catch (Exception e) {
-                        return Mono.error(e);
+                        wavChunk = toAutioFormatBytes(chunk, format);
+                    } catch (IOException e) {
+                        log.error("오디오 포맷 변환중 에러발생: {}", e.getMessage());
+                        return Flux.error(new ApiException(ErrorCode.INTERNAL_SERVER_ERROR));
                     }
+                    return sttApiClient.convertToTextNonBlock(wavChunk); // Mono<String>
                 })
                 .filter(s -> !s.isBlank())
                 .map(s -> s.endsWith(".") ? s : s + ".")
                 .collectList()
-                .block();
+                .block(); // 이 부분에서 예외가 던져짐
 
-        return String.join(" ", texts);
+        return String.join(" ", Objects.requireNonNull(texts));
     }
 
     private AudioFormat getAudioFormat(byte[] wavData) {
@@ -101,7 +105,7 @@ public class SttProcessor {
     }
 
     private byte[] toAutioFormatBytes(byte[] rawData, AudioFormat format) throws IOException {
-        log.info("오디오 형식({}) 추가",format);
+        log.info("오디오 형식({}) 추가", format);
         try (
                 ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream()

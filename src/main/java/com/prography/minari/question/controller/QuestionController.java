@@ -1,10 +1,10 @@
 package com.prography.minari.question.controller;
 
 import com.prography.minari.common.response.CommonResponse;
-import com.prography.minari.question.dto.DailyUserQuestionResDto;
 import com.prography.minari.question.controller.docs.QuestionApiDocs;
 import com.prography.minari.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,17 +19,17 @@ public class QuestionController implements QuestionApiDocs {
     private final QuestionService questionService;
 
     @GetMapping("/questions/{questionId}/contents")
-    public CommonResponse<String> getQuestion(@PathVariable Long questionId) {
-        return CommonResponse.success(questionService.readContents(questionId));
+    public ResponseEntity<CommonResponse<String>> getQuestion(@PathVariable Long questionId) {
+        return ResponseEntity.ok(CommonResponse.success(questionService.readContents(questionId)));
     }
 
     @GetMapping("/users/{userId}/questions")
-    public CommonResponse<Long> getDailyQuestion(@PathVariable("userId") Long userId) {
-        return CommonResponse.success(questionService.readDaily(userId));
+    public ResponseEntity<CommonResponse<Long>> getDailyQuestion(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(CommonResponse.success(questionService.readDaily(userId)));
     }
 
     @GetMapping("/questions/{questionId}/tag")
-    public CommonResponse<List<String>> getTags(@PathVariable("questionId") Long questionId) {
-        return CommonResponse.success(questionService.readTags(questionId));
+    public ResponseEntity<CommonResponse<List<String>>> getTags(@PathVariable("questionId") Long questionId) {
+        return ResponseEntity.ok(CommonResponse.success(questionService.readTags(questionId)));
     }
 }
