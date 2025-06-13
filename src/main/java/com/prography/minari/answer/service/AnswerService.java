@@ -38,13 +38,28 @@ public class AnswerService {
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
-        byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
-        String speech = sttProcessor.convertToText(inputStream);
-        answerWriter.write(Answer.builder()
-                .reply(speech)
-                .user(user)
-                .question(question)
-                .build());
+
+        boolean success = true;
+        String speech = null;
+        try {
+            long l = System.currentTimeMillis();
+            byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
+            System.out.println(System.currentTimeMillis() - l);
+            l = System.currentTimeMillis();
+            speech = sttProcessor.convertToText(inputStream);
+            System.out.println(System.currentTimeMillis() - l);
+        } catch (ApiException e) {
+            success = false;
+            throw e;
+        } finally {
+            // 예외가 발생하든 말든 항상 기록
+            answerWriter.write(Answer.builder()
+                    .reply(speech)
+                    .user(user)
+                    .question(question)
+                    .success(success)
+                    .build());
+        }
     }
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {
