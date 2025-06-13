@@ -6,6 +6,8 @@ import com.prography.minari.common.execption.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.sound.sampled.*;
 import java.io.*;
@@ -23,22 +25,21 @@ public class SttProcessor {
     public String convertToText(byte[] file) {
         AudioFormat format = getAudioFormat(file);
         List<byte[]> rawChunks = splitWavToExactMinutes(file, format);
-        List<String> texts = rawChunks.stream()
-                .map(chunk -> {
+        List<String> texts = Flux.fromIterable(rawChunks)
+                .flatMapSequential(chunk -> {
                     try {
                         byte[] wavChunk = toAutioFormatBytes(chunk, format);
-                        return sttApiClient.convertToText(wavChunk);
+                        return sttApiClient.convertToTextNonBlock(wavChunk); // Mono<String>
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        return Mono.error(e);
                     }
                 })
-                .toList();
-
-        return texts.stream()
                 .filter(s -> !s.isBlank())
                 .map(s -> s.endsWith(".") ? s : s + ".")
-                .collect(Collectors.joining(" "));
+                .collectList()
+                .block();
 
+        return String.join(" ", texts);
     }
 
     private AudioFormat getAudioFormat(byte[] wavData) {

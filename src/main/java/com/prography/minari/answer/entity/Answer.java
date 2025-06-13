@@ -17,7 +17,7 @@ public class Answer extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,name = "reply")
+    @Column(name = "reply",length = 1000)
     private String reply;
 
     @ManyToOne(fetch = FetchType.LAZY)

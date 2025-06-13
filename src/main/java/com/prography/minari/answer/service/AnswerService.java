@@ -35,17 +35,19 @@ public class AnswerService {
     private final AudioFileFormatConverter audioFileFormatConverter;
 
     public void writeUserSpeech(MultipartFile file, Long userId, Long questionId) {
-        String speech = null;
-        User user = null;
-        Question question = null;
-        boolean success = true;
+        User user = userReader.read(userId);
+        Question question = questionReader.read(questionId)
+                .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
 
+        boolean success = true;
+        String speech = null;
         try {
+            long l = System.currentTimeMillis();
             byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
+            System.out.println(System.currentTimeMillis() - l);
+            l = System.currentTimeMillis();
             speech = sttProcessor.convertToText(inputStream);
-            user = userReader.read(userId);
-            question = questionReader.read(questionId)
-                    .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
+            System.out.println(System.currentTimeMillis() - l);
         } catch (ApiException e) {
             success = false;
             throw e;
