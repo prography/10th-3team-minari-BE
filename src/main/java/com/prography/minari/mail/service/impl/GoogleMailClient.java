@@ -2,8 +2,8 @@ package com.prography.minari.mail.service.impl;
 
 import com.prography.minari.common.aop.ImplService;
 import com.prography.minari.common.execption.ApiException;
-import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.mail.dto.MailRequest;
+import com.prography.minari.mail.service.MailClient;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.MimeMessage;
@@ -19,7 +19,7 @@ import static com.prography.minari.common.execption.ErrorCode.*;
 @ImplService
 @Slf4j
 @RequiredArgsConstructor
-public class GoogleMailClient {
+public class GoogleMailClient implements MailClient {
 
     private final JavaMailSender javaMailSender;
 
