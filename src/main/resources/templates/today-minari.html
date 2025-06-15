@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘의 미나리</title>
+</head>
+<body style="margin:0;padding:0;font-family:Arial,sans-serif;background-color:#ffffff;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="padding: 20px;">
+    <tr>
+        <td align="center">
+            <table width="360" cellpadding="0" cellspacing="0" border="0"
+                   style="background-color:#ffffff;border-radius:10px;padding:20px;border:1px solid #e0e0e0;">
+                <tr>
+                    <td align="left" style="font-size:24px;font-weight:bold;padding-bottom:16px;color:#000;">
+                        ♣ MINARI
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:18px;font-weight:500;color:#000;padding-bottom:28px;">
+                        ♣ 오늘의 미나리
+                    </td>
+                </tr>
+                <!-- 카드 섹션 -->
+                <tr>
+                    <td>
+                        <table cellpadding="10" cellspacing="10" border="0">
+                            <tr>
+                                <!-- 세부 카테고리 (동적) -->
+                                <td style="width:100px;height:120px;background-color:#1a1a1a;border-radius:10px;color:#ccff66;text-align:center;vertical-align:middle;font-size:14px;">
+                                    <span th:text="${category}">세부 카테고리</span>
+                                </td>
+
+                                <!-- 키워드 (동적) -->
+                                <td style="width:100px;height:120px;background-color:#1a1a1a;border-radius:10px;color:#ccff66;text-align:center;vertical-align:middle;font-size:14px;">
+                                    <span th:text="${keyword}">키워드</span>
+                                </td>
+
+                                <!-- ? 카드 (고정 또는 랜덤 값도 가능) -->
+                                <td style="width:100px;height:120px;background-color:#f3ffcc;border-radius:10px;color:#000000;text-align:center;vertical-align:middle;font-size:28px;font-weight:bold;">
+                                    <span th:text="${surpriseChar}">?</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- 버튼 -->
+                <tr>
+                    <td align="center" style="padding: 30px 0 10px;">
+                        <a href="https://minari-official.com/"
+                           style="display:inline-block;padding:12px 24px;background-color:#d7ff57;color:#000;text-decoration:none;border-radius:6px;font-weight:bold;">
+                            미나리 심으러 가기 →
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- 하단 아이콘들 -->
+                <tr>
+                    <td align="center" style="padding-top: 20px;">
+                        <a href="https://github.com/minari-official" target="_blank" style="text-decoration: none;">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111432.png" alt="GitHub" width="24"
+                                 style="margin: 0 8px; border: none;">
+                        </a>
+                        <a href="https://instagram.com/minari.official" target="_blank" style="text-decoration: none;">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" width="24"
+                                 style="margin: 0 8px; border: none;">
+                        </a>
+                        <a href="https://minari-official.com/profile" target="_blank" style="text-decoration: none;">
+                            <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile" width="24"
+                                 style="margin: 0 8px; border: none;">
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
