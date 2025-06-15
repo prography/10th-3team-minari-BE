@@ -20,7 +20,7 @@ public class AnswerController implements AnswerApiDocs {
     private final AnswerService answerService;
 
     // STT변환 API
-    @PostMapping(path = "/{userId}/questions/{questionId}")
+    @PostMapping("/{userId}/questions/{questionId}")
     public ResponseEntity<CommonResponse<InterviewContentResponse>> convertToText(
             @ModelAttribute InterviewSttConvertReq req,
             @PathVariable("questionId") Long questionId,
