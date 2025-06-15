@@ -22,9 +22,9 @@ public class UserService {
         return UserFindResDto.from(user);
     }
 
-    public UserJoinResDto join(UserJoinReqDto userJoinReqDto) {
-        // user 조회 TODO Spring Security 도입 이후 파라미터에서 UserID 제거
-        User findUser = userReader.read(userJoinReqDto.userId());
+    public UserJoinResDto join(UserJoinReqDto userJoinReqDto, Long userId) {
+        // user 조회
+        User findUser = userReader.read(userId);
 
         // 회원가입
         User joinUser = userWriter.join(

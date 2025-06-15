@@ -1,9 +1,8 @@
 package com.prography.minari.common.filter;
 
-import ch.qos.logback.core.util.StringUtil;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prography.minari.common.execption.ApiException;
-import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.user.entity.User;
@@ -16,16 +15,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_FOUND_EXCEPTION;

@@ -38,7 +38,7 @@ public class UserServiceTest {
                 .sample();
 
         // when
-        UserJoinResDto expectedDto = userService.join(userJoinReqDto);
+        UserJoinResDto expectedDto = userService.join(userJoinReqDto, actualUser.getId());
 
         // then
         assertNotNull(expectedDto);
