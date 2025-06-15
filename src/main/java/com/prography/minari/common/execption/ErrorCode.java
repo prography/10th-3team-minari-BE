@@ -9,6 +9,7 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "잘못된 입력입니다.","C001"),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다.","C002"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.","C003"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다.","C004"),
     QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "데이터를 찾을 수 없습니다.","Q001"),
     JWT_EXPIRED_EXCEPTION(HttpStatus.NOT_FOUND, "토큰이 만료되었습니다.","JWT001"),
     JWT_INVALID_SIGNATURE_EXCEPTION(HttpStatus.NOT_FOUND, "유효하지 않은 서명입니다.","JWT002"),
