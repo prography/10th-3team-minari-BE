@@ -28,5 +28,8 @@ public class Answer extends BaseTimeEntity {
     @JoinColumn(name = "question_id")
     private Question question;
 
+    @Column(name = "memo")
     private String memo;
+    @Column(name = "running_time")
+    private Double runningTime;
 }

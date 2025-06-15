@@ -1,5 +1,6 @@
 package com.prography.minari.answer.controller.docs;
 
+import com.prography.minari.answer.dto.req.InterviewSttConvertReq;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import com.prography.minari.common.response.CommonResponse;
@@ -19,12 +20,10 @@ public interface AnswerApiDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "변환 성공")
     })
-    ResponseEntity<CommonResponse<String>> convertToText(
-            @Parameter(description = "음성 파일") @RequestParam("file") MultipartFile file,
+    ResponseEntity<CommonResponse<InterviewContentResponse>> convertToText(
+            @Parameter(description = "음성 및 메모 데이터") @RequestBody InterviewSttConvertReq request,
             @Parameter(description = "질문 ID") @PathVariable Long questionId,
-            @Parameter(description = "사용자 ID") @PathVariable Long userId,
-            @Parameter(description = "메모") @RequestBody ConvertSttMemoRequest request
-
+            @Parameter(description = "사용자 ID") @PathVariable Long userId
             );
 
     @Operation(summary = "STT 변환상태 조회", description = "STT 변환 상태 또는 답변 여부를 확인합니다.")

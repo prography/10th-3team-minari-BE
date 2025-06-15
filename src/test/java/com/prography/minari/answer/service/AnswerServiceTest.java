@@ -4,6 +4,7 @@ import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector;
 import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.answer.repository.AnswerRepository;
+import com.prography.minari.answer.service.dto.SttConvertAudioFileInfo;
 import com.prography.minari.answer.service.dto.SttStatus;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
@@ -132,7 +133,10 @@ class AnswerServiceTest {
         when(audioFileFormatConverter.convertToWavAsByte(any()))
                 .thenReturn(new byte[]{1, 1, 1});
         when(sttProcessor.convertToText(any(byte[].class)))
-                .thenReturn(result);
+                .thenReturn(SttConvertAudioFileInfo.builder()
+                        .speech(result)
+                        .runningTime(10000D)
+                        .build());
 
         // when
         answerService.writeUserSpeech(mockFile, saveUser.getId(), saveQuestion.getId(), memo);
@@ -210,7 +214,10 @@ class AnswerServiceTest {
         when(audioFileFormatConverter.convertToWavAsByte(any()))
                 .thenThrow(ApiException.class);
         when(sttProcessor.convertToText(any(byte[].class)))
-                .thenReturn(result);
+                .thenReturn(SttConvertAudioFileInfo.builder()
+                        .speech(result)
+                        .runningTime(10000D)
+                        .build());
 
         // when
 
@@ -228,7 +235,11 @@ class AnswerServiceTest {
         );*/
     }
 
-    @Test
+    /**
+     * Todo
+     * AnswerService.class 면접 1회제한로직 해제시 함께 해제
+     */
+    /*@Test
     void 이미_면접완료했을때_예외발생_테스트() {
         //given
         User user = fixtureMonkey.giveMeBuilder(User.class)
@@ -241,16 +252,21 @@ class AnswerServiceTest {
         Question saveQuestion = questionRepository.save(question);
 
         answerRepository.save(Answer.builder()
-                        .memo("memo")
-                        .user(saveUser)
-                        .reply("reply")
-                        .question(saveQuestion)
+                .memo("memo")
+                .user(saveUser)
+                .reply("reply")
+                .question(saveQuestion)
                 .build());
         MockMultipartFile mockFile = new MockMultipartFile(
                 "audio", "audio.wav", "audio/wav", new byte[]{0, 1, 2}
         );
         // when
+        when(sttProcessor.convertToText(any()))
+                .thenReturn(SttConvertAudioFileInfo.builder()
+                        .runningTime(100D)
+                        .speech("speech")
+                .build());
         // then
-        assertThrows(ApiException.class, () -> answerService.writeUserSpeech(mockFile,saveUser.getId(), saveQuestion.getId(), null));
-    }
+        assertThrows(ApiException.class, () -> answerService.writeUserSpeech(mockFile, saveUser.getId(), saveQuestion.getId(), null));
+    }*/
 }

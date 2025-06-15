@@ -1,6 +1,7 @@
 package com.prography.minari.answer.service;
 
 import com.prography.minari.answer.entity.Answer;
+import com.prography.minari.answer.service.dto.SttConvertAudioFileInfo;
 import com.prography.minari.answer.service.dto.SttStatus;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
@@ -33,7 +34,7 @@ public class AnswerService {
     private final QuestionReader questionReader;
     private final AudioFileFormatConverter audioFileFormatConverter;
 
-    public void writeUserSpeech(MultipartFile file, Long userId, Long questionId, String memo) {
+    public InterviewContentResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId, String memo) {
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
@@ -43,19 +44,29 @@ public class AnswerService {
          * Todo
          * 프론트 개발 완료후 주석 제거
          */
-        /*if (!answers.isEmpty()) {
+        if (!answers.isEmpty()) {
             throw new ApiException(ErrorCode.FREE_ANSWER_ALREADY_DONE);
-        }*/
+        }
 
         byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
-        String speech = sttProcessor.convertToText(inputStream);
+        SttConvertAudioFileInfo convertResult = sttProcessor.convertToText(inputStream);
 
-        answerWriter.write(Answer.builder()
-                .reply(speech)
+        Answer answer = answerWriter.write(Answer.builder()
+                .runningTime(convertResult.getRunningTime())
+                .reply(convertResult.getSpeech())
                 .user(user)
                 .question(question)
                 .memo(memo)
                 .build());
+
+        return InterviewContentResponse.builder()
+                .runningTime(convertResult.getRunningTime())
+                .answer(question.getAnswer())
+                .reply(convertResult.getSpeech())
+                .question(question.getContent())
+                .createDate(answer.getCreatedDateTime().toLocalDate())
+                .build();
+
     }
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {
@@ -78,6 +89,13 @@ public class AnswerService {
             throw new ApiException(ErrorCode.ENTITY_NOT_FOUND);
         }
         Answer answer = answers.getLast();
-        return InterviewContentResponse.of(question.getAnswer(), question.getContent(), answer.getReply());
+
+        return InterviewContentResponse.builder()
+                .createDate(answer.getCreatedDateTime().toLocalDate())
+                .runningTime(answer.getRunningTime())
+                .question(question.getContent())
+                .answer(question.getAnswer())
+                .reply(answer.getReply())
+                .build();
     }
 }
