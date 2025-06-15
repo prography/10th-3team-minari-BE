@@ -39,16 +39,19 @@ public class AnswerService {
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
         List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
 
-        if (!answers.isEmpty()) {
+        /**
+         * Todo
+         * 프론트 개발 완료후 주석 제거
+         */
+        /*if (!answers.isEmpty()) {
             throw new ApiException(ErrorCode.FREE_ANSWER_ALREADY_DONE);
-        }
+        }*/
 
         byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
         String speech = sttProcessor.convertToText(inputStream);
-        // 예외가 발생하든 말든 항상 기록
+
         answerWriter.write(Answer.builder()
                 .reply(speech)
-                .success(true)
                 .user(user)
                 .question(question)
                 .memo(memo)
@@ -59,12 +62,11 @@ public class AnswerService {
         List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
         if (answers.isEmpty()) {
             return UserAnswerStatusResponse.builder()
-                    .status(SttStatus.PROCESS)
+                    .status(SttStatus.NOT_FOUND)
                     .build();
         }
-        Answer last = answers.getLast();
         return UserAnswerStatusResponse.builder()
-                .status(last.isSuccess() ? SttStatus.SUCCESS : SttStatus.ERROR)
+                .status(SttStatus.SUCCESS)
                 .build();
     }
 

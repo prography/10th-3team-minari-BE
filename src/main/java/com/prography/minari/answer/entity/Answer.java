@@ -28,7 +28,5 @@ public class Answer extends BaseTimeEntity {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    private boolean success;
-
     private String memo;
 }
