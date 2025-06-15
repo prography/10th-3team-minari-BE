@@ -19,10 +19,10 @@ public class AnswerController implements AnswerApiDocs {
 
     // STT변환 API
     @PostMapping("/{userId}/questions/{questionId}")
-    public ResponseEntity<CommonResponse<String>> convertToText(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<CommonResponse<String>> convertToText(@RequestPart("file") MultipartFile file,
                                                 @PathVariable("questionId") Long questionId,
                                                 @PathVariable("userId") Long userId,
-                                                @RequestBody ConvertSttMemoRequest request
+                                                @RequestPart("request") ConvertSttMemoRequest request
     ) {
         answerService.writeUserSpeech(file, userId, questionId,request.getMemo());
         return ResponseEntity.ok(CommonResponse.ok());
