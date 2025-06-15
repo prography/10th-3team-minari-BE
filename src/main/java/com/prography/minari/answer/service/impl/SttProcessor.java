@@ -7,7 +7,6 @@ import com.prography.minari.common.execption.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
@@ -55,10 +54,10 @@ public class SttProcessor {
         try (AudioInputStream fullStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new ByteArrayInputStream(wavData)))) {
             return fullStream.getFormat();
         } catch (UnsupportedAudioFileException e) {
-            log.error("지원하지 않는 오디오 포맷: {}", e.getMessage());
+            log.info("[음성파일 포맷조회] 지원하지 않는 오디오 포맷: {}", e.getMessage());
             throw new ApiException(ErrorCode.AUDIO_UNSUPPORT_FORMAT_EXCEPTION);
         } catch (IOException e) {
-            log.error("오디오 파일 처리 중 IO 오류 발생: {}", e.getMessage());
+            log.info("[음성파일 포맷조회] 오디오 파일 처리 중 IO 오류 발생: {}", e.getMessage());
             throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
@@ -100,10 +99,10 @@ public class SttProcessor {
             return chunks;
 
         } catch (UnsupportedAudioFileException e) {
-            log.error("지원하지 않는 오디오 포맷: {}", e.getMessage(), e);
+            log.info("[음성파일 1분 분리] 지원하지 않는 오디오 포맷: {}", e.getMessage(), e);
             throw new ApiException(ErrorCode.AUDIO_UNSUPPORT_FORMAT_EXCEPTION);
         } catch (IOException e) {
-            log.error("오디오 파일 처리 중 IO 오류 발생: {}", e.getMessage(), e);
+            log.info("[음성파일 1분 분리] 오디오 파일 처리 중 IO 오류 발생: {}", e.getMessage(), e);
             throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
@@ -131,10 +130,10 @@ public class SttProcessor {
 
             return durationInSeconds;
         } catch (UnsupportedAudioFileException e) {
-            log.error("지원하지 않는 오디오 포맷: {}", e.getMessage(), e);
+            log.info("[음성파일 시간계산] 지원하지 않는 오디오 포맷: {}", e.getMessage(), e);
             throw new ApiException(ErrorCode.AUDIO_UNSUPPORT_FORMAT_EXCEPTION);
         } catch (IOException e) {
-            log.error("오디오 파일 처리 중 IO 오류 발생: {}", e.getMessage(), e);
+            log.info("[음성파일 시간계산] 오디오 파일 처리 중 IO 오류 발생: {}", e.getMessage(), e);
             throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
