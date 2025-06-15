@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -189,19 +190,19 @@ class AnswerServiceTest {
         answerService.writeUserSpeech(mockFile, saveUser.getId(), saveQuestion.getId(), memo);
 
         // then
-        Optional<Answer> answerOpt = answerRepository.findByUserIdAndQuestionId(saveUser.getId(), saveQuestion.getId());
+        List<Answer> answerOpt = answerRepository.findAllByUserIdAndQuestionId(saveUser.getId(), saveQuestion.getId());
         assertAll(
                 () -> assertThat(answerOpt).isNotEmpty(),
-                () -> assertThat(answerOpt.get().getMemo()).isEqualTo(memo),
-                () -> assertThat(answerOpt.get().getReply()).isEqualTo(result),
-                ()->assertThat(answerOpt.get().isSuccess()).isEqualTo(true),
-                () -> assertThat(answerOpt.get().getUser().getId()).isEqualTo(saveUser.getId()),
-                () -> assertThat(answerOpt.get().getQuestion().getId()).isEqualTo(saveQuestion.getId())
+                () -> assertThat(answerOpt.getLast().getMemo()).isEqualTo(memo),
+                () -> assertThat(answerOpt.getLast().getReply()).isEqualTo(result),
+                ()->assertThat(answerOpt.getLast().isSuccess()).isEqualTo(true),
+                () -> assertThat(answerOpt.getLast().getUser().getId()).isEqualTo(saveUser.getId()),
+                () -> assertThat(answerOpt.getLast().getQuestion().getId()).isEqualTo(saveQuestion.getId())
         );
     }
 
     @Test
-    void STT변환API호출예외_테스트() {
+    void STT변환API호출예외_면접결과저장안되는_테스트() {
         // given
         User user = fixtureMonkey.giveMeBuilder(User.class)
                 .setNull("email")
@@ -228,20 +229,20 @@ class AnswerServiceTest {
 
         // then
         assertThrows(ApiException.class, () -> answerService.writeUserSpeech(mockFile, saveUser.getId(), saveQuestion.getId(), memo));
-        Optional<Answer> answerOpt = answerRepository.findByUserIdAndQuestionId(saveUser.getId(), saveQuestion.getId());
-
-        assertAll(
+        List<Answer> answerOpt = answerRepository.findAllByUserIdAndQuestionId(saveUser.getId(), saveQuestion.getId());
+        assertThat(answerOpt).isEmpty();
+       /* assertAll(
                 () -> assertThat(answerOpt).isNotEmpty(),
-                () -> assertThat(answerOpt.get().getMemo()).isEqualTo(memo),
-                () -> assertThat(answerOpt.get().getReply()).isNull(),
-                ()->assertThat(answerOpt.get().isSuccess()).isEqualTo(false),
-                () -> assertThat(answerOpt.get().getUser().getId()).isEqualTo(saveUser.getId()),
-                () -> assertThat(answerOpt.get().getQuestion().getId()).isEqualTo(saveQuestion.getId())
-        );
+                () -> assertThat(answerOpt.getLast().getMemo()).isEqualTo(memo),
+                () -> assertThat(answerOpt.getLast().getReply()).isNull(),
+                ()->assertThat(answerOpt.getLast().isSuccess()).isEqualTo(false),
+                () -> assertThat(answerOpt.getLast().getUser().getId()).isEqualTo(saveUser.getId()),
+                () -> assertThat(answerOpt.getLast().getQuestion().getId()).isEqualTo(saveQuestion.getId())
+        );*/
     }
 
     @Test
-    void 파일형변환예외_테스트() {
+    void 파일형변환예외_면접결과저장안되는_테스트() {
         // given
         User user = fixtureMonkey.giveMeBuilder(User.class)
                 .setNull("email")
@@ -268,15 +269,42 @@ class AnswerServiceTest {
 
         // then
         assertThrows(ApiException.class, () -> answerService.writeUserSpeech(mockFile, saveUser.getId(), saveQuestion.getId(), memo));
-        Optional<Answer> answerOpt = answerRepository.findByUserIdAndQuestionId(saveUser.getId(), saveQuestion.getId());
-
-        assertAll(
+        List<Answer> answerOpt = answerRepository.findAllByUserIdAndQuestionId(saveUser.getId(), saveQuestion.getId());
+        assertThat(answerOpt).isEmpty();
+        /*assertAll(
                 () -> assertThat(answerOpt).isNotEmpty(),
-                () -> assertThat(answerOpt.get().getMemo()).isEqualTo(memo),
-                () -> assertThat(answerOpt.get().getReply()).isNull(),
-                ()->assertThat(answerOpt.get().isSuccess()).isEqualTo(false),
-                () -> assertThat(answerOpt.get().getUser().getId()).isEqualTo(saveUser.getId()),
-                () -> assertThat(answerOpt.get().getQuestion().getId()).isEqualTo(saveQuestion.getId())
+                () -> assertThat(answerOpt.getLast().getMemo()).isEqualTo(memo),
+                () -> assertThat(answerOpt.getLast().getReply()).isNull(),
+                ()->assertThat(answerOpt.getLast().isSuccess()).isEqualTo(false),
+                () -> assertThat(answerOpt.getLast().getUser().getId()).isEqualTo(saveUser.getId()),
+                () -> assertThat(answerOpt.getLast().getQuestion().getId()).isEqualTo(saveQuestion.getId())
+        );*/
+    }
+
+    @Test
+    void 이미_면접완료했을때_예외발생_테스트() {
+        //given
+        User user = fixtureMonkey.giveMeBuilder(User.class)
+                .setNull("email")
+                .setNotNull("domain")
+                .sample();
+        User saveUser = userRepository.save(user);
+
+        Question question = fixtureMonkey.giveMeOne(Question.class);
+        Question saveQuestion = questionRepository.save(question);
+
+        answerRepository.save(Answer.builder()
+                        .memo("memo")
+                        .user(saveUser)
+                        .reply("reply")
+                        .success(true)
+                        .question(saveQuestion)
+                .build());
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "audio", "audio.wav", "audio/wav", new byte[]{0, 1, 2}
         );
+        // when
+        // then
+        assertThrows(ApiException.class, () -> answerService.writeUserSpeech(mockFile,saveUser.getId(), saveQuestion.getId(), null));
     }
 }

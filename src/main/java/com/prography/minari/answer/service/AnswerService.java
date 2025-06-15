@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,42 +37,45 @@ public class AnswerService {
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
 
-        boolean success = true;
-        String speech = null;
-        try {
-            byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
-            speech = sttProcessor.convertToText(inputStream);
-        } catch (ApiException e) {
-            success = false;
-            throw e;
-        } finally {
-            // 예외가 발생하든 말든 항상 기록
-            answerWriter.write(Answer.builder()
-                    .reply(speech)
-                    .user(user)
-                    .question(question)
-                    .success(success)
-                    .memo(memo)
-                    .build());
+        if (!answers.isEmpty()) {
+            throw new ApiException(ErrorCode.FREE_ANSWER_ALREADY_DONE);
         }
+
+        byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
+        String speech = sttProcessor.convertToText(inputStream);
+        // 예외가 발생하든 말든 항상 기록
+        answerWriter.write(Answer.builder()
+                .reply(speech)
+                .success(true)
+                .user(user)
+                .question(question)
+                .memo(memo)
+                .build());
     }
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {
-        Optional<Answer> optionalAnswer = answerReader.readByUserIdAndQuestionId(userId, questionId);
-        SttStatus sttStatus = optionalAnswer
-                .map(answer -> answer.isSuccess() ? SttStatus.SUCCESS : SttStatus.ERROR)
-                .orElse(SttStatus.PROCESS);
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
+        if (answers.isEmpty()) {
+            return UserAnswerStatusResponse.builder()
+                    .status(SttStatus.PROCESS)
+                    .build();
+        }
+        Answer last = answers.getLast();
         return UserAnswerStatusResponse.builder()
-                .status(sttStatus)
+                .status(last.isSuccess() ? SttStatus.SUCCESS : SttStatus.ERROR)
                 .build();
     }
 
     public InterviewContentResponse getAnswer(Long questionId, Long userId) {
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
-        Answer answer = answerReader.readByUserIdAndQuestionId(userId, questionId)
-                .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
+        if (answers.isEmpty()) {
+            throw new ApiException(ErrorCode.ENTITY_NOT_FOUND);
+        }
+        Answer answer = answers.getLast();
         return InterviewContentResponse.of(question.getAnswer(), question.getContent(), answer.getReply());
     }
 }
