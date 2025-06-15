@@ -19,7 +19,8 @@ public enum ErrorCode {
     EMAIL_MESSAGE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 메시지 생성 중 오류가 발생했습니다.", "MAIL002"),
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다.", "MAIL003"),
     METHOD_ARGUMENT_NOT_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "", "VALIDATION"),
-    AUDIO_UNSUPPORT_FORMAT_EXCEPTION(HttpStatus.NOT_FOUND, "지원하지 않는 오디오 포맷입니다.","AU003"),;
+    AUDIO_UNSUPPORT_FORMAT_EXCEPTION(HttpStatus.NOT_FOUND, "지원하지 않는 오디오 포맷입니다.","AU003"),
+    REQUEST_BODY_IS_MISSING(HttpStatus.NOT_FOUND, "Request Body가 존재하지 않습니다.", "VALIDATION");
 
     private final HttpStatus status;
     private final String message;

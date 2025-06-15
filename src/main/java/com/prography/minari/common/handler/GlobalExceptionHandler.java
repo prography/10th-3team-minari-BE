@@ -5,6 +5,7 @@ import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.response.CommonResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +28,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest()
                 .body(CommonResponse.fail(ErrorCode.METHOD_ARGUMENT_NOT_VALIDATION_EXCEPTION.getCode(), errorMessage));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        return ResponseEntity
+                .badRequest()
+                .body(CommonResponse.fail(ErrorCode.REQUEST_BODY_IS_MISSING.getCode(), ErrorCode.REQUEST_BODY_IS_MISSING.getMessage()));
     }
 
 }
