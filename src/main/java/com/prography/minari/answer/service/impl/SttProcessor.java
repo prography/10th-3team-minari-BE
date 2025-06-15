@@ -1,5 +1,6 @@
 package com.prography.minari.answer.service.impl;
 
+import com.prography.minari.answer.service.dto.SttConvertAudioFileInfo;
 import com.prography.minari.common.aop.ImplService;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
@@ -24,9 +25,10 @@ import java.util.Objects;
 public class SttProcessor {
     private final SttApiClient sttApiClient;
 
-    public String convertToText(byte[] file) {
+    public SttConvertAudioFileInfo convertToText(byte[] file) {
         AudioFormat format = getAudioFormat(file);
         List<byte[]> rawChunks = splitWavToExactMinutes(file, format);
+        double audioDurationInSeconds = getAudioDurationInSeconds(file);
         List<String> texts = Flux.fromIterable(rawChunks)
                 .flatMapSequential(chunk -> {
                     byte[] wavChunk = null;
@@ -42,8 +44,10 @@ public class SttProcessor {
                 .map(s -> s.endsWith(".") ? s : s + ".")
                 .collectList()
                 .block(); // 이 부분에서 예외가 던져짐
-
-        return String.join(" ", Objects.requireNonNull(texts));
+        return SttConvertAudioFileInfo.builder()
+                .runningTime(audioDurationInSeconds)
+                .speech(String.join(" ", Objects.requireNonNull(texts)))
+                .build();
     }
 
     private AudioFormat getAudioFormat(byte[] wavData) {
@@ -113,6 +117,25 @@ public class SttProcessor {
             AudioInputStream chunkStream = new AudioInputStream(bais, format, rawData.length / format.getFrameSize());
             AudioSystem.write(chunkStream, AudioFileFormat.Type.WAVE, baos);
             return baos.toByteArray();
+        }
+    }
+
+    private double getAudioDurationInSeconds(byte[] wavBytes) {
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new ByteArrayInputStream(wavBytes))) {
+            AudioFormat format = audioInputStream.getFormat();
+            long frameLength = audioInputStream.getFrameLength(); // 전체 프레임 수
+            float frameRate = format.getFrameRate();              // 초당 프레임 수
+
+            double durationInSeconds = frameLength / frameRate;
+            log.info("총 프레임 수: {}, 초당 프레임 수: {}, 총 시간: {}초", frameLength, frameRate, durationInSeconds);
+
+            return durationInSeconds;
+        } catch (UnsupportedAudioFileException e) {
+            log.error("지원하지 않는 오디오 포맷: {}", e.getMessage(), e);
+            throw new ApiException(ErrorCode.AUDIO_UNSUPPORT_FORMAT_EXCEPTION);
+        } catch (IOException e) {
+            log.error("오디오 파일 처리 중 IO 오류 발생: {}", e.getMessage(), e);
+            throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 }

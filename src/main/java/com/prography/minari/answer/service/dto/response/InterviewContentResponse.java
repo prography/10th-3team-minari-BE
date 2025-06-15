@@ -3,14 +3,15 @@ package com.prography.minari.answer.service.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
+
 @Getter
 @Builder
 public class InterviewContentResponse {
     private String answer;
     private String question;
     private String reply;
+    private LocalDate createDate;
+    private Double runningTime;
 
-    public static InterviewContentResponse of(String answer, String question, String reply) {
-        return new InterviewContentResponse(answer, question, reply);
-    }
 }
