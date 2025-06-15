@@ -5,6 +5,7 @@ import com.prography.minari.mail.dto.MailVerificationReqDto;
 import com.prography.minari.mail.service.MailService;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.social.service.SocialService;
+import com.prography.minari.user.controller.docs.UserApiDocs;
 import com.prography.minari.user.dto.UserJoinReqDto;
 import com.prography.minari.user.dto.UserJoinResDto;
 import com.prography.minari.user.dto.UserLoginResDto;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-public class UserController {
+public class UserController implements UserApiDocs {
 
     private final UserService userService;
     private final SocialService socialService;
