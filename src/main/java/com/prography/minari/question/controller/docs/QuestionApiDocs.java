@@ -22,8 +22,7 @@ public interface QuestionApiDocs {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "질문 내용 반환 성공",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))
+                    description = "질문 내용 반환 성공"
             )
     })
     @GetMapping("/questions/{questionId}/contents")
@@ -39,8 +38,7 @@ public interface QuestionApiDocs {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "오늘의 질문 조회 성공",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))
+                    description = "오늘의 질문 조회 성공"
             )
     })
     @GetMapping("/users/{userId}/questions")
@@ -56,8 +54,7 @@ public interface QuestionApiDocs {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "질문 태그 목록 조회 성공",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))
+                    description = "질문 태그 목록 조회 성공"
             )
     })
     @GetMapping("/questions/{questionId}/tag")

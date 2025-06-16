@@ -7,12 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
     @Query("select A from Answer A where A.user.id = :userId and A.question.id = :questionId")
-    Optional<Answer> findByUserIdAndQuestionId(@Param("userId") Long userId, @Param("questionId") Long questionId);
+    List<Answer> findAllByUserIdAndQuestionId(@Param("userId") Long userId, @Param("questionId") Long questionId);
 
     Long user(User user);
 }

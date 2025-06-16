@@ -1,6 +1,7 @@
 package com.prography.minari.answer.service;
 
 import com.prography.minari.answer.entity.Answer;
+import com.prography.minari.answer.service.dto.SttConvertAudioFileInfo;
 import com.prography.minari.answer.service.dto.SttStatus;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,46 +34,68 @@ public class AnswerService {
     private final QuestionReader questionReader;
     private final AudioFileFormatConverter audioFileFormatConverter;
 
-    public void writeUserSpeech(MultipartFile file, Long userId, Long questionId, String memo) {
+    public InterviewContentResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId, String memo) {
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
 
-        boolean success = true;
-        String speech = null;
-        try {
-            byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
-            speech = sttProcessor.convertToText(inputStream);
-        } catch (ApiException e) {
-            success = false;
-            throw e;
-        } finally {
-            // 예외가 발생하든 말든 항상 기록
-            answerWriter.write(Answer.builder()
-                    .reply(speech)
-                    .user(user)
-                    .question(question)
-                    .success(success)
-                    .memo(memo)
-                    .build());
+        /**
+         * Todo
+         * 프론트 개발 완료후 주석 제거
+         */
+        if (!answers.isEmpty()) {
+            throw new ApiException(ErrorCode.FREE_ANSWER_ALREADY_DONE);
         }
+
+        byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
+        SttConvertAudioFileInfo convertResult = sttProcessor.convertToText(inputStream);
+
+        Answer answer = answerWriter.write(Answer.builder()
+                .runningTime(convertResult.getRunningTime())
+                .reply(convertResult.getSpeech())
+                .user(user)
+                .question(question)
+                .memo(memo)
+                .build());
+
+        return InterviewContentResponse.builder()
+                .runningTime(convertResult.getRunningTime())
+                .answer(question.getAnswer())
+                .reply(convertResult.getSpeech())
+                .question(question.getContent())
+                .createDate(answer.getCreatedDateTime().toLocalDate())
+                .build();
+
     }
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {
-        Optional<Answer> optionalAnswer = answerReader.readByUserIdAndQuestionId(userId, questionId);
-        SttStatus sttStatus = optionalAnswer
-                .map(answer -> answer.isSuccess() ? SttStatus.SUCCESS : SttStatus.ERROR)
-                .orElse(SttStatus.PROCESS);
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
+        if (answers.isEmpty()) {
+            return UserAnswerStatusResponse.builder()
+                    .status(SttStatus.NOT_FOUND)
+                    .build();
+        }
         return UserAnswerStatusResponse.builder()
-                .status(sttStatus)
+                .status(SttStatus.SUCCESS)
                 .build();
     }
 
     public InterviewContentResponse getAnswer(Long questionId, Long userId) {
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
-        Answer answer = answerReader.readByUserIdAndQuestionId(userId, questionId)
-                .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
-        return InterviewContentResponse.of(question.getAnswer(), question.getContent(), answer.getReply());
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
+        if (answers.isEmpty()) {
+            throw new ApiException(ErrorCode.ENTITY_NOT_FOUND);
+        }
+        Answer answer = answers.getLast();
+
+        return InterviewContentResponse.builder()
+                .createDate(answer.getCreatedDateTime().toLocalDate())
+                .runningTime(answer.getRunningTime())
+                .question(question.getContent())
+                .answer(question.getAnswer())
+                .reply(answer.getReply())
+                .build();
     }
 }

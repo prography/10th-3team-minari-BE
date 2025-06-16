@@ -21,8 +21,7 @@ public interface UserApiDocs {
             description = "소셜 타입, 인증 코드, 리디렉션 URI를 받아 소셜 로그인을 수행하고, JWT 토큰 및 사용자 정보를 반환합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "소셜 로그인 성공",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class)))
+            @ApiResponse(responseCode = "200", description = "소셜 로그인 성공")
     })
     @GetMapping("/users/oauth/{social}")
     CommonResponse<UserLoginResDto> oauth(
@@ -36,8 +35,7 @@ public interface UserApiDocs {
             description = "입력된 이메일 주소로 인증 메일을 전송합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "이메일 인증 요청 성공",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class)))
+            @ApiResponse(responseCode = "200", description = "이메일 인증 요청 성공")
     })
     @PostMapping("/users/mail-verification")
     CommonResponse<Void> emailVerification(
@@ -54,8 +52,7 @@ public interface UserApiDocs {
             description = "사용자 회원가입 정보를 받아 사용자 계정을 생성합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원가입 성공",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class)))
+            @ApiResponse(responseCode = "200", description = "회원가입 성공")
     })
     @PostMapping("/users/join")
     CommonResponse<UserJoinResDto> join(
@@ -72,9 +69,7 @@ public interface UserApiDocs {
             description = "ID에 해당하는 사용자 정보를 반환합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class)))
-    })
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공")})
     @GetMapping("/users/{id}")
     CommonResponse<UserFindResDto> findByUserId(
             @Parameter(description = "조회할 사용자 ID", required = true) @PathVariable("id") Long id
