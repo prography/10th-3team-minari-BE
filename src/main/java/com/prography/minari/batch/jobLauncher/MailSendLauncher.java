@@ -26,6 +26,5 @@ public class MailSendLauncher {
                 .addLocalDateTime("sendMailDate", LocalDateTime.now())
                 .toJobParameters();
         jobLauncher.run(mailJobConfiguration.start(jobRepository, transactionManager), mailSendDateParameter);
-        ;
     }
 }
