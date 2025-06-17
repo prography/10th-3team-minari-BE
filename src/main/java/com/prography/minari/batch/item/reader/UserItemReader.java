@@ -14,7 +14,7 @@ public class UserItemReader {
         return new JpaPagingItemReaderBuilder<User>()
                 .name("userItemReader")                     // 리더 이름
                 .entityManagerFactory(emf)                  // EntityManagerFactory (필수)
-                .queryString("SELECT u FROM User u")        // JPQL
+                .queryString("SELECT u FROM User u WHERE u.isSubscribed = true")           // JPQL
                 .pageSize(100)                              // chunk 크기와 일치시킴
                 .build();
     }
