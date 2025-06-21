@@ -4,7 +4,9 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
-
+  batch:
+    job:
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: update
