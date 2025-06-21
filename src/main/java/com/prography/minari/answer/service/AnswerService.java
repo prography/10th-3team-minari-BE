@@ -9,6 +9,7 @@ import com.prography.minari.answer.service.impl.AnswerReader;
 import com.prography.minari.answer.service.impl.AnswerWriter;
 import com.prography.minari.answer.service.impl.AudioFileFormatConverter;
 import com.prography.minari.answer.service.impl.SttProcessor;
+import com.prography.minari.aws.impl.FileUploader;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.question.entity.Question;
@@ -32,6 +33,7 @@ public class AnswerService {
     private final AnswerReader answerReader;
     private final UserReader userReader;
     private final QuestionReader questionReader;
+    private final FileUploader fileUploader;
     private final AudioFileFormatConverter audioFileFormatConverter;
 
     public InterviewContentResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId, String memo) {
@@ -58,7 +60,7 @@ public class AnswerService {
                 .question(question)
                 .memo(memo)
                 .build());
-
+        fileUploader.upload(file, "/voice");
         return InterviewContentResponse.builder()
                 .runningTime(convertResult.getRunningTime())
                 .answer(question.getAnswer())
