@@ -23,14 +23,15 @@ public class S3Uploader implements FileUploader {
     private String bucket;
 
     @Override
-    public String upload(MultipartFile file, String folder) {
+    public String upload(MultipartFile file, String relativeFolderPath) {
         String fileName = file.getOriginalFilename();
-        String fileUrl = "https://" + bucket + folder + fileName;
+        String fullPath = relativeFolderPath + "/" + fileName;
+        String fileUrl = "https://" + bucket + fullPath;
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
         try {
-            amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
+            amazonS3Client.putObject(bucket, fullPath, file.getInputStream(), metadata);
         } catch (IOException e) {
             log.error("Failed to upload file", e.getStackTrace()[0]);
             throw new ApiException(ErrorCode.INTERNAL_SERVER_ERROR);
