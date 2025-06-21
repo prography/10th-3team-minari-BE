@@ -33,15 +33,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final List<String> WHITELIST = List.of(
-            "/api/v1/users/oauth/",
-            "/swagger-ui/",
-            "/v3/api-docs",
-            "/swagger-resources",
-            "/webjars/",
-            "/favicon.ico"
-    );
-
     private final JwtUtil jwtUtil;
     private final UserReader userReader;
 
@@ -49,11 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 로그인 URI 및 Swagger는 Filter 처리 생략!
-        if (WHITELIST.stream().anyMatch(request.getRequestURI()::startsWith)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        System.out.println("🧱 JwtAuthenticationFilter 적용됨: " + request.getRequestURI());
 
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
