@@ -72,6 +72,10 @@ dependencies {
 	//ffmpeg
 	implementation("ws.schild:jave-core:3.3.1")
 
+	// db ssh tunneling
+	implementation 'com.github.mwiede:jsch:0.2.17'
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
 }
 
 tasks.named('test') {
