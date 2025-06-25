@@ -39,7 +39,7 @@ public interface UserApiDocs {
 
     @Operation(
             summary = "이메일 인증 요청",
-            description = "입력된 이메일 주소로 인증 메일을 전송합니다."
+            description = "입력된 이메일 주소로 인증 메일을 전송합니다. (로그인된 사용자만 가능)"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "이메일 인증 요청 성공")
@@ -51,7 +51,8 @@ public interface UserApiDocs {
                     required = true,
                     content = @Content(schema = @Schema(implementation = MailVerificationReqDto.class))
             )
-            @RequestBody MailVerificationReqDto mailVerificationReqDto
+            @RequestBody MailVerificationReqDto mailVerificationReqDto,
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
     );
 
     @Operation(
@@ -80,6 +81,25 @@ public interface UserApiDocs {
     })
     @GetMapping("/users/me")
     ResponseEntity<CommonResponse<UserFindResDto>> findByUserId(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
+    );
+
+    @Operation(
+            summary = "이메일 인증번호 검증",
+            description = "이메일과 인증번호(코드)를 받아 인증을 검증합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이메일 인증 성공"),
+            @ApiResponse(responseCode = "400", description = "인증 실패 또는 만료")
+    })
+    @PostMapping("/users/mail-verification/verify")
+    ResponseEntity<CommonResponse<Void>> verifyMailCode(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "이메일 인증번호 검증 요청 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = com.prography.minari.user.dto.MailVerificationCheckReqDto.class))
+            )
+            @RequestBody com.prography.minari.user.dto.MailVerificationCheckReqDto req,
             @Parameter(hidden = true) @AuthenticationPrincipal User user
     );
 }

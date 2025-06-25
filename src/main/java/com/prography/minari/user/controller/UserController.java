@@ -6,10 +6,7 @@ import com.prography.minari.mail.service.MailService;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.social.service.SocialService;
 import com.prography.minari.user.controller.docs.UserApiDocs;
-import com.prography.minari.user.dto.UserJoinReqDto;
-import com.prography.minari.user.dto.UserJoinResDto;
-import com.prography.minari.user.dto.UserLoginReqDto;
-import com.prography.minari.user.dto.UserLoginResDto;
+import com.prography.minari.user.dto.*;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +32,14 @@ public class UserController implements UserApiDocs {
     }
 
     @PostMapping("/users/mail-verification")
-    public ResponseEntity emailVerification(@RequestBody @Validated MailVerificationReqDto mailVerificationReqDto) {
-        mailService.sendAuthMail(mailVerificationReqDto);
+    public ResponseEntity emailVerification(@RequestBody @Validated MailVerificationReqDto mailVerificationReqDto, @AuthenticationPrincipal User user) {
+        mailService.sendAuthMail(mailVerificationReqDto, user);
+        return ResponseEntity.ok(CommonResponse.ok());
+    }
+
+    @PostMapping("/users/mail-verification/verify")
+    public ResponseEntity verifyMailCode(@RequestBody MailVerificationCheckReqDto mailVerificationCheckReqDto, @AuthenticationPrincipal User user) {
+        mailService.verifyAuthCode(mailVerificationCheckReqDto, user);
         return ResponseEntity.ok(CommonResponse.ok());
     }
 
