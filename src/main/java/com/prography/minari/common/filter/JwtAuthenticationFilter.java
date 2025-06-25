@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_FOUND_EXCEPTION;
@@ -36,11 +37,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserReader userReader;
 
+    private static final List<String> PERMIT_ALL_PATHS = Arrays.asList(
+            "/api/v1/users/oauth",
+            "/swagger-ui/",
+            "/v3/api-docs/",
+            "/swagger-resources/",
+            "/webjars/",
+            "/favicon.ico"
+    );
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        System.out.println("🧱 JwtAuthenticationFilter 적용됨: " + request.getRequestURI());
+
+        log.info(request.getRequestURI());
+
+        // 리스트에 포함된 경로는 필터를 그냥 통과시킴
+        if (PERMIT_ALL_PATHS.stream().anyMatch(request.getRequestURI()::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 

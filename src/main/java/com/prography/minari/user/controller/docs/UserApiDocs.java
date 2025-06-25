@@ -21,16 +21,20 @@ public interface UserApiDocs {
 
     @Operation(
             summary = "소셜 로그인",
-            description = "소셜 타입, 인증 코드, 리디렉션 URI를 받아 소셜 로그인을 수행하고, JWT 토큰 및 사용자 정보를 반환합니다."
+            description = "소셜 타입과 인증 정보를 받아 소셜 로그인을 수행하고, JWT 토큰 및 사용자 정보를 반환합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "소셜 로그인 성공")
     })
-    @GetMapping("/users/oauth/{social}")
+    @PostMapping("/users/oauth/{social}")
     ResponseEntity<CommonResponse<UserLoginResDto>> oauth(
-            @Parameter(description = "소셜 로그인 타입 (예: kakao)", required = true) @PathVariable String social,
-            @Parameter(description = "OAuth 인증 코드", required = true) @RequestParam("code") String code,
-            @Parameter(description = "OAuth 리디렉션 URI", required = true) @RequestParam("redirect-uri") String redirectUri
+            @Parameter(description = "소셜 로그인 타입 (예: kakao)", required = true) @PathVariable("social") String socialType,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "소셜 로그인 요청 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = com.prography.minari.user.dto.UserLoginReqDto.class))
+            )
+            @RequestBody com.prography.minari.user.dto.UserLoginReqDto userLoginReqDto
     );
 
     @Operation(

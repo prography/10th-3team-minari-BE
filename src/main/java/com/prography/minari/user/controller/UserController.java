@@ -8,6 +8,7 @@ import com.prography.minari.social.service.SocialService;
 import com.prography.minari.user.controller.docs.UserApiDocs;
 import com.prography.minari.user.dto.UserJoinReqDto;
 import com.prography.minari.user.dto.UserJoinResDto;
+import com.prography.minari.user.dto.UserLoginReqDto;
 import com.prography.minari.user.dto.UserLoginResDto;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.UserService;
@@ -27,9 +28,9 @@ public class UserController implements UserApiDocs {
     private final SocialService socialService;
     private final MailService mailService;
 
-    @GetMapping("/users/oauth/{social}")
-    public ResponseEntity oauth(@RequestParam("code") String code, @RequestParam("redirect-uri") String redirectUri, @PathVariable("social") String socialType) {
-        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri);
+    @PostMapping("/users/oauth/{social}")
+    public ResponseEntity oauth(@PathVariable("social") String socialType, @RequestBody @Validated UserLoginReqDto userLoginReqDto) {
+        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), userLoginReqDto.code(), userLoginReqDto.redirectUri());
         return ResponseEntity.ok(CommonResponse.success(userLoginResDto));
     }
 
