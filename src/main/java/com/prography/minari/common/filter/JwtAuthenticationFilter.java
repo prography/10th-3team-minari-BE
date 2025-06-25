@@ -50,9 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-
-        log.info(request.getRequestURI());
-
         // 리스트에 포함된 경로는 필터를 그냥 통과시킴
         if (PERMIT_ALL_PATHS.stream().anyMatch(request.getRequestURI()::startsWith)) {
             filterChain.doFilter(request, response);
