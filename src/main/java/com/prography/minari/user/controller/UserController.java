@@ -35,7 +35,7 @@ public class UserController implements UserApiDocs {
     }
 
     @PostMapping("/users/mail-verification")
-    public ResponseEntity emailVerification(@RequestBody @Validated MailVerificationReqDto mailVerificationReqDto) {
+    public ResponseEntity<CommonResponse<String>> emailVerification(@RequestBody @Validated MailVerificationReqDto mailVerificationReqDto) {
         mailService.sendAuthMail(mailVerificationReqDto);
         return ResponseEntity.ok(CommonResponse.ok());
     }
@@ -49,6 +49,9 @@ public class UserController implements UserApiDocs {
     @GetMapping("/users/me")
     public ResponseEntity findByUserId(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(userService.findById(user.getId()));
+    public ResponseEntity<CommonResponse<UserJoinResDto>> join(@RequestBody @Validated UserJoinReqDto userJoinReqDto) {
+        UserJoinResDto userJoinResDto = userService.join(userJoinReqDto);
+        return ResponseEntity.ok(CommonResponse.success(userJoinResDto));
     }
 
 }
