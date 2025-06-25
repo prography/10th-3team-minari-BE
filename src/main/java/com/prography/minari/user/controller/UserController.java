@@ -54,4 +54,10 @@ public class UserController implements UserApiDocs {
         return ResponseEntity.ok(userService.findById(user.getId()));
     }
 
+    @DeleteMapping("/users/me")
+    public ResponseEntity deleteByUserId(@AuthenticationPrincipal User user) {
+        userService.delete(user);
+        return ResponseEntity.ok(CommonResponse.success("계정삭제"));
+    }
+
 }
