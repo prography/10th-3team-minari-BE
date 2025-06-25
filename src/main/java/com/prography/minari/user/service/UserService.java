@@ -1,5 +1,7 @@
 package com.prography.minari.user.service;
 
+import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.dto.UserJoinReqDto;
 import com.prography.minari.user.dto.UserJoinResDto;
@@ -22,9 +24,13 @@ public class UserService {
         return UserFindResDto.from(user);
     }
 
-    public UserJoinResDto join(UserJoinReqDto userJoinReqDto) {
-        // user 조회 TODO Spring Security 도입 이후 파라미터에서 UserID 제거
-        User findUser = userReader.read(userJoinReqDto.userId());
+    public UserJoinResDto join(UserJoinReqDto userJoinReqDto, Long userId) {
+        // user 조회
+        User findUser = userReader.read(userId);
+
+        // 이미 회원가입이 완료된 사용자인 경우, 중복 가입 방지를 위해 예외 처리
+        if(findUser.isRegistered())
+            throw new ApiException(ErrorCode.ALREADY_REGISTERED);
 
         // 회원가입
         User joinUser = userWriter.join(

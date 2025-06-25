@@ -6,28 +6,35 @@ import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.dto.UserJoinReqDto;
 import com.prography.minari.user.dto.UserJoinResDto;
 import com.prography.minari.user.dto.UserLoginResDto;
+import com.prography.minari.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 public interface UserApiDocs {
 
     @Operation(
             summary = "소셜 로그인",
-            description = "소셜 타입, 인증 코드, 리디렉션 URI를 받아 소셜 로그인을 수행하고, JWT 토큰 및 사용자 정보를 반환합니다."
+            description = "소셜 타입과 인증 정보를 받아 소셜 로그인을 수행하고, JWT 토큰 및 사용자 정보를 반환합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "소셜 로그인 성공")
     })
-    @GetMapping("/users/oauth/{social}")
-    CommonResponse<UserLoginResDto> oauth(
-            @Parameter(description = "소셜 로그인 타입 (예: kakao)", required = true) @PathVariable String social,
-            @Parameter(description = "OAuth 인증 코드", required = true) @RequestParam("code") String code,
-            @Parameter(description = "OAuth 리디렉션 URI", required = true) @RequestParam("redirect-uri") String redirectUri
+    @PostMapping("/users/oauth/{social}")
+    ResponseEntity<CommonResponse<UserLoginResDto>> oauth(
+            @Parameter(description = "소셜 로그인 타입 (예: kakao)", required = true) @PathVariable("social") String socialType,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "소셜 로그인 요청 정보",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = com.prography.minari.user.dto.UserLoginReqDto.class))
+            )
+            @RequestBody com.prography.minari.user.dto.UserLoginReqDto userLoginReqDto
     );
 
     @Operation(
@@ -38,7 +45,7 @@ public interface UserApiDocs {
             @ApiResponse(responseCode = "200", description = "이메일 인증 요청 성공")
     })
     @PostMapping("/users/mail-verification")
-    CommonResponse<Void> emailVerification(
+    ResponseEntity<CommonResponse<Void>> emailVerification(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "이메일 인증 요청 정보",
                     required = true,
@@ -55,13 +62,13 @@ public interface UserApiDocs {
             @ApiResponse(responseCode = "200", description = "회원가입 성공")
     })
     @PostMapping("/users/join")
-    CommonResponse<UserJoinResDto> join(
+    ResponseEntity<CommonResponse<UserJoinResDto>> join(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "회원가입 요청 정보",
                     required = true,
                     content = @Content(schema = @Schema(implementation = UserJoinReqDto.class))
             )
-            @RequestBody UserJoinReqDto userJoinReqDto
+            @RequestBody UserJoinReqDto userJoinReqDto, @Parameter(hidden = true) @AuthenticationPrincipal User user
     );
 
     @Operation(
@@ -69,9 +76,10 @@ public interface UserApiDocs {
             description = "ID에 해당하는 사용자 정보를 반환합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공")})
-    @GetMapping("/users/{id}")
-    CommonResponse<UserFindResDto> findByUserId(
-            @Parameter(description = "조회할 사용자 ID", required = true) @PathVariable("id") Long id
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공")
+    })
+    @GetMapping("/users/me")
+    ResponseEntity<CommonResponse<UserFindResDto>> findByUserId(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
     );
 }
