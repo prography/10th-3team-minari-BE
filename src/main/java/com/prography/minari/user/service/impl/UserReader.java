@@ -15,4 +15,8 @@ public class UserReader {
     public User read(Long userId) {
         return userRepository.findById(userId).orElseThrow(()->new RuntimeException("User not found"));
     }
+
+    public User readByUUID(String uuid) {
+        return userRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
