@@ -6,6 +6,7 @@ import com.prography.minari.user.entity.User;
 import com.prography.minari.user.enums.EmailSendTime;
 import com.prography.minari.user.enums.ExperienceLevel;
 import com.prography.minari.user.repository.UserRepository;
+import com.prography.minari.mail.repository.MailAuthLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserWriter {
 
     private final UserRepository userRepository;
+    private final MailAuthLogRepository mailAuthLogRepository;
 
     public User join(User user, String email, Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, Domain domain) {
         user.join(email, isSubscribed, emailSendTime, studyExperienceLevel, workExperienceLevel, domain);
@@ -22,6 +24,7 @@ public class UserWriter {
     }
 
     public void delete(User user) {
+        mailAuthLogRepository.deleteByUserId(user.getId());
         userRepository.delete(user);
     }
 }
