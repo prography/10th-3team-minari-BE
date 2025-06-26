@@ -2,6 +2,8 @@ package com.prography.minari.user.service;
 
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
+import com.prography.minari.payment.entity.Seed;
+import com.prography.minari.payment.service.impl.SeedReader;
 import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.dto.UserJoinReqDto;
 import com.prography.minari.user.dto.UserJoinResDto;
@@ -18,10 +20,12 @@ public class UserService {
 
     private final UserReader userReader;
     private final UserWriter userWriter;
+    private final SeedReader seedReader;
 
     public UserFindResDto findById(Long id) {
         User user = userReader.read(id);
-        return UserFindResDto.from(user);
+        Seed seed = seedReader.readByUserId(id).orElse(new Seed(0L,user));
+        return UserFindResDto.from(user, seed);
     }
 
     public UserJoinResDto join(UserJoinReqDto userJoinReqDto, Long userId) {
