@@ -57,6 +57,9 @@ public class User extends BaseTimeEntity {
     @Enumerated(value = STRING)
     private Domain domain;
 
+    @Column(name = "uuid")
+    private String uuid;
+
     public static User create(String email, SocialType socialType, Long socialId, String name, String image) {
         User user = new User();
         user.email = email;

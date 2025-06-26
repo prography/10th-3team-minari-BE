@@ -26,4 +26,8 @@ public class UserReader {
                     return new ApiException(USER_NOT_FOUND);
                 });
     }
+
+    public User readByUUID(String uuid) {
+        return userRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
