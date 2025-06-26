@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface SeedRepository extends JpaRepository<Seed, Long> {
     @Query("select s from Seed s where s.user.id=:userId")
     Optional<Seed> findByUserId(@Param("userId") Long userId);
+
+    void deleteByUserId(Long id);
 }
