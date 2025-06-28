@@ -35,10 +35,11 @@ public class SocialService {
         User user = userRepository.findBySocialTypeAndSocialId(socialType, userInfoDto.socialId())
                 .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
 
-        // jwt 생성 TODO Spring Security 도입시, 차후에 제거될 예정
-        String jwt = jwtUtil.createToken(user.getId().toString());
+        // jwt 생성
+        String serverAccessToken = jwtUtil.createAccessToken(user.getId().toString());
+        String serverRefreshToken = jwtUtil.createRefreshToken(user.getId().toString());
 
-        return UserLoginResDto.from(user, jwt);
+        return UserLoginResDto.from(user, serverAccessToken, serverRefreshToken);
     }
 
 }
