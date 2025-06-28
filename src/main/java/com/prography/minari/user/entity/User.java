@@ -79,6 +79,7 @@ public class User extends BaseTimeEntity {
         user.name = name;
         user.image = image;
         user.isRegistered = false;
+        user.uuid = socialType + "_" + socialId;
         return user;
     }
 
