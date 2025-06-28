@@ -29,7 +29,7 @@ public class AdminController {
 
     @DeleteMapping("/users/me")
     public ResponseEntity deleteUser(@AuthenticationPrincipal User user) {
-        userService.deleteAdmin(user);
+        userService.deleteAdmin(user.getId());
         return ResponseEntity.ok(CommonResponse.success("[ADMIN] 계정 즉시 삭제"));
     }
 

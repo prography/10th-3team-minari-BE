@@ -63,8 +63,8 @@ public class UserService {
         userWriter.delete(user);
     }
 
-    public void deleteAdmin(User user) {
-        userWriter.deleteAdmin(user);
+    public void deleteAdmin(Long userId) {
+        userWriter.deleteAdmin(userId);
     }
 
     // JWT 재발급

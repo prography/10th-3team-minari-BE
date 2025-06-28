@@ -6,12 +6,11 @@ import com.prography.minari.answer.service.AnswerService;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import com.prography.minari.common.response.CommonResponse;
-import com.prography.minari.question.controller.dto.req.ConvertSttMemoRequest;
+import com.prography.minari.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -46,5 +45,14 @@ public class AnswerController implements AnswerApiDocs {
     public ResponseEntity<CommonResponse<InterviewContentResponse>> getAnswer(@PathVariable("questionId") Long questionId,
                                                                               @PathVariable("userId") Long userId) {
         return ResponseEntity.ok(CommonResponse.success(answerService.getAnswer(questionId, userId)));
+    }
+
+    @GetMapping("/answers")
+    public ResponseEntity getAnswerList(
+            @RequestParam("year") String year,
+            @RequestParam("month") String month
+            , @AuthenticationPrincipal User user) {
+
+        return ResponseEntity.ok(null);
     }
 }

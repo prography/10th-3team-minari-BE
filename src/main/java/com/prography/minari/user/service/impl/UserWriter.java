@@ -33,9 +33,9 @@ public class UserWriter {
         log.info("계정 삭제 : [{}] {} 삭제 예정", user.getId(), user.getDeletedAt());
     }
 
-    public void deleteAdmin(User user) {
-        mailAuthLogRepository.deleteByUserId(user.getId());
-        seedRepository.deleteByUserId(user.getId());
-        userRepository.delete(user);
+    public void deleteAdmin(Long userId) {
+        mailAuthLogRepository.deleteByUserId(userId);
+        seedRepository.deleteByUserId(userId);
+        userRepository.deleteById(userId);
     }
 }

@@ -1,5 +1,6 @@
 package com.prography.minari.user.dto;
 
+import com.prography.minari.common.entity.Domain;
 import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.entity.User;
@@ -12,7 +13,8 @@ public record UserFindResDto(
         String name,
         String image,
         Long seed,
-        String uuid
+        String uuid,
+        Domain domain
 )
 {
     public static UserFindResDto from(User user, Seed seed) {
@@ -24,7 +26,8 @@ public record UserFindResDto(
                 user.getName(),
                 user.getImage(),
                 seed.getTotal(),
-                user.getUuid()
+                user.getUuid(),
+                user.getDomain()
         );
     }
 }
