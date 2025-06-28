@@ -1,5 +1,6 @@
 package com.prography.minari.user.service.impl;
 
+import com.prography.minari.answer.repository.AnswerRepository;
 import com.prography.minari.common.aop.ImplService;
 import com.prography.minari.common.entity.Domain;
 import com.prography.minari.payment.repository.SeedRepository;
@@ -19,8 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserWriter {
 
     private final UserRepository userRepository;
-    private final MailAuthLogRepository mailAuthLogRepository;
     private final SeedRepository seedRepository;
+    private final AnswerRepository answerRepository;
+    private final MailAuthLogRepository mailAuthLogRepository;
+
 
     public User join(User user, String email, Boolean isSubscribed, EmailSendTime emailSendTime, ExperienceLevel studyExperienceLevel, ExperienceLevel workExperienceLevel, Domain domain) {
         user.join(email, isSubscribed, emailSendTime, studyExperienceLevel, workExperienceLevel, domain);
@@ -35,7 +38,6 @@ public class UserWriter {
 
     public void deleteAdmin(Long userId) {
         mailAuthLogRepository.deleteByUserId(userId);
-        seedRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }
 }
