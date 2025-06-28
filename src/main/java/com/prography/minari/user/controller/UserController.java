@@ -51,7 +51,8 @@ public class UserController implements UserApiDocs {
 
     @GetMapping("/users/me")
     public ResponseEntity findByUserId(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(userService.findById(user.getId()));
+        UserFindResDto dto = userService.findById(user.getId());
+        return ResponseEntity.ok(CommonResponse.success(dto));
     }
 
     @DeleteMapping("/users/me")
