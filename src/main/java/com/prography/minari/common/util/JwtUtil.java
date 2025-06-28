@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Date;
 
 import static com.prography.minari.common.execption.ErrorCode.*;
@@ -26,11 +27,20 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
-    public String createToken(String userId) {
+    public String createAccessToken(String userId) {
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String createRefreshToken(String userId) {
+        return Jwts.builder()
+                .setSubject(userId)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration * 2))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -42,6 +52,17 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public Duration getDuration(String token) {
+        Date tokenExpiration = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+
+        return Duration.ofMillis(tokenExpiration.getTime() - System.currentTimeMillis());
     }
 
     public void isValidateToken(String token) {

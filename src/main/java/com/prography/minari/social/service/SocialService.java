@@ -1,5 +1,6 @@
 package com.prography.minari.social.service;
 
+import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.social.dto.social.UserInfoDto;
@@ -10,6 +11,7 @@ import com.prography.minari.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Service
@@ -19,6 +21,7 @@ public class SocialService {
     private final Map<String, SocialClient> socialClientMap;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final RedisProcessor redisProcessor;
 
     public UserLoginResDto login(SocialType socialType, String code, String redirectUri) {
 
@@ -35,10 +38,15 @@ public class SocialService {
         User user = userRepository.findBySocialTypeAndSocialId(socialType, userInfoDto.socialId())
                 .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
 
-        // jwt 생성 TODO Spring Security 도입시, 차후에 제거될 예정
-        String jwt = jwtUtil.createToken(user.getId().toString());
+        // jwt 생성
+        String serverAccessToken = jwtUtil.createAccessToken(user.getId().toString());
+        String serverRefreshToken = jwtUtil.createRefreshToken(user.getId().toString());
 
-        return UserLoginResDto.from(user, jwt);
+        // refresh token, redis 적재
+        Duration duration = jwtUtil.getDuration(serverRefreshToken);
+        redisProcessor.setValue(user.getId().toString(), serverRefreshToken, duration);
+
+        return UserLoginResDto.from(user, serverAccessToken, serverRefreshToken);
     }
 
 }

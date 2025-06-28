@@ -1,6 +1,5 @@
 package com.prography.minari.common.filter;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.response.CommonResponse;
@@ -39,6 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final List<String> PERMIT_ALL_PATHS = Arrays.asList(
             "/api/v1/users/oauth",
+            "/api/v1/users/token/refresh",
             "/swagger-ui",
             "/v3/api-docs",
             "/swagger-resources",
@@ -84,7 +84,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("{}: {}", e.getErrorCode(), e.getErrorMessage());
             writeUnauthorizedResponse(response, e.getErrorCode(), e.getErrorMessage());
         }
-
     }
 
     // Unauthorized Response 공통 예외 처리 Response
@@ -101,5 +100,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new RuntimeException(e);
         }
     }
-
 }
