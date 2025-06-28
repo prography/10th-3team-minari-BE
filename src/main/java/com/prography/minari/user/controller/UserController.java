@@ -15,7 +15,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -60,9 +59,16 @@ public class UserController implements UserApiDocs {
         return ResponseEntity.ok(CommonResponse.success("계정삭제"));
     }
 
-    @GetMapping("/users/token/refresh")
-    public ResponseEntity tokenRefresh(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(userService.refreshToken(user.getId()));
+    @PostMapping("/users/token/refresh")
+    public ResponseEntity refreshToken(@AuthenticationPrincipal User user) {
+        UserRefreshTokenResDto response = userService.refreshToken(user);
+        return ResponseEntity.ok(CommonResponse.success(response));
+    }
+
+    @PostMapping("/users/logout")
+    public ResponseEntity logout(@AuthenticationPrincipal User user) {
+        userService.logout(user);
+        return ResponseEntity.ok(CommonResponse.ok());
     }
 
 }

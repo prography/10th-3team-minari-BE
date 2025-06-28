@@ -1,6 +1,5 @@
 package com.prography.minari.common.filter;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.response.CommonResponse;
@@ -65,6 +64,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        // Bearer 토큰에서 실제 토큰 추출
+        if (accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+
         // JWT 검증
         try {
             jwtUtil.isValidateToken(accessToken);
@@ -84,7 +88,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("{}: {}", e.getErrorCode(), e.getErrorMessage());
             writeUnauthorizedResponse(response, e.getErrorCode(), e.getErrorMessage());
         }
-
     }
 
     // Unauthorized Response 공통 예외 처리 Response
@@ -101,5 +104,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new RuntimeException(e);
         }
     }
-
 }

@@ -2,6 +2,7 @@ package com.prography.minari.user.service;
 
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
+import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.dto.UserJoinReqDto;
@@ -11,20 +12,24 @@ import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.impl.UserReader;
 import com.prography.minari.user.service.impl.UserWriter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserReader userReader;
     private final UserWriter userWriter;
     private final JwtUtil jwtUtil;
+    private final RedisProcessor redisProcessor;
 
-    public UserFindResDto findById(Long id) {
-        User user = userReader.read(id);
-        return UserFindResDto.from(user);
+    public UserFindResDto findById(Long userId) {
+        return UserFindResDto.from(userReader.read(userId));
     }
 
     public UserJoinResDto join(UserJoinReqDto userJoinReqDto, Long userId) {
@@ -47,16 +52,25 @@ public class UserService {
         );
 
         return UserJoinResDto.from(joinUser);
-
     }
 
     public void delete(User user) {
         userWriter.delete(user);
     }
 
-    public UserRefreshTokenResDto refreshToken(Long userId) {
-        String accessToken = jwtUtil.createAccessToken(userId);
-        String refreshToken = jwtUtil.createRefreshToken(userId);
-        return UserRefreshTokenResDto.from(accessToken, refreshToken);
+    // JWT 재발급
+    public UserRefreshTokenResDto refreshToken(User user) {
+        String newAccessToken = jwtUtil.createAccessToken(user.getId());
+        String newRefreshToken = jwtUtil.createRefreshToken(user.getId());
+
+        // refresh token 갱신
+        Duration expiration = jwtUtil.getDuration(newRefreshToken);
+        redisProcessor.setValue(user.getId().toString(), newRefreshToken, expiration);
+
+        return UserRefreshTokenResDto.from(newAccessToken, newRefreshToken);
+    }
+
+    public void logout(User user) {
+        redisProcessor.deleteValue(user.getId().toString());
     }
 }
