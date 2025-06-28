@@ -8,12 +8,10 @@ import com.prography.minari.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RestController("/admin/api/v1")
+@RestController
+@RequestMapping("/admin/api/v1")
 @RequiredArgsConstructor
 public class AdminController {
     private final AdminRewardService adminRewardService;
