@@ -34,7 +34,7 @@ public class UserServiceTest {
                 .set("image", "https://picsum.photos/640/640")
                 .sample();
 
-        User actualUser = userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image()));
+        User actualUser = userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), "공격적못생김99"));
 
         UserJoinReqDto userJoinReqDto = fixtureMonkey.giveMeBuilder(UserJoinReqDto.class)
                 .set("userId", actualUser.getId())
@@ -63,7 +63,7 @@ public class UserServiceTest {
                 .set("image", "https://picsum.photos/640/640")
                 .sample();
 
-        User actualUser = userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image()));
+        User actualUser = userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), "공격적못생김99"));
 
         UserJoinReqDto userJoinReqDto = fixtureMonkey.giveMeBuilder(UserJoinReqDto.class)
                 .set("userId", actualUser.getId())

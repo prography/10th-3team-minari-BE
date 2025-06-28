@@ -52,11 +52,11 @@ class SocialServiceTest {
                 .thenReturn(Optional.empty());
 
         when(userRepository.save(ArgumentMatchers.<User>any()))
-                .thenReturn(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image()));
+                .thenReturn(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), "공격적못생김99"));
 
         // when
         User savedUser = userRepository.findBySocialTypeAndSocialId(KAKAO, userInfoDto.socialId())
-                .orElseGet(() -> userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
+                .orElseGet(() -> userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), "공격적못생김99")));
 
         // then
         assertAll(
@@ -81,7 +81,7 @@ class SocialServiceTest {
                 .set("image", "https://picsum.photos/640/640")
                 .sample();
 
-        User returnUser = User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image());
+        User returnUser = User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), "공격적못생김99");
         returnUser.join("minari@gmail.com", true, AM_08, UNDER_1YEAR, NONE, BACKEND);
 
         when(userRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, userInfoDto.socialId()))
@@ -89,7 +89,7 @@ class SocialServiceTest {
 
         // when
         User expectedUser = userRepository.findBySocialTypeAndSocialId(KAKAO, userInfoDto.socialId())
-                .orElseGet(() -> userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
+                .orElseGet(() -> userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), "공격적못생김99")));
 
         // then
         assertAll(

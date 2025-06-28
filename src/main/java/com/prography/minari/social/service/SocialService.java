@@ -2,6 +2,7 @@ package com.prography.minari.social.service;
 
 import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
+import com.prography.minari.common.util.UuidUtil;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.social.dto.social.UserInfoDto;
 import com.prography.minari.social.service.impl.SocialClient;
@@ -22,6 +23,7 @@ public class SocialService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final RedisProcessor redisProcessor;
+    private final UuidUtil uuidUtil;
 
     public UserLoginResDto login(SocialType socialType, String code, String redirectUri) {
 
@@ -34,9 +36,12 @@ public class SocialService {
         // 사용자 정보 가져오기
         UserInfoDto userInfoDto = socialClient.readUserInfo(accessToken);
 
+        // uuid 생성
+        String uuid = uuidUtil.generateUniqueUuid();
+
         // 사용자 정보로 기존 회원 조회, 없으면 새 User 객체 생성
         User user = userRepository.findBySocialTypeAndSocialId(socialType, userInfoDto.socialId())
-                .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
+                .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), uuid)));
 
         // jwt 생성
         String serverAccessToken = jwtUtil.createAccessToken(user.getId().toString());

@@ -77,7 +77,7 @@ public class User extends BaseTimeEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = LAZY)
     private Seed seed;
 
-    public static User create(String email, SocialType socialType, Long socialId, String name, String image) {
+    public static User create(String email, SocialType socialType, Long socialId, String name, String image, String uuid) {
         User user = new User();
         user.email = email;
         user.socialType = socialType;
@@ -85,7 +85,7 @@ public class User extends BaseTimeEntity {
         user.name = name;
         user.image = image;
         user.isRegistered = false;
-        user.uuid = socialType + "_" + socialId;
+        user.uuid = uuid;
         user.isDeleted = false;
         return user;
     }
