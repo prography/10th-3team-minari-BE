@@ -5,6 +5,11 @@ import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.user.dto.*;
+import com.prography.minari.payment.entity.Seed;
+import com.prography.minari.payment.service.impl.SeedReader;
+import com.prography.minari.user.dto.UserFindResDto;
+import com.prography.minari.user.dto.UserJoinReqDto;
+import com.prography.minari.user.dto.UserJoinResDto;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.impl.UserReader;
 import com.prography.minari.user.service.impl.UserWriter;
@@ -24,9 +29,12 @@ public class UserService {
     private final UserWriter userWriter;
     private final JwtUtil jwtUtil;
     private final RedisProcessor redisProcessor;
+    private final SeedReader seedReader;
 
-    public UserFindResDto findById(Long userId) {
-        return UserFindResDto.from(userReader.read(userId));
+    public UserFindResDto findById(Long id) {
+        User user = userReader.read(id);
+        Seed seed = seedReader.readByUserId(id).orElse(new Seed(0L,user));
+        return UserFindResDto.from(user, seed);
     }
 
     public UserJoinResDto join(UserJoinReqDto userJoinReqDto, Long userId) {

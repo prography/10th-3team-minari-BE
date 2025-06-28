@@ -25,10 +25,10 @@ public interface UserApiDocs {
             summary = "소셜 로그인",
             description = "소셜 타입과 인증 정보를 받아 소셜 로그인을 수행하고, JWT 토큰 및 사용자 정보를 반환합니다."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "소셜 로그인 성공")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "소셜 로그인 성공",
+                    content = @Content(schema = @Schema(implementation = UserLoginResDto.class)))
     })
-    @PostMapping("/users/oauth/{social}")
     ResponseEntity<CommonResponse<UserLoginResDto>> oauth(
             @Parameter(description = "소셜 로그인 타입 (예: kakao)", required = true) @PathVariable("social") String socialType,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -43,10 +43,10 @@ public interface UserApiDocs {
             summary = "이메일 인증 요청",
             description = "입력된 이메일 주소로 인증 메일을 전송합니다. (로그인된 사용자만 가능)"
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "이메일 인증 요청 성공")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 인증 요청 성공",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class)))
     })
-    @PostMapping("/users/mail-verification")
     ResponseEntity<CommonResponse<Void>> emailVerification(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "이메일 인증 요청 정보",
@@ -61,10 +61,10 @@ public interface UserApiDocs {
             summary = "회원가입",
             description = "사용자 회원가입 정보를 받아 사용자 계정을 생성합니다."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "회원가입 성공")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원가입 성공",
+                    content = @Content(schema = @Schema(implementation = UserJoinResDto.class)))
     })
-    @PostMapping("/users/join")
     ResponseEntity<CommonResponse<UserJoinResDto>> join(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "회원가입 요청 정보",
@@ -78,10 +78,10 @@ public interface UserApiDocs {
             summary = "사용자 조회",
             description = "ID에 해당하는 사용자 정보를 반환합니다."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "사용자 조회 성공")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 조회 성공",
+                    content = @Content(schema = @Schema(implementation = UserFindResDto.class)))
     })
-    @GetMapping("/users/me")
     ResponseEntity<CommonResponse<UserFindResDto>> findByUserId(
             @Parameter(hidden = true) @AuthenticationPrincipal User user
     );
@@ -90,11 +90,12 @@ public interface UserApiDocs {
             summary = "이메일 인증번호 검증",
             description = "이메일과 인증번호(코드)를 받아 인증을 검증합니다."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "이메일 인증 성공"),
-            @ApiResponse(responseCode = "400", description = "인증 실패 또는 만료")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 인증 성공",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+            @ApiResponse(responseCode = "400", description = "인증 실패 또는 만료",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class)))
     })
-    @PostMapping("/users/mail-verification/verify")
     ResponseEntity<CommonResponse<Void>> verifyMailCode(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "이메일 인증번호 검증 요청 정보",

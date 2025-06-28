@@ -3,10 +3,12 @@ package com.prography.minari.payment.entity;
 import com.prography.minari.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Table(name = "SEEDS")
 @Entity
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Seed {
