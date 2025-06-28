@@ -61,14 +61,14 @@ public class UserController implements UserApiDocs {
 
     @PostMapping("/users/token/refresh")
     public ResponseEntity refreshToken(@AuthenticationPrincipal User user) {
-        UserRefreshTokenResDto response = userService.refreshToken(user);
-        return ResponseEntity.ok(CommonResponse.success(response));
+        UserRefreshTokenResDto dto = userService.refreshToken(user);
+        return ResponseEntity.ok(CommonResponse.success(dto));
     }
 
     @PostMapping("/users/logout")
     public ResponseEntity logout(@AuthenticationPrincipal User user) {
         userService.logout(user);
-        return ResponseEntity.ok(CommonResponse.ok());
+        return ResponseEntity.ok(CommonResponse.success("로그아웃되었습니다."));
     }
 
 }

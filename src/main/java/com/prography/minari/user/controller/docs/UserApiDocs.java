@@ -6,6 +6,7 @@ import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.dto.UserJoinReqDto;
 import com.prography.minari.user.dto.UserJoinResDto;
 import com.prography.minari.user.dto.UserLoginResDto;
+import com.prography.minari.user.dto.UserRefreshTokenResDto;
 import com.prography.minari.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -100,6 +101,33 @@ public interface UserApiDocs {
                     content = @Content(schema = @Schema(implementation = com.prography.minari.user.dto.MailVerificationCheckReqDto.class))
             )
             @RequestBody com.prography.minari.user.dto.MailVerificationCheckReqDto req,
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
+    );
+
+    @Operation(
+            summary = "토큰 재발급",
+            description = "현재 사용자의 Access Token과 Refresh Token을 재발급합니다. (로그인된 사용자만 가능)"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", 
+                    content = @Content(schema = @Schema(implementation = UserRefreshTokenResDto.class))),
+            @ApiResponse(responseCode = "401", description = "인증 실패")
+    })
+    @PostMapping("/users/token/refresh")
+    ResponseEntity<CommonResponse<UserRefreshTokenResDto>> refreshToken(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
+    );
+
+    @Operation(
+            summary = "로그아웃",
+            description = "현재 사용자를 로그아웃 처리합니다. Refresh Token을 Redis에서 삭제합니다. (로그인된 사용자만 가능)"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패")
+    })
+    @PostMapping("/users/logout")
+    ResponseEntity<CommonResponse<String>> logout(
             @Parameter(hidden = true) @AuthenticationPrincipal User user
     );
 }

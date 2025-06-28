@@ -63,6 +63,14 @@ public class UserService {
         String newAccessToken = jwtUtil.createAccessToken(user.getId());
         String newRefreshToken = jwtUtil.createRefreshToken(user.getId());
 
+        // redis에 refresh token 적재되어 있지 않으면, 예외 처리
+
+//        if() {
+//            log.info();
+//            throw new ApiException(ErrorCode.JWT_EXPIRED_EXCEPTION);
+//        }
+
+
         // refresh token 갱신
         Duration expiration = jwtUtil.getDuration(newRefreshToken);
         redisProcessor.setValue(user.getId().toString(), newRefreshToken, expiration);

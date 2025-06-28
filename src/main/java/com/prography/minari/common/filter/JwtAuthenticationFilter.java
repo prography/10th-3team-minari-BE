@@ -64,11 +64,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Bearer 토큰에서 실제 토큰 추출
-        if (accessToken.startsWith("Bearer ")) {
-            accessToken = accessToken.substring(7);
-        }
-
         // JWT 검증
         try {
             jwtUtil.isValidateToken(accessToken);
