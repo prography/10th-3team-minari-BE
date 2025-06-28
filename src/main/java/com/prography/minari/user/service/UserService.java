@@ -4,10 +4,7 @@ import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
-import com.prography.minari.user.dto.UserFindResDto;
-import com.prography.minari.user.dto.UserJoinReqDto;
-import com.prography.minari.user.dto.UserJoinResDto;
-import com.prography.minari.user.dto.UserRefreshTokenResDto;
+import com.prography.minari.user.dto.*;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.impl.UserReader;
 import com.prography.minari.user.service.impl.UserWriter;
@@ -59,21 +56,19 @@ public class UserService {
     }
 
     // JWT 재발급
-    public UserRefreshTokenResDto refreshToken(User user) {
-        String newAccessToken = jwtUtil.createAccessToken(user.getId());
-        String newRefreshToken = jwtUtil.createRefreshToken(user.getId());
+    public UserRefreshTokenResDto refreshToken(UserRefreshTokenReqDto userRefreshTokenReqDto) {
 
-        // redis에 refresh token 적재되어 있지 않으면, 예외 처리
+        String userId = jwtUtil.getUserId(userRefreshTokenReqDto.refreshToken());
 
-//        if() {
-//            log.info();
-//            throw new ApiException(ErrorCode.JWT_EXPIRED_EXCEPTION);
-//        }
+        String newAccessToken = jwtUtil.createAccessToken(userId);
+        String newRefreshToken = jwtUtil.createRefreshToken(userId);
 
+        // refreshToken 검증
+        redisProcessor.validateRefreshToken(userId, userRefreshTokenReqDto.refreshToken());
 
         // refresh token 갱신
         Duration expiration = jwtUtil.getDuration(newRefreshToken);
-        redisProcessor.setValue(user.getId().toString(), newRefreshToken, expiration);
+        redisProcessor.setValue(userId, newRefreshToken, expiration);
 
         return UserRefreshTokenResDto.from(newAccessToken, newRefreshToken);
     }

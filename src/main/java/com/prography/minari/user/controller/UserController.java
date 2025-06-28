@@ -60,8 +60,8 @@ public class UserController implements UserApiDocs {
     }
 
     @PostMapping("/users/token/refresh")
-    public ResponseEntity refreshToken(@AuthenticationPrincipal User user) {
-        UserRefreshTokenResDto dto = userService.refreshToken(user);
+    public ResponseEntity refreshToken(@RequestBody UserRefreshTokenReqDto userRefreshTokenReqDto) {
+        UserRefreshTokenResDto dto = userService.refreshToken(userRefreshTokenReqDto);
         return ResponseEntity.ok(CommonResponse.success(dto));
     }
 
