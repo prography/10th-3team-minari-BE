@@ -60,4 +60,9 @@ public class UserController implements UserApiDocs {
         return ResponseEntity.ok(CommonResponse.success("계정삭제"));
     }
 
+    @GetMapping("/users/token/refresh")
+    public ResponseEntity tokenRefresh(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.refreshToken(user.getId()));
+    }
+
 }

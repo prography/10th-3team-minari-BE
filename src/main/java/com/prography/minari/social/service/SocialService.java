@@ -36,8 +36,8 @@ public class SocialService {
                 .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
 
         // jwt 생성
-        String serverAccessToken = jwtUtil.createAccessToken(user.getId().toString());
-        String serverRefreshToken = jwtUtil.createRefreshToken(user.getId().toString());
+        String serverAccessToken = jwtUtil.createAccessToken(user.getId());
+        String serverRefreshToken = jwtUtil.createRefreshToken(user.getId());
 
         return UserLoginResDto.from(user, serverAccessToken, serverRefreshToken);
     }

@@ -2,9 +2,11 @@ package com.prography.minari.user.service;
 
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
+import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.dto.UserJoinReqDto;
 import com.prography.minari.user.dto.UserJoinResDto;
+import com.prography.minari.user.dto.UserRefreshTokenResDto;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.impl.UserReader;
 import com.prography.minari.user.service.impl.UserWriter;
@@ -18,6 +20,7 @@ public class UserService {
 
     private final UserReader userReader;
     private final UserWriter userWriter;
+    private final JwtUtil jwtUtil;
 
     public UserFindResDto findById(Long id) {
         User user = userReader.read(id);
@@ -49,5 +52,11 @@ public class UserService {
 
     public void delete(User user) {
         userWriter.delete(user);
+    }
+
+    public UserRefreshTokenResDto refreshToken(Long userId) {
+        String accessToken = jwtUtil.createAccessToken(userId);
+        String refreshToken = jwtUtil.createRefreshToken(userId);
+        return UserRefreshTokenResDto.from(accessToken, refreshToken);
     }
 }

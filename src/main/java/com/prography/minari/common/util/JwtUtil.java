@@ -26,18 +26,18 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
-    public String createAccessToken(String userId) {
+    public String createAccessToken(Long userId) {
         return Jwts.builder()
-                .setSubject(userId)
+                .setSubject(userId.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String createRefreshToken(String userId) {
+    public String createRefreshToken(Long userId) {
         return Jwts.builder()
-                .setSubject(userId)
+                .setSubject(userId.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 2))
                 .signWith(key, SignatureAlgorithm.HS256)
