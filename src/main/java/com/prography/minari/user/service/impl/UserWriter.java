@@ -26,6 +26,10 @@ public class UserWriter {
     }
 
     public void delete(User user) {
+        user.delete();
+    }
+
+    public void deleteAdmin(User user) {
         mailAuthLogRepository.deleteByUserId(user.getId());
         seedRepository.deleteByUserId(user.getId());
         userRepository.delete(user);

@@ -63,6 +63,10 @@ public class UserService {
         userWriter.delete(user);
     }
 
+    public void deleteAdmin(User user) {
+        userWriter.deleteAdmin(user);
+    }
+
     // JWT 재발급
     public UserRefreshTokenResDto refreshToken(UserRefreshTokenReqDto userRefreshTokenReqDto) {
 
