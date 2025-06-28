@@ -9,8 +9,10 @@ import com.prography.minari.user.enums.ExperienceLevel;
 import com.prography.minari.user.repository.UserRepository;
 import com.prography.minari.mail.repository.MailAuthLogRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @ImplService
 @RequiredArgsConstructor
 @Transactional
@@ -27,6 +29,8 @@ public class UserWriter {
 
     public void delete(User user) {
         user.delete();
+        userRepository.save(user);
+        log.info("계정 삭제 : [{}] {} 삭제 예정", user.getId(), user.getDeletedAt());
     }
 
     public void deleteAdmin(User user) {
