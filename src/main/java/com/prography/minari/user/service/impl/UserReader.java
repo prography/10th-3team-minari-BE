@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.prography.minari.common.execption.ErrorCode.ACCOUNT_SOFT_DELETED;
 import static com.prography.minari.common.execption.ErrorCode.USER_NOT_FOUND;
 
 @Slf4j
@@ -20,11 +21,20 @@ public class UserReader {
     private final UserRepository userRepository;
 
     public User read(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.info("존재하지 않는 사용자입니다. 회원가입을 먼저 진행해주세요. userId={}", userId);
-                    return new ApiException(USER_NOT_FOUND);
-                });
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> {
+                log.info("존재하지 않는 사용자입니다. 회원가입을 먼저 진행해주세요. userId={}", userId);
+                return new ApiException(USER_NOT_FOUND);
+            });
+
+        // 삭제된 계정일 경우, 예외 처리
+        if(user.isDeleted()) {
+            log.info("해당 계정은 삭제된 계정입니다. userId={}", userId);
+            throw new ApiException(ACCOUNT_SOFT_DELETED);
+        }
+
+
+        return user;
     }
 
     public User readByUUID(String uuid) {
