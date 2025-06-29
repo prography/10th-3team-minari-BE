@@ -1,7 +1,9 @@
 package com.prography.minari.user.entity;
 
+import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.common.entity.BaseTimeEntity;
 import com.prography.minari.common.entity.Domain;
+import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.enums.EmailSendTime;
 import com.prography.minari.user.enums.ExperienceLevel;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.FetchType.LAZY;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -56,6 +59,15 @@ public class User extends BaseTimeEntity {
 
     @Enumerated(value = STRING)
     private Domain domain;
+
+    @Column(name = "uuid")
+    private String uuid;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = LAZY)
+    private List<Answer> answers = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = LAZY)
+    private Seed seed;
 
     public static User create(String email, SocialType socialType, Long socialId, String name, String image) {
         User user = new User();

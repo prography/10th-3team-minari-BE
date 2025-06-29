@@ -7,8 +7,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
 public record UserJoinReqDto(
-        @Email String email,
-        @NotNull Long userId,
+        String email,
         @NotNull Boolean isSubscribed,
         @NotNull EmailSendTime emailSendTime,
         @NotNull ExperienceLevel studyExperienceLevel,
