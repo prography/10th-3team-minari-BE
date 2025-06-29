@@ -6,6 +6,8 @@ import com.prography.minari.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -30,6 +32,11 @@ public class Answer extends BaseTimeEntity {
 
     @Column(name = "memo")
     private String memo;
+
     @Column(name = "running_time")
     private Double runningTime;
+
+    @Column(name = "answered_date")
+    private LocalDate answeredDate;
+
 }

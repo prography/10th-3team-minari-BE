@@ -1,6 +1,8 @@
 package com.prography.minari.social.service;
 
+import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
+import com.prography.minari.common.util.UuidUtil;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.social.dto.social.UserInfoDto;
 import com.prography.minari.social.service.impl.SocialClient;
@@ -10,6 +12,7 @@ import com.prography.minari.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Service
@@ -19,6 +22,8 @@ public class SocialService {
     private final Map<String, SocialClient> socialClientMap;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final RedisProcessor redisProcessor;
+    private final UuidUtil uuidUtil;
 
     public UserLoginResDto login(SocialType socialType, String code, String redirectUri) {
 
@@ -31,14 +36,22 @@ public class SocialService {
         // 사용자 정보 가져오기
         UserInfoDto userInfoDto = socialClient.readUserInfo(accessToken);
 
+        // uuid 생성
+        String uuid = uuidUtil.generateUniqueUuid();
+
         // 사용자 정보로 기존 회원 조회, 없으면 새 User 객체 생성
         User user = userRepository.findBySocialTypeAndSocialId(socialType, userInfoDto.socialId())
-                .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image())));
+                .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), uuid)));
 
-        // jwt 생성 TODO Spring Security 도입시, 차후에 제거될 예정
-        String jwt = jwtUtil.createToken(user.getId().toString());
+        // jwt 생성
+        String serverAccessToken = jwtUtil.createAccessToken(user.getId().toString());
+        String serverRefreshToken = jwtUtil.createRefreshToken(user.getId().toString());
 
-        return UserLoginResDto.from(user, jwt);
+        // refresh token, redis 적재
+        Duration duration = jwtUtil.getDuration(serverRefreshToken);
+        redisProcessor.setValue(user.getId().toString(), serverRefreshToken, duration);
+
+        return UserLoginResDto.from(user, serverAccessToken, serverRefreshToken);
     }
 
 }

@@ -1,11 +1,11 @@
 package com.prography.minari.common.filter;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.user.entity.User;
+import com.prography.minari.user.repository.UserRepository;
 import com.prography.minari.user.service.impl.UserReader;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_FOUND_EXCEPTION;
+import static com.prography.minari.common.execption.ErrorCode.USER_NOT_FOUND;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -35,10 +36,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserReader userReader;
+    private final UserRepository userRepository;
 
     private static final List<String> PERMIT_ALL_PATHS = Arrays.asList(
             "/api/v1/users/oauth",
+            "/api/v1/users/token/refresh",
             "/swagger-ui",
             "/v3/api-docs",
             "/swagger-resources",
@@ -76,7 +78,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Authentication Context 등록
         try {
             Long userId = Long.parseLong(jwtUtil.getUserId(accessToken));
-            User user = userReader.read(userId); // User 조회
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ApiException(USER_NOT_FOUND));
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
@@ -84,7 +87,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("{}: {}", e.getErrorCode(), e.getErrorMessage());
             writeUnauthorizedResponse(response, e.getErrorCode(), e.getErrorMessage());
         }
-
     }
 
     // Unauthorized Response 공통 예외 처리 Response
@@ -101,5 +103,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new RuntimeException(e);
         }
     }
-
 }

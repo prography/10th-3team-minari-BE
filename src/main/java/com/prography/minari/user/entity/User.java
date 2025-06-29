@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.List;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -63,13 +65,19 @@ public class User extends BaseTimeEntity {
     @Column(name = "uuid")
     private String uuid;
 
+    @Column(name = "isDeleted")
+    private boolean isDeleted;
+
+    @Column(name = "deletedAt")
+    private LocalDateTime deletedAt;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = LAZY)
     private List<Answer> answers = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = LAZY)
     private Seed seed;
 
-    public static User create(String email, SocialType socialType, Long socialId, String name, String image) {
+    public static User create(String email, SocialType socialType, Long socialId, String name, String image, String uuid) {
         User user = new User();
         user.email = email;
         user.socialType = socialType;
@@ -77,6 +85,8 @@ public class User extends BaseTimeEntity {
         user.name = name;
         user.image = image;
         user.isRegistered = false;
+        user.uuid = uuid;
+        user.isDeleted = false;
         return user;
     }
 
@@ -99,4 +109,11 @@ public class User extends BaseTimeEntity {
     public List<Domain>getPreferDomains() {
         return List.of(domain,Domain.CS);
     }
+
+    // 계정 7일후 삭제 처리를 위해 deletedAt 시간 적재
+    public void delete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now().plusDays(7);
+    }
+
 }

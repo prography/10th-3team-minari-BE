@@ -1,11 +1,20 @@
 package com.prography.minari.user.dto;
 
+import com.prography.minari.common.entity.Domain;
 import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.entity.User;
 
 public record UserFindResDto(
-        Long id, String email, SocialType socialType, String socialId, String name, String image, Long seed
+        Long id,
+        String email,
+        SocialType socialType,
+        String socialId,
+        String name,
+        String image,
+        Long seed,
+        String uuid,
+        Domain domain
 )
 {
     public static UserFindResDto from(User user, Seed seed) {
@@ -16,7 +25,9 @@ public record UserFindResDto(
                 String.valueOf(user.getSocialId()), // socialId가 String이면 그대로, Long이면 변환
                 user.getName(),
                 user.getImage(),
-                seed.getTotal()
+                seed.getTotal(),
+                user.getUuid(),
+                user.getDomain()
         );
     }
 }

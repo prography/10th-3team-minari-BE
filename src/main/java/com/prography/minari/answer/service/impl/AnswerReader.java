@@ -6,8 +6,8 @@ import com.prography.minari.common.aop.ImplService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @ImplService
 @RequiredArgsConstructor
@@ -17,5 +17,9 @@ public class AnswerReader {
 
     public List<Answer> readAllByUserIdAndQuestionId(Long userId, Long questionId) {
         return answerRepository.findAllByUserIdAndQuestionId(userId, questionId);
+    }
+
+    public List<Answer> readAnswersByDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
+        return answerRepository.findByUserIdAndAnsweredDateBetween(userId, startDate, endDate);
     }
 }
