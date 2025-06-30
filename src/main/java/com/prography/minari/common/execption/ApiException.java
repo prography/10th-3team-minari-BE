@@ -2,15 +2,19 @@ package com.prography.minari.common.execption;
 
 public class ApiException extends RuntimeException {
 
-    private final String code;
+    private final ErrorCode code;
 
     public ApiException(ErrorCode errorCode) {
         super();
-        this.code = errorCode.getCode();
+        this.code = errorCode;
     }
 
     public String getErrorCode() {
-        return code;
+        return code.getCode();
+    }
+
+    public String getErrorMessage() {
+        return code.getMessage();
     }
 
 }

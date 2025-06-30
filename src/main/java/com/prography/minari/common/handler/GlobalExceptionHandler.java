@@ -3,20 +3,24 @@ package com.prography.minari.common.handler;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.response.CommonResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ResponseEntity handleApiException(ApiException e) {
+        log.info(e.getErrorMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(CommonResponse.fail(e.getErrorCode(), null));
+                .body(CommonResponse.fail(e.getErrorCode(), e.getErrorMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -27,6 +31,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest()
                 .body(CommonResponse.fail(ErrorCode.METHOD_ARGUMENT_NOT_VALIDATION_EXCEPTION.getCode(), errorMessage));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        return ResponseEntity
+                .badRequest()
+                .body(CommonResponse.fail(ErrorCode.REQUEST_BODY_IS_MISSING.getCode(), ErrorCode.REQUEST_BODY_IS_MISSING.getMessage()));
     }
 
 }

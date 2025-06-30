@@ -23,6 +23,7 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
+
   mail:
     host: smtp.gmail.com       # SMTP 서버 호스트
     port: 587                  # SMTP 서버 포트

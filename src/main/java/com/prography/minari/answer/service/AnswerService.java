@@ -21,6 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,5 +102,25 @@ public class AnswerService {
                 .answer(question.getAnswer())
                 .reply(answer.getReply())
                 .build();
+    }
+
+    public List<Answer> readAnswersByDateRange(User user) {
+
+
+
+        // 1주 범위 (월~일)
+        LocalDate weekStart = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate weekEnd = LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+
+        // 1달 범위
+        LocalDate monthStart = LocalDate.now().withDayOfMonth(1);
+        LocalDate monthEnd = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+
+        // 1년 범위
+        LocalDate yearStart = LocalDate.now().withDayOfYear(1);
+        LocalDate yearEnd = LocalDate.now().withMonth(12).withDayOfMonth(31);
+
+        return null;
+
     }
 }

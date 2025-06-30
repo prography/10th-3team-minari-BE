@@ -2,6 +2,8 @@ package com.prography.minari.user.service;
 
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.introspector.ConstructorPropertiesArbitraryIntrospector;
+import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.social.dto.social.UserInfoDto;
 import com.prography.minari.user.dto.UserJoinReqDto;
 import com.prography.minari.user.dto.UserJoinResDto;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.prography.minari.common.execption.ErrorCode.ALREADY_REGISTERED;
 import static com.prography.minari.social.dto.enums.SocialType.KAKAO;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,14 +34,14 @@ public class UserServiceTest {
                 .set("image", "https://picsum.photos/640/640")
                 .sample();
 
-        User actualUser = userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image()));
+        User actualUser = userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), "공격적못생김99"));
 
         UserJoinReqDto userJoinReqDto = fixtureMonkey.giveMeBuilder(UserJoinReqDto.class)
                 .set("userId", actualUser.getId())
                 .sample();
 
         // when
-        UserJoinResDto expectedDto = userService.join(userJoinReqDto);
+        UserJoinResDto expectedDto = userService.join(userJoinReqDto, actualUser.getId());
 
         // then
         assertNotNull(expectedDto);
@@ -50,6 +53,35 @@ public class UserServiceTest {
                 () -> assertEquals(userJoinReqDto.workExperienceLevel(), expectedDto.workExperienceLevel()),
                 () -> assertEquals(userJoinReqDto.domain(), expectedDto.domain())
         );
+    }
+
+    @Test
+    void 중복회원가입() {
+
+        // given
+        UserInfoDto userInfoDto = fixtureMonkey.giveMeBuilder(UserInfoDto.class)
+                .set("image", "https://picsum.photos/640/640")
+                .sample();
+
+        User actualUser = userRepository.save(User.create("", KAKAO, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), "공격적못생김99"));
+
+        UserJoinReqDto userJoinReqDto = fixtureMonkey.giveMeBuilder(UserJoinReqDto.class)
+                .set("userId", actualUser.getId())
+                .sample();
+
+        userService.join(userJoinReqDto, actualUser.getId());
+
+        // when
+        ApiException apiException = assertThrows(ApiException.class, () -> {
+            userService.join(userJoinReqDto, actualUser.getId());
+        });
+
+        // then
+        assertAll(
+                () -> assertEquals(ALREADY_REGISTERED.getCode(), apiException.getErrorCode()),
+                () -> assertEquals(ALREADY_REGISTERED.getMessage(), apiException.getErrorMessage())
+        );
+
     }
 
 }
