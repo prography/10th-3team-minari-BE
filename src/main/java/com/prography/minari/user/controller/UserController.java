@@ -9,11 +9,17 @@ import com.prography.minari.user.controller.docs.UserApiDocs;
 import com.prography.minari.user.dto.*;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
+
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,8 +33,9 @@ public class UserController implements UserApiDocs {
     @GetMapping("/users/oauth/{social}")
     public ResponseEntity oauth(@PathVariable("social") String socialType,
                                 @RequestParam("code") String code,
-                                @RequestParam("redirect-uri") String redirectUri) {
-        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri);
+                                @RequestParam("redirect-uri") String redirectUri,
+                                HttpServletResponse response) {
+        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri, response);
         return ResponseEntity.ok(CommonResponse.success(userLoginResDto));
     }
 

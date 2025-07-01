@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.SignatureException;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -36,6 +37,16 @@ public class JwtUtil {
                 .compact();
     }
 
+    public ResponseCookie createAccessTokenCookie(String accessToken) {
+        return ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofMinutes(30))
+                .sameSite("None")
+                .build();
+    }
+
     public String createRefreshToken(String userId) {
         return Jwts.builder()
                 .setSubject(userId)
@@ -43,6 +54,16 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 2))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
+        return ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ofMinutes(30))
+                .sameSite("None")
+                .build();
     }
 
     public String getUserId(String token) {

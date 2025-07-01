@@ -9,11 +9,16 @@ import com.prography.minari.social.service.impl.SocialClient;
 import com.prography.minari.user.dto.UserLoginResDto;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Map;
+
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +30,7 @@ public class SocialService {
     private final RedisProcessor redisProcessor;
     private final UuidUtil uuidUtil;
 
-    public UserLoginResDto login(SocialType socialType, String code, String redirectUri) {
+    public UserLoginResDto login(SocialType socialType, String code, String redirectUri, HttpServletResponse response) {
 
         // 소셜 로그인 구현체 주입
         SocialClient socialClient = socialClientMap.get(socialType.getValue());
@@ -46,6 +51,14 @@ public class SocialService {
         // jwt 생성
         String serverAccessToken = jwtUtil.createAccessToken(user.getId().toString());
         String serverRefreshToken = jwtUtil.createRefreshToken(user.getId().toString());
+
+        // jwt cookie 생성
+        ResponseCookie accessTokenCookie = jwtUtil.createAccessTokenCookie(serverAccessToken);
+        ResponseCookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(serverRefreshToken);
+
+        // 헤더에 추가
+        response.addHeader(SET_COOKIE, accessTokenCookie.toString());
+        response.addHeader(SET_COOKIE, refreshTokenCookie.toString());
 
         // refresh token, redis 적재
         Duration duration = jwtUtil.getDuration(serverRefreshToken);
