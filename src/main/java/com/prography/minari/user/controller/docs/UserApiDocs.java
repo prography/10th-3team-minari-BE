@@ -36,8 +36,8 @@ public interface UserApiDocs {
                     required = true,
                     content = @Content(schema = @Schema(implementation = com.prography.minari.user.dto.UserLoginReqDto.class))
             )
-            @RequestParam String code,
-            @RequestParam String redirectUri
+            @RequestParam("code") String code,
+            @RequestParam("redirect-uri") String redirectUri
     );
 
     @Operation(
