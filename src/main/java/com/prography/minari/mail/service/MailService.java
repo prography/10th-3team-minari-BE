@@ -7,27 +7,25 @@ import com.prography.minari.mail.dto.MailRequest;
 import com.prography.minari.mail.dto.MailVerificationReqDto;
 import com.prography.minari.mail.entity.MailAuthLog;
 import com.prography.minari.mail.repository.MailAuthLogRepository;
-import com.prography.minari.mail.service.impl.GoogleMailClient;
+import com.prography.minari.mail.service.impl.MailTemplateCreater;
 import com.prography.minari.user.dto.MailVerificationCheckReqDto;
 import com.prography.minari.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Map;
+
+import static com.prography.minari.mail.dto.MailSubject.AUTH_SUBJECT;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class MailService {
 
-    private static final String AUTH_SUBJECT = "[미래의 나를 위한 리워드] 이메일 인증을 완료해주세요.";
-
-    private final GoogleMailClient googleMailClient;
-    private final TemplateEngine templateEngine;
+    private final MailTemplateCreater mailTemplateCreater;
+    private final MailClient mailClient;
     private final MailAuthLogRepository mailAuthLogRepository;
 
     public void sendAuthMail(MailVerificationReqDto mailVerificationReqDto, User user) {
@@ -42,17 +40,12 @@ public class MailService {
         mailAuthLogRepository.save(MailAuthLog.create(user.getId(), authCode));
 
         // 인증 메일 양식 만들기
-        MailRequest authMailRequest = createAuthMailTemplate(mailVerificationReqDto.to(), mailVerificationReqDto.redirectUri(), authCode);
+        MailRequest authMailRequest = mailTemplateCreater.create(AUTH_SUBJECT.getName(),
+                mailVerificationReqDto.to(),
+                Map.of("verificationLink", mailVerificationReqDto.redirectUri(),"authCode",authCode),
+                "auth-mail");
         // 인증 메일 전송
-        googleMailClient.sendMail(authMailRequest);
-    }
-
-    private MailRequest createAuthMailTemplate(String to, String redirectUri, String authCode) {
-        Context context = new Context();
-        context.setVariable("verificationLink", redirectUri);
-        context.setVariable("authCode", authCode);
-        String autContents = templateEngine.process("auth-mail", context);
-        return MailRequest.create(to, AUTH_SUBJECT, autContents);
+        mailClient.sendMail(authMailRequest);
     }
 
     // 인증번호 검증
@@ -70,5 +63,4 @@ public class MailService {
             throw new ApiException(ErrorCode.EXPIRED_AUTH_CODE);
         }
     }
-
 }
