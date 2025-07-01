@@ -24,9 +24,11 @@ public class UserController implements UserApiDocs {
     private final SocialService socialService;
     private final MailService mailService;
 
-    @PostMapping("/users/oauth/{social}")
-    public ResponseEntity oauth(@PathVariable("social") String socialType, @RequestBody @Validated UserLoginReqDto userLoginReqDto) {
-        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), userLoginReqDto.code(), userLoginReqDto.redirectUri());
+    @GetMapping("/users/oauth/{social}")
+    public ResponseEntity oauth(@PathVariable("social") String socialType,
+                                @RequestParam("code") String code,
+                                @RequestParam("redirect-uri") String redirectUri) {
+        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri);
         return ResponseEntity.ok(CommonResponse.success(userLoginResDto));
     }
 
