@@ -26,11 +26,9 @@ public class SocialService {
 
     private final Map<String, SocialClient> socialClientMap;
     private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
-    private final RedisProcessor redisProcessor;
     private final UuidUtil uuidUtil;
 
-    public UserLoginResDto login(SocialType socialType, String code, String redirectUri, HttpServletResponse response) {
+    public UserLoginResDto login(SocialType socialType, String code, String redirectUri) {
 
         // 소셜 로그인 구현체 주입
         SocialClient socialClient = socialClientMap.get(socialType.getValue());
@@ -48,23 +46,7 @@ public class SocialService {
         User user = userRepository.findBySocialTypeAndSocialId(socialType, userInfoDto.socialId())
                 .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), uuid)));
 
-        // jwt 생성
-        String serverAccessToken = jwtUtil.createAccessToken(user.getId().toString());
-        String serverRefreshToken = jwtUtil.createRefreshToken(user.getId().toString());
-
-        // jwt cookie 생성
-        ResponseCookie accessTokenCookie = jwtUtil.createAccessTokenCookie(serverAccessToken);
-        ResponseCookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(serverRefreshToken);
-
-        // 헤더에 추가
-        response.addHeader(SET_COOKIE, accessTokenCookie.toString());
-        response.addHeader(SET_COOKIE, refreshTokenCookie.toString());
-
-        // refresh token, redis 적재
-        Duration duration = jwtUtil.getDuration(serverRefreshToken);
-        redisProcessor.setValue(user.getId().toString(), serverRefreshToken, duration);
-
-        return UserLoginResDto.from(user, serverAccessToken, serverRefreshToken);
+        return UserLoginResDto.from(user);
     }
 
 }

@@ -10,6 +10,7 @@ import com.prography.minari.user.service.impl.UserReader;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_FOUND_EXCEPTION;
 import static com.prography.minari.common.execption.ErrorCode.USER_NOT_FOUND;
+import static com.prography.minari.common.util.JwtUtil.ACCESS_TOKEN;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -58,7 +61,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        // Authorization 헤더에 accessToken이 없으면 쿠키에서 accessToken을 찾음
+        String accessToken = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
+                .filter(cookie -> ACCESS_TOKEN.equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
 
         // 헤더에 Authorization이 존재하지 않을 경우 예외 처리
         if(StringUtils.isBlank(accessToken)) {

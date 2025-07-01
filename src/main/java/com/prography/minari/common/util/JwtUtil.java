@@ -19,6 +19,9 @@ import static com.prography.minari.common.execption.ErrorCode.*;
 @Slf4j
 public class JwtUtil {
 
+    public static final String ACCESS_TOKEN = "access-token";
+    public static final String REFRESH_TOKEN = "refresh-token";
+
     private final Key key;
     private final Long expiration;
 
@@ -38,11 +41,11 @@ public class JwtUtil {
     }
 
     public ResponseCookie createAccessTokenCookie(String accessToken) {
-        return ResponseCookie.from("accessToken", accessToken)
+        return ResponseCookie.from(ACCESS_TOKEN, accessToken)
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(Duration.ofMinutes(30))
+                .maxAge(Duration.ofMillis(expiration))
                 .sameSite("None")
                 .build();
     }
@@ -57,11 +60,11 @@ public class JwtUtil {
     }
 
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
-        return ResponseCookie.from("refreshToken", refreshToken)
+        return ResponseCookie.from(REFRESH_TOKEN, refreshToken)
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(Duration.ofMinutes(30))
+                .maxAge(Duration.ofMillis(expiration * 2))
                 .sameSite("None")
                 .build();
     }

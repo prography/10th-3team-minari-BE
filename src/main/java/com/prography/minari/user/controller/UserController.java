@@ -1,6 +1,8 @@
 package com.prography.minari.user.controller;
 
 import com.prography.minari.common.response.CommonResponse;
+import com.prography.minari.common.service.impl.RedisProcessor;
+import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.mail.dto.MailVerificationReqDto;
 import com.prography.minari.mail.service.MailService;
 import com.prography.minari.social.dto.enums.SocialType;
@@ -29,14 +31,30 @@ public class UserController implements UserApiDocs {
     private final UserService userService;
     private final SocialService socialService;
     private final MailService mailService;
+    private final RedisProcessor redisProcessor;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/users/oauth/{social}")
     public ResponseEntity oauth(@PathVariable("social") String socialType,
                                 @RequestParam("code") String code,
-                                @RequestParam("redirect-uri") String redirectUri,
-                                HttpServletResponse response) {
-        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri, response);
-        return ResponseEntity.ok(CommonResponse.success(userLoginResDto));
+                                @RequestParam("redirect-uri") String redirectUri) {
+        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri);
+
+        // jwt 생성
+        String serverAccessToken = jwtUtil.createAccessToken(userLoginResDto.id().toString());
+        String serverRefreshToken = jwtUtil.createRefreshToken(userLoginResDto.id().toString());
+
+        ResponseCookie accessTokenCookie = jwtUtil.createAccessTokenCookie(serverAccessToken);
+        ResponseCookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(serverRefreshToken);
+
+        // refresh token, redis 적재
+        Duration duration = jwtUtil.getDuration(serverRefreshToken);
+        redisProcessor.setValue(userLoginResDto.id().toString(), serverRefreshToken, duration);
+
+        return ResponseEntity.ok()
+            .header(SET_COOKIE, accessTokenCookie.toString())
+            .header(SET_COOKIE, refreshTokenCookie.toString())
+            .body(CommonResponse.success(userLoginResDto));
     }
 
     @PostMapping("/users/mail-verification")

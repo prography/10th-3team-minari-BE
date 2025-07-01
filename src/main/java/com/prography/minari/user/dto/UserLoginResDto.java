@@ -5,8 +5,6 @@ import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.entity.User;
 
 public record UserLoginResDto(
-        String accessToken,
-        String refreshToken,
         Long id,
         String email,
         SocialType socialType,
@@ -16,10 +14,8 @@ public record UserLoginResDto(
         boolean registered)
 {
 
-    public static UserLoginResDto from(User user, String accessToken, String refreshToken) {
+    public static UserLoginResDto from(User user) {
         return new UserLoginResDto(
-                accessToken,
-                refreshToken,
                 user.getId(),
                 user.getEmail(),
                 user.getSocialType(),
