@@ -13,6 +13,7 @@ import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +24,7 @@ import java.time.Duration;
 
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -37,23 +39,11 @@ public class UserController implements UserApiDocs {
     @GetMapping("/users/oauth/{social}")
     public ResponseEntity oauth(@PathVariable("social") String socialType,
                                 @RequestParam("code") String code,
-                                @RequestParam("redirect-uri") String redirectUri) {
-        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri);
+                                @RequestParam("redirect-uri") String redirectUri,
+                                HttpServletResponse response) {
+        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri, response);
 
-        // jwt 생성
-        String serverAccessToken = jwtUtil.createAccessToken(userLoginResDto.id().toString());
-        String serverRefreshToken = jwtUtil.createRefreshToken(userLoginResDto.id().toString());
-
-        ResponseCookie accessTokenCookie = jwtUtil.createAccessTokenCookie(serverAccessToken);
-        ResponseCookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(serverRefreshToken);
-
-        // refresh token, redis 적재
-        redisProcessor.setValue(userLoginResDto.id().toString(), serverRefreshToken);
-
-        return ResponseEntity.ok()
-            .header(SET_COOKIE, accessTokenCookie.toString())
-            .header(SET_COOKIE, refreshTokenCookie.toString())
-            .body(CommonResponse.success(userLoginResDto));
+        return ResponseEntity.ok(CommonResponse.success(userLoginResDto));
     }
 
     @PostMapping("/users/mail-verification")
@@ -70,6 +60,7 @@ public class UserController implements UserApiDocs {
 
     @PostMapping("/users/join")
     public ResponseEntity join(@RequestBody @Validated UserJoinReqDto userJoinReqDto, @AuthenticationPrincipal User user) {
+        log.info("controller join");
         UserJoinResDto dto = userService.join(userJoinReqDto, user.getId());
         return ResponseEntity.ok(CommonResponse.success(dto));
     }

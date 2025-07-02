@@ -84,6 +84,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // JWT 검증
         try {
             jwtUtil.isValidateToken(accessToken);
+
+            User user = userRepository.findById(Long.parseLong(jwtUtil.getUserId(accessToken)))
+                    .orElseThrow(() -> new ApiException(USER_NOT_FOUND));
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            filterChain.doFilter(request, response);
         } catch(ExpiredJwtException e) {
             log.info("{}, {}", ACCESS_TOKEN, JWT_EXPIRED_EXCEPTION.getMessage());
 
@@ -127,7 +134,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 log.info("TOKEN REFRESH SUCCESS : {}", newAccessToken);
 
-                // 8. 다음 필터로 진행
+                // 다음 필터로 진행
                 filterChain.doFilter(request, response);
             } catch (ApiException ex) {
                 // refreshToken도 만료/유효하지 않으면 401

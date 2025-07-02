@@ -33,6 +33,7 @@ public class UserService {
     }
 
     public UserJoinResDto join(UserJoinReqDto userJoinReqDto, Long userId) {
+        log.info("service join");
         // user 조회
         User findUser = userReader.read(userId);
 
