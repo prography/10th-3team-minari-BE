@@ -18,4 +18,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     Long user(User user);
 
     List<Answer> findByUserIdAndAnsweredDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
+
+    Long countByUserId(Long userId);
 }

@@ -1,5 +1,6 @@
 package com.prography.minari.user.service;
 
+import com.prography.minari.answer.service.impl.AnswerReader;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.service.impl.RedisProcessor;
@@ -23,13 +24,16 @@ public class UserService {
 
     private final UserReader userReader;
     private final UserWriter userWriter;
+    private final AnswerReader answerReader;
+    private final JwtUtil jwtUtil;
     private final RedisProcessor redisProcessor;
     private final SeedReader seedReader;
 
     public UserFindResDto findById(Long id) {
         User user = userReader.read(id);
         Seed seed = seedReader.readByUserId(id).orElse(new Seed(0L,user));
-        return UserFindResDto.from(user, seed);
+        Long dayCount = answerReader.countByUserId(id);
+        return UserFindResDto.from(user, seed, dayCount);
     }
 
     public UserJoinResDto join(UserJoinReqDto userJoinReqDto, Long userId) {
