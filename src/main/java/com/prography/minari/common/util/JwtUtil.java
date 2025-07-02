@@ -35,7 +35,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))//expiration))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -48,6 +48,10 @@ public class JwtUtil {
                 .maxAge(Duration.ofMillis(expiration))
                 .sameSite("None")
                 .build();
+    }
+
+    public ResponseCookie deleteAccessTokenCookie() {
+        return createAccessTokenCookie(null);
     }
 
     public String createRefreshToken(String userId) {
@@ -67,6 +71,10 @@ public class JwtUtil {
                 .maxAge(Duration.ofMillis(expiration * 2))
                 .sameSite("None")
                 .build();
+    }
+
+    public ResponseCookie deleteRefreshTokenCookie() {
+        return createRefreshTokenCookie(null);
     }
 
     public String getUserId(String token) {
@@ -89,15 +97,12 @@ public class JwtUtil {
         return Duration.ofMillis(tokenExpiration.getTime() - System.currentTimeMillis());
     }
 
-    public void isValidateToken(String token) {
+    public void isValidateToken(String token) throws ExpiredJwtException {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
-        } catch(ExpiredJwtException e) {
-            log.info("토큰이 만료되었습니다. JWT: {}", token);
-            throw new ApiException(JWT_EXPIRED_EXCEPTION);
         } catch(SignatureException e) {
             log.info("유효하지 않은 서명입니다. JWT: {}", token);
             throw new ApiException(JWT_INVALID_SIGNATURE_EXCEPTION);

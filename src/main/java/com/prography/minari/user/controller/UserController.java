@@ -48,8 +48,7 @@ public class UserController implements UserApiDocs {
         ResponseCookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(serverRefreshToken);
 
         // refresh token, redis 적재
-        Duration duration = jwtUtil.getDuration(serverRefreshToken);
-        redisProcessor.setValue(userLoginResDto.id().toString(), serverRefreshToken, duration);
+        redisProcessor.setValue(userLoginResDto.id().toString(), serverRefreshToken);
 
         return ResponseEntity.ok()
             .header(SET_COOKIE, accessTokenCookie.toString())
@@ -87,16 +86,18 @@ public class UserController implements UserApiDocs {
         return ResponseEntity.ok(CommonResponse.success("계정삭제"));
     }
 
-    @PostMapping("/users/token/refresh")
-    public ResponseEntity refreshToken(@RequestBody UserRefreshTokenReqDto userRefreshTokenReqDto) {
-        UserRefreshTokenResDto dto = userService.refreshToken(userRefreshTokenReqDto);
-        return ResponseEntity.ok(CommonResponse.success(dto));
-    }
-
     @PostMapping("/users/logout")
     public ResponseEntity logout(@AuthenticationPrincipal User user) {
         userService.logout(user);
-        return ResponseEntity.ok(CommonResponse.success("로그아웃되었습니다."));
+
+        // JWT 쿠키 삭제 (Set-Cookie with Max-Age=0)
+        ResponseCookie accessTokenExpiredCookie = jwtUtil.deleteAccessTokenCookie();
+        ResponseCookie refreshTokenExpiredCookie = jwtUtil.deleteRefreshTokenCookie();
+
+        return ResponseEntity.ok()
+                .header(SET_COOKIE, accessTokenExpiredCookie.toString())
+                .header(SET_COOKIE, refreshTokenExpiredCookie.toString())
+                .body(CommonResponse.success("로그아웃되었습니다."));
     }
 
 }

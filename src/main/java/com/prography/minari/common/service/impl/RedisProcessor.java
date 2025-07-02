@@ -3,6 +3,7 @@ package com.prography.minari.common.service.impl;
 import com.prography.minari.common.aop.ImplService;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
+import com.prography.minari.common.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,12 +19,13 @@ import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_MATCHED;
 public class RedisProcessor {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final JwtUtil jwtUtil;
 
     /**
      * Redis에 데이터 저장 (만료시간 설정)
      */
-    public void setValue(String key, Object value, Duration duration) {
-        redisTemplate.opsForValue().set(key, value, duration);
+    public void setValue(String key, Object value) {
+        redisTemplate.opsForValue().set(key, value, jwtUtil.getDuration(value.toString()));
         log.info("refresh token 저장 : {}", value);
     }
 
