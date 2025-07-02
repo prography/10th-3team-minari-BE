@@ -21,21 +21,30 @@ import java.util.Optional;
 public class MailContentCreateProcessor {
     private final MailTemplateCreater mailTemplateCreater;
     private final QuestionReader questionReader;
+
     @Bean
     public ItemProcessor<User, MailRequest> processor() {
         return user -> {
-            Optional<Question> questionOpt = questionReader.readDaily(user, List.of(Domain.CS, user.getDomain()), user.getDaysSinceJoined());
-            if(questionOpt.isPresent()) {
-                Question question = questionOpt.get();
-                return mailTemplateCreater.create("오늘의 미나리",
-                        user.getEmail(),
-                        Map.of("category",question.getDomain().toString(),"keyword",question.getTags().getFirst()),
-                        "today-minari");
-            }
-            return mailTemplateCreater.create("오늘의 미나리",
-                    user.getEmail(),
-                    Map.of(),
-                    "no-have-problem.html");
+
+            Optional<Question> questionOpt = questionReader.readDaily(
+                    user,
+                    List.of(Domain.CS, user.getDomain()),
+                    user.getDaysSinceJoined()
+            );
+
+            return questionOpt.map(question ->
+                    mailTemplateCreater.create(
+                            "오늘의 미나리",
+                            user.getEmail(),
+                            Map.of("category", question.getDomain().toString(), "keyword", question.getTags().getFirst()),
+                            "today-minari")
+            ).orElse(
+                    mailTemplateCreater.create(
+                            "오늘의 미나리",
+                            user.getEmail(),
+                            Map.of(),
+                            "no-have-problem.html")
+            );
         };
     }
 }

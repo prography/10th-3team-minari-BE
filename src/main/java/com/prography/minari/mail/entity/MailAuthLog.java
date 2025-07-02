@@ -1,9 +1,11 @@
 package com.prography.minari.mail.entity;
 
 import com.prography.minari.common.entity.BaseTimeEntity;
-import com.prography.minari.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity

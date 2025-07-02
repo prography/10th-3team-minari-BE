@@ -63,4 +63,5 @@ public class MailService {
             throw new ApiException(ErrorCode.EXPIRED_AUTH_CODE);
         }
     }
+
 }
