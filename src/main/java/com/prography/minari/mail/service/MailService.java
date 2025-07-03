@@ -48,7 +48,12 @@ public class MailService {
         mailClient.sendMail(authMailRequest);
     }
 
-    // 인증번호 검증
+    /**
+     * Verifies the provided email authentication code for a user.
+     *
+     * Checks that the most recent authentication code for the user matches the provided code and has not expired.
+     * Throws an exception if the code is missing, invalid, or expired.
+     */
     public void verifyAuthCode(MailVerificationCheckReqDto mailVerificationCheckReqDto, User user) {
         MailAuthLog mailAuthLog = mailAuthLogRepository.findFirstByUserIdOrderByCreatedDateTimeDesc(user.getId())
                 .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
