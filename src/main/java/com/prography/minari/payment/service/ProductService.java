@@ -24,6 +24,7 @@ public class ProductService {
                                     .fakePrice(p.getFakePrice())
                                     .message(p.getMessage())
                                     .quantity(p.getQuantity())
+                                    .dicount(p.getDiscountRate())
                                     .build();
                         }
                 ).sorted(Comparator.comparing(SellingProductResponseDto::getQuantity))

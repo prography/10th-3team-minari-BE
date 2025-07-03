@@ -20,4 +20,7 @@ public class SellingProductResponseDto {
     @Schema(description = "할인에 대한 문구(html로 넘어갈 예정)", example = "")
     @Column(name = "message")
     private String message;
+    @Schema(description = "할인률", example = "")
+    @Column(name = "message")
+    private int dicount;
 }
