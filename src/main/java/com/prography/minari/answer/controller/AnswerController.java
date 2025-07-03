@@ -48,10 +48,7 @@ public class AnswerController implements AnswerApiDocs {
     }
 
     @GetMapping("/answers")
-    public ResponseEntity getAnswerList(
-            @RequestParam("year") String year,
-            @RequestParam("month") String month
-            , @AuthenticationPrincipal User user) {
+    public ResponseEntity getAnswerList(@RequestParam("year") String year, @RequestParam("month") String month, @RequestParam("week") String week, @AuthenticationPrincipal User user) {
 
         return ResponseEntity.ok(null);
     }
