@@ -2,6 +2,7 @@ package com.prography.minari.answer.controller;
 
 import com.prography.minari.answer.controller.docs.AnswerApiDocs;
 import com.prography.minari.answer.dto.req.InterviewSttConvertReq;
+import com.prography.minari.answer.dto.res.AnswerHistoryResDto;
 import com.prography.minari.answer.service.AnswerService;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
@@ -48,8 +49,11 @@ public class AnswerController implements AnswerApiDocs {
     }
 
     @GetMapping("/answers")
-    public ResponseEntity getAnswerList(@RequestParam("year") String year, @RequestParam("month") String month, @RequestParam("week") String week, @AuthenticationPrincipal User user) {
-
+    public ResponseEntity getAnswerHistoryList(@RequestParam("year") Integer year,
+                                               @RequestParam("month") Integer month,
+                                               @RequestParam("week") Integer week,
+                                               @AuthenticationPrincipal User user) {
+        AnswerHistoryResDto dto = answerService.getAnswerHistoryList(year, month, week, user);
         return ResponseEntity.ok(null);
     }
 }

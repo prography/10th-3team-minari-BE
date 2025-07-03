@@ -1,5 +1,6 @@
 package com.prography.minari.answer.service;
 
+import com.prography.minari.answer.dto.res.AnswerHistoryResDto;
 import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.answer.service.dto.SttConvertAudioFileInfo;
 import com.prography.minari.answer.service.dto.SttStatus;
@@ -15,6 +16,7 @@ import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.impl.UserReader;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,5 +125,35 @@ public class AnswerService {
 
         return null;
 
+    }
+
+    public AnswerHistoryResDto getAnswerHistoryList(Integer year, Integer month, Integer week, User user) {
+
+        LocalDate startDate;
+        LocalDate endDate;
+
+        // 주 단위
+        if (month != null && week != null) {
+            LocalDate firstDayOfMonth = LocalDate.of(year, month, 1);
+            WeekFields weekFields = WeekFields.of(DayOfWeek.MONDAY, 1);
+            TemporalField weekOfMonth = weekFields.weekOfMonth();
+
+            startDate = firstDayOfMonth.with(weekOfMonth, week).with(DayOfWeek.MONDAY);
+            endDate = startDate.plusDays(6);
+        }
+        // 월 단위
+        else if (month != null && week == null) {
+            startDate = LocalDate.of(year, month, 1);
+            endDate = YearMonth.of(year, month).atEndOfMonth();
+        }
+        // 연 단위
+        else {
+            startDate = LocalDate.of(year, 1, 1);
+            endDate = LocalDate.of(year, 12, 31);
+        }
+
+        List<Answer> answers = answerReader.readAnswersByDateRange(user.getId(), startDate, endDate);
+
+        return null;
     }
 }
