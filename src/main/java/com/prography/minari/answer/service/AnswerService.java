@@ -39,6 +39,18 @@ public class AnswerService {
     private final FileUploader fileUploader;
     private final AudioFileFormatConverter audioFileFormatConverter;
 
+    /**
+     * Processes a user's uploaded speech audio file for a specific question, converts it to text, saves the answer, and uploads the audio file.
+     *
+     * Retrieves the user and question, checks for existing answers to prevent duplicates, converts the audio to WAV format, performs speech-to-text processing, saves the resulting answer, uploads the original audio file to storage, and returns a response containing answer details.
+     *
+     * @param file      the uploaded audio file containing the user's speech
+     * @param userId    the ID of the user submitting the answer
+     * @param questionId the ID of the question being answered
+     * @param memo      an optional memo to associate with the answer
+     * @return an InterviewContentResponse containing the answer's details, including running time, question content, reply, and creation date
+     * @throws ApiException if the question is not found or if an answer already exists for the user and question
+     */
     public InterviewContentResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId, String memo) {
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)

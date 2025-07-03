@@ -17,6 +17,11 @@ public class AwsS3Config {
     @Value("${cloud.aws.region.static}")
     private String region;
 
+    /**
+     * Creates and configures an {@link AmazonS3Client} bean using AWS credentials and region from application properties.
+     *
+     * @return a configured {@link AmazonS3Client} for interacting with AWS S3
+     */
     @Bean
     public AmazonS3Client amazonS3Client() {
          BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);

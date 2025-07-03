@@ -22,6 +22,14 @@ public class S3Uploader implements FileUploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    /****
+     * Uploads a multipart file to the specified folder path within the configured AWS S3 bucket.
+     *
+     * @param file the multipart file to upload
+     * @param relativeFolderPath the folder path within the S3 bucket where the file will be stored
+     * @return the HTTPS URL of the uploaded file in the S3 bucket
+     * @throws ApiException if an I/O error occurs during file upload
+     */
     @Override
     public String upload(MultipartFile file, String relativeFolderPath) {
         String fileName = file.getOriginalFilename();
