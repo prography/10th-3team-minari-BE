@@ -62,7 +62,8 @@ public class SecurityConfig {
                 "https://minari-staging.netlify.app",
                 "https://minari-official.com",
                 "http://localhost:8080",
-                "http://localhost:3000"
+                "http://localhost:3000",
+                "https://minari-cookie.netlify.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
