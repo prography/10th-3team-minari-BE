@@ -11,10 +11,12 @@ public record UserLoginResDto(
         String socialId,
         String name,
         String image,
-        boolean registered)
+        boolean registered,
+        String accessToken,
+        String refreshToken)
 {
 
-    public static UserLoginResDto from(User user) {
+    public static UserLoginResDto from(User user, String accessToken, String refreshToken) {
         return new UserLoginResDto(
                 user.getId(),
                 user.getEmail(),
@@ -22,7 +24,9 @@ public record UserLoginResDto(
                 String.valueOf(user.getSocialId()), // socialId가 String이면 그대로, Long이면 변환
                 user.getName(),
                 user.getImage(),
-                user.isRegistered()
+                user.isRegistered(),
+                accessToken,
+                refreshToken
         );
     }
 

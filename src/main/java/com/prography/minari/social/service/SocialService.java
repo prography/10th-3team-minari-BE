@@ -61,7 +61,7 @@ public class SocialService {
         response.addHeader(SET_COOKIE, accessTokenCookie.toString());
         response.addHeader(SET_COOKIE, refreshTokenCookie.toString());
 
-        return UserLoginResDto.from(user);
+        return UserLoginResDto.from(user, serverAccessToken, serverRefreshToken);
     }
 
 }
