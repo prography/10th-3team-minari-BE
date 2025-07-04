@@ -1,6 +1,10 @@
 version: 0.0
 os: linux
 
+files:
+  - source: scripts/
+    destination: /home/ubuntu/scripts
+
 hooks:
   BeforeInstall:
     - location: scripts/set-permissions.sh
