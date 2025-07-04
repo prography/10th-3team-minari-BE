@@ -66,3 +66,6 @@ naver:
 jwt:
   secret: ${JWT_SECRET}
   expiration: 3600000
+
+server:
+  use-forward-headers: true
