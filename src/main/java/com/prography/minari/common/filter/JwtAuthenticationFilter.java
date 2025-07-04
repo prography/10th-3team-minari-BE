@@ -34,6 +34,7 @@ import static com.prography.minari.common.execption.ErrorCode.*;
 import static com.prography.minari.common.util.JwtUtil.ACCESS_TOKEN;
 import static com.prography.minari.common.util.JwtUtil.REFRESH_TOKEN;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -66,11 +67,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // Authorization 헤더에 accessToken이 없으면 쿠키에서 accessToken을 찾음
-        String accessToken = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
-                .filter(cookie -> ACCESS_TOKEN.equals(cookie.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
+        // String accessToken = Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
+        //        .filter(cookie -> ACCESS_TOKEN.equals(cookie.getName()))
+        //        .map(Cookie::getValue)
+        //        .findFirst()
+        //        .orElse(null);
+
+        String accessToken = request.getHeader(AUTHORIZATION);
 
         log.info("추출한 accessToken : {}", accessToken);
 
