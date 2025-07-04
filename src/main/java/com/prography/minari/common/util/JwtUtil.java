@@ -42,7 +42,7 @@ public class JwtUtil {
 
     public ResponseCookie createAccessTokenCookie(String accessToken) {
         return ResponseCookie.from(ACCESS_TOKEN, accessToken)
-                .httpOnly(true)
+                .httpOnly(false) // TODO true로 해야함
                 .secure(true)
                 .domain("www.minari.shop")
                 .path("/")
@@ -66,7 +66,7 @@ public class JwtUtil {
 
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from(REFRESH_TOKEN, refreshToken)
-                .httpOnly(true)
+                .httpOnly(false) // TODO true로 해야함
                 .secure(true)
                 .domain("www.minari.shop")
                 .path("/")
