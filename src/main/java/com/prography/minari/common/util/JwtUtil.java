@@ -43,7 +43,7 @@ public class JwtUtil {
     public ResponseCookie createAccessTokenCookie(String accessToken) {
         return ResponseCookie.from(ACCESS_TOKEN, accessToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(Duration.ofMillis(expiration))
                 .sameSite("None")
@@ -66,7 +66,7 @@ public class JwtUtil {
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from(REFRESH_TOKEN, refreshToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(Duration.ofMillis(expiration * 2))
                 .sameSite("None")
