@@ -44,7 +44,7 @@ public class JwtUtil {
         return ResponseCookie.from(ACCESS_TOKEN, accessToken)
                 .httpOnly(false) // TODO true로 해야함
                 .secure(true)
-                .domain("www.minari.shop")
+                .domain(".minari-official.com")
                 .path("/")
                 .maxAge(Duration.ofMillis(expiration))
                 .sameSite("None")
@@ -68,7 +68,7 @@ public class JwtUtil {
         return ResponseCookie.from(REFRESH_TOKEN, refreshToken)
                 .httpOnly(false) // TODO true로 해야함
                 .secure(true)
-                .domain("www.minari.shop")
+                .domain(".minari-official.com")
                 .path("/")
                 .maxAge(Duration.ofMillis(expiration * 2))
                 .sameSite("None")
