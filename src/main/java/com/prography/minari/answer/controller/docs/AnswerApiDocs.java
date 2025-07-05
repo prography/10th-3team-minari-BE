@@ -1,19 +1,26 @@
 package com.prography.minari.answer.controller.docs;
 
 import com.prography.minari.answer.dto.req.InterviewSttConvertReq;
+import com.prography.minari.answer.dto.res.AnswerHistoryResDto;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.question.controller.dto.req.ConvertSttMemoRequest;
+import com.prography.minari.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
 
 public interface AnswerApiDocs {
     @Operation(summary = "음성 파일을 텍스트로 변환", description = "사용자가 업로드한 음성 파일을 STT로 변환합니다.")
@@ -53,4 +60,24 @@ public interface AnswerApiDocs {
             @Parameter(description = "질문 ID", required = true)
             @PathVariable("questionId") Long questionId
     );
+
+    @Operation(
+            summary = "사용자의 답변 이력 조회",
+            description = "지정한 기간(startDate ~ endDate) 동안 사용자의 답변 이력과 달성률을 조회합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 날짜 범위", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/answers")
+    ResponseEntity<CommonResponse<AnswerHistoryResDto>> getAnswerHistoryList(
+            @Parameter(description = "시작 날짜 (yyyy-MM-dd)", required = true)
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+
+            @Parameter(description = "종료 날짜 (yyyy-MM-dd)", required = true)
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
+    );
+
 }
