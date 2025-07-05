@@ -25,7 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +64,10 @@ public class AnswerService {
                 .user(user)
                 .question(question)
                 .memo(memo)
+                .answeredDate(LocalDate.now().atStartOfDay()
+                        .minusHours((long) convertResult.getRunningTime())
+                        .minusMinutes(Math.round((convertResult.getRunningTime() % 1) * 60))
+                        .toLocalDate())
                 .build());
 
         return InterviewContentResponse.builder()
@@ -105,18 +112,26 @@ public class AnswerService {
 
     public AnswerHistoryResDto getAnswerHistoryList(LocalDate startDate, LocalDate endDate, User user) {
 
-        // 사용자 리허설 내역
-        List<AnswerResDto> answerResList = answerReader.readAnswersByDateRange(user.getId(), startDate, endDate).stream()
-                .map(answer -> AnswerResDto.create(
-                        answer.getId(),
-                        answer.getAnsweredDate(),
-                        answer.getQuestion().getId()
-                ))
+        // answer 리스트 조회 및 날짜 기준으로 매핑
+        Map<LocalDate, Answer> answerMap = answerReader.readAnswersByDateRange(user.getId(), startDate, endDate).stream()
+                .collect(Collectors.toMap(
+                        Answer::getAnsweredDate,
+                        Function.identity()
+                ));
+
+        // startDate ~ endDate에 포함되는 Answer 데이터 전체 생성
+        List<AnswerResDto> answerResList = Stream.iterate(startDate, date -> !date.isAfter(endDate), date -> date.plusDays(1))
+                .map(date -> {
+                    Answer answer = answerMap.get(date);
+                    return (answer != null)
+                            ? AnswerResDto.createExisted(answer.getId(), date, answer.getQuestion().getId())
+                            : AnswerResDto.createEmpty(date);
+                })
                 .collect(Collectors.toList());
 
         // 미나리 달성률
         int achievementRate = Math.toIntExact(
-                Math.round((answerResList.size() * 100.0) / (ChronoUnit.DAYS.between(startDate, endDate) + 1))
+                Math.round((answerResList.stream().filter(AnswerResDto::isExisted).count() * 100.0) / (ChronoUnit.DAYS.between(startDate, endDate) + 1))
         );
 
         return AnswerHistoryResDto.create(achievementRate, answerResList);
