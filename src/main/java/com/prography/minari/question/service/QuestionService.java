@@ -4,6 +4,7 @@ import com.prography.minari.common.entity.Domain;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.question.dto.DailyUserQuestionResDto;
+import com.prography.minari.question.dto.res.QuestionResDto;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
@@ -37,5 +38,10 @@ public class QuestionService {
         return question
                 .map(Question::getId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
+    }
+
+    public QuestionResDto findById(Long questionId) {
+        Question question = questionReader.findById(questionId);
+        return QuestionResDto.from(question);
     }
 }
