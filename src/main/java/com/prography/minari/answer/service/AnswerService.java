@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +65,8 @@ public class AnswerService {
                 .user(user)
                 .question(question)
                 .memo(memo)
-                .answeredDate(LocalDate.now().atStartOfDay()
-                        .minusHours((long) convertResult.getRunningTime())
-                        .minusMinutes(Math.round((convertResult.getRunningTime() % 1) * 60))
+                .answeredDate(LocalDateTime.now()
+                        .minusSeconds(Math.round(convertResult.getRunningTime()))
                         .toLocalDate())
                 .build());
 
