@@ -116,4 +116,8 @@ public class User extends BaseTimeEntity {
         this.deletedAt = LocalDateTime.now().plusDays(7);
     }
 
+    public void reactivate() {
+        this.isDeleted = false;
+        this.deletedAt = null;
+    }
 }
