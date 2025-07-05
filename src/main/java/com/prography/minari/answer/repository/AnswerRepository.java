@@ -15,8 +15,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     @Query("select A from Answer A where A.user.id = :userId and A.question.id = :questionId")
     List<Answer> findAllByUserIdAndQuestionId(@Param("userId") Long userId, @Param("questionId") Long questionId);
 
-    Long user(User user);
-
     List<Answer> findByUserIdAndAnsweredDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 
     Long countByUserId(Long userId);

@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static com.prography.minari.common.execption.ErrorCode.ENTITY_NOT_FOUND;
+import static com.prography.minari.common.execption.ErrorCode.QUESTION_NOT_FOUND;
 
 @ImplService
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class QuestionReader {
 
     public Question findById(Long id) {
         return questionRepository.findById(id)
-                .orElseThrow(() -> new ApiException(ENTITY_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(QUESTION_NOT_FOUND));
     }
 
 }

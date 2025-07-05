@@ -25,7 +25,6 @@ public class UserService {
     private final UserReader userReader;
     private final UserWriter userWriter;
     private final AnswerReader answerReader;
-    private final JwtUtil jwtUtil;
     private final RedisProcessor redisProcessor;
     private final SeedReader seedReader;
 
