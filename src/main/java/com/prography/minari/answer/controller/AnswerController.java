@@ -52,10 +52,10 @@ public class AnswerController implements AnswerApiDocs {
     }
 
     @GetMapping("/answers")
-    public ResponseEntity getAnswerHistoryList(@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                               @RequestParam("end")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+    public ResponseEntity getAnswerHistoryList(@RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                               @RequestParam("endDate")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                                                @AuthenticationPrincipal User user) {
         AnswerHistoryResDto dto = answerService.getAnswerHistoryList(startDate, endDate, user);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(CommonResponse.success(dto));
     }
 }
