@@ -1,6 +1,7 @@
 package com.prography.minari.answer.service;
 
 import com.prography.minari.answer.dto.res.AnswerHistoryResDto;
+import com.prography.minari.answer.dto.res.AnswerResDto;
 import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.answer.service.dto.SttConvertAudioFileInfo;
 import com.prography.minari.answer.service.dto.SttStatus;
@@ -22,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -102,8 +105,20 @@ public class AnswerService {
 
     public AnswerHistoryResDto getAnswerHistoryList(LocalDate startDate, LocalDate endDate, User user) {
 
-        List<Answer> answers = answerReader.readAnswersByDateRange(user.getId(), startDate, endDate);
+        // 사용자 리허설 내역
+        List<AnswerResDto> answerResList = answerReader.readAnswersByDateRange(user.getId(), startDate, endDate).stream()
+                .map(answer -> AnswerResDto.create(
+                        answer.getId(),
+                        answer.getAnsweredDate(),
+                        answer.getQuestion().getId()
+                ))
+                .collect(Collectors.toList());
 
-        return null;
+        // 미나리 달성률
+        int achievementRate = Math.toIntExact(
+                Math.round((answerResList.size() * 100.0) / (ChronoUnit.DAYS.between(startDate, endDate) + 1))
+        );
+
+        return AnswerHistoryResDto.create(achievementRate, answerResList);
     }
 }

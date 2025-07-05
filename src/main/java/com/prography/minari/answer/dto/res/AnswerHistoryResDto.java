@@ -6,7 +6,7 @@ public record AnswerHistoryResDto(
         Integer achievementRate,
         List<AnswerResDto> answerlist
 ) {
-    public AnswerHistoryResDto create(Integer achievementRate, List<AnswerResDto> answerlist) {
+    public static AnswerHistoryResDto create(Integer achievementRate, List<AnswerResDto> answerlist) {
         return new AnswerHistoryResDto(achievementRate, answerlist);
     }
 }
