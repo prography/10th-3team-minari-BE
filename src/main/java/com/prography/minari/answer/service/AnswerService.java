@@ -16,20 +16,13 @@ import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.impl.UserReader;
-import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -107,50 +100,7 @@ public class AnswerService {
                 .build();
     }
 
-    public List<Answer> readAnswersByDateRange(User user) {
-
-
-
-        // 1주 범위 (월~일)
-        LocalDate weekStart = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        LocalDate weekEnd = LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-
-        // 1달 범위
-        LocalDate monthStart = LocalDate.now().withDayOfMonth(1);
-        LocalDate monthEnd = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
-
-        // 1년 범위
-        LocalDate yearStart = LocalDate.now().withDayOfYear(1);
-        LocalDate yearEnd = LocalDate.now().withMonth(12).withDayOfMonth(31);
-
-        return null;
-
-    }
-
-    public AnswerHistoryResDto getAnswerHistoryList(Integer year, Integer month, Integer week, User user) {
-
-        LocalDate startDate;
-        LocalDate endDate;
-
-        // 주 단위
-        if (month != null && week != null) {
-            LocalDate firstDayOfMonth = LocalDate.of(year, month, 1);
-            WeekFields weekFields = WeekFields.of(DayOfWeek.MONDAY, 1);
-            TemporalField weekOfMonth = weekFields.weekOfMonth();
-
-            startDate = firstDayOfMonth.with(weekOfMonth, week).with(DayOfWeek.MONDAY);
-            endDate = startDate.plusDays(6);
-        }
-        // 월 단위
-        else if (month != null && week == null) {
-            startDate = LocalDate.of(year, month, 1);
-            endDate = YearMonth.of(year, month).atEndOfMonth();
-        }
-        // 연 단위
-        else {
-            startDate = LocalDate.of(year, 1, 1);
-            endDate = LocalDate.of(year, 12, 31);
-        }
+    public AnswerHistoryResDto getAnswerHistoryList(LocalDate startDate, LocalDate endDate, User user) {
 
         List<Answer> answers = answerReader.readAnswersByDateRange(user.getId(), startDate, endDate);
 

@@ -9,9 +9,12 @@ import com.prography.minari.answer.service.dto.response.InterviewContentResponse
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -49,11 +52,10 @@ public class AnswerController implements AnswerApiDocs {
     }
 
     @GetMapping("/answers")
-    public ResponseEntity getAnswerHistoryList(@RequestParam("year") Integer year,
-                                               @RequestParam("month") Integer month,
-                                               @RequestParam("week") Integer week,
+    public ResponseEntity getAnswerHistoryList(@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                               @RequestParam("end")   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                                                @AuthenticationPrincipal User user) {
-        AnswerHistoryResDto dto = answerService.getAnswerHistoryList(year, month, week, user);
+        AnswerHistoryResDto dto = answerService.getAnswerHistoryList(startDate, endDate, user);
         return ResponseEntity.ok(null);
     }
 }
