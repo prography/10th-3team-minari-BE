@@ -3,12 +3,12 @@ package com.prography.minari.user.entity;
 import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.common.entity.BaseTimeEntity;
 import com.prography.minari.common.entity.Domain;
+import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.enums.EmailSendTime;
 import com.prography.minari.user.enums.ExperienceLevel;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.prography.minari.common.execption.ErrorCode.ACCOUNT_NOT_DELETED;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -117,6 +118,9 @@ public class User extends BaseTimeEntity {
     }
 
     public void reactivate() {
+
+        if(!this.isDeleted) throw new ApiException(ACCOUNT_NOT_DELETED);
+
         this.isDeleted = false;
         this.deletedAt = null;
     }

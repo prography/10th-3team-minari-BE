@@ -12,6 +12,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다.","C004"),
     ALREADY_REGISTERED(HttpStatus.CONFLICT, "이미 회원가입이 완료된 사용자입니다.","C005"),
     ACCOUNT_SOFT_DELETED(HttpStatus.CONFLICT, "계정 삭제된 사용자입니다.","C006"),
+    ACCOUNT_NOT_DELETED(HttpStatus.CONFLICT, "계정 삭제되지 않은 사용자입니다.","C007"),
     QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND, "남아있는 문제가 존재하지 않습니다.","Q001"),
     JWT_EXPIRED_EXCEPTION(HttpStatus.NOT_FOUND, "토큰이 만료되었습니다.","JWT001"),
     JWT_INVALID_SIGNATURE_EXCEPTION(HttpStatus.NOT_FOUND, "유효하지 않은 서명입니다.","JWT002"),
