@@ -19,7 +19,7 @@ import java.io.IOException;
 public class S3Uploader implements FileUploader {
     private final AmazonS3Client amazonS3Client;
 
-    @Value("${cloud.aws.s3.bucket}")
+    @Value("${cloud.aws.s3.bucket:default}")
     private String bucket;
 
     /****
