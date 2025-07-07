@@ -13,6 +13,7 @@ import com.prography.minari.answer.service.impl.AudioFileFormatConverter;
 import com.prography.minari.answer.service.impl.SttProcessor;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
+import com.prography.minari.common.util.AnalyticsUtil;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
@@ -130,9 +131,7 @@ public class AnswerService {
                 .collect(Collectors.toList());
 
         // 미나리 달성률
-        int achievementRate = Math.toIntExact(
-                Math.round((answerResList.stream().filter(AnswerResDto::isExisted).count() * 100.0) / (ChronoUnit.DAYS.between(startDate, endDate) + 1))
-        );
+        int achievementRate = AnalyticsUtil.calculateAchievementRate(answerResList, startDate, endDate);
 
         return AnswerHistoryResDto.create(achievementRate, answerResList);
     }
