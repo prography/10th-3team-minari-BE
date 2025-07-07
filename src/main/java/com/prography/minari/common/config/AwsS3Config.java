@@ -10,11 +10,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AwsS3Config {
-    @Value("${cloud.aws.credentials.access-key}")
+    /**
+     * todo
+     * 아직 properties에 값 안넣음
+     */
+    @Value("${cloud.aws.credentials.access-key:default}")
     private String accessKey;
-    @Value("${cloud.aws.credentials.secret-key}")
+    @Value("${cloud.aws.credentials.secret-key:default}")
     private String secretKey;
-    @Value("${cloud.aws.region.static}")
+    @Value("${cloud.aws.region.static:default}")
     private String region;
 
     /**
