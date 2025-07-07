@@ -28,7 +28,9 @@ public enum ErrorCode {
     REQUEST_BODY_IS_MISSING(HttpStatus.NOT_FOUND, "Request Body가 존재하지 않습니다.", "VALIDATION"),
     FREE_ANSWER_ALREADY_DONE(HttpStatus.BAD_REQUEST, "이미 오늘의 미나리에 답변하였습니다.", "A001"),
     INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "유효햐지 않은 인증번호입니다.", "AUTH001"),
-    EXPIRED_AUTH_CODE(HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다.", "AUTH002");
+    EXPIRED_AUTH_CODE(HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다.", "AUTH002"),
+    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작일은 종료일보다 이후일 수 없습니다.", "DATE001"),
+    ;
 
     private final HttpStatus status;
     private final String message;

@@ -2,15 +2,23 @@ package com.prography.minari.answer.controller;
 
 import com.prography.minari.answer.controller.docs.AnswerApiDocs;
 import com.prography.minari.answer.dto.req.InterviewSttConvertReq;
+import com.prography.minari.answer.dto.res.AnswerHistoryResDto;
 import com.prography.minari.answer.service.AnswerService;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
+import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+
+import static com.prography.minari.common.execption.ErrorCode.INVALID_DATE_RANGE;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -48,11 +56,14 @@ public class AnswerController implements AnswerApiDocs {
     }
 
     @GetMapping("/answers")
-    public ResponseEntity getAnswerList(
-            @RequestParam("year") String year,
-            @RequestParam("month") String month
-            , @AuthenticationPrincipal User user) {
+    public ResponseEntity<CommonResponse<AnswerHistoryResDto>> getAnswerHistoryList(
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @AuthenticationPrincipal User user) {
 
-        return ResponseEntity.ok(null);
+        if (startDate.isAfter(endDate)) throw new ApiException(INVALID_DATE_RANGE);
+
+        AnswerHistoryResDto dto = answerService.getAnswerHistoryList(startDate, endDate, user);
+        return ResponseEntity.ok(CommonResponse.success(dto));
     }
 }

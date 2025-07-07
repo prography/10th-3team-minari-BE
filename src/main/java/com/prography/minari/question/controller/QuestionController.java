@@ -2,6 +2,7 @@ package com.prography.minari.question.controller;
 
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.question.controller.docs.QuestionApiDocs;
+import com.prography.minari.question.dto.res.QuestionResDto;
 import com.prography.minari.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +32,11 @@ public class QuestionController implements QuestionApiDocs {
     @GetMapping("/questions/{questionId}/tag")
     public ResponseEntity<CommonResponse<List<String>>> getTags(@PathVariable("questionId") Long questionId) {
         return ResponseEntity.ok(CommonResponse.success(questionService.readTags(questionId)));
+    }
+
+    @GetMapping("/questions/{questionId}")
+    public ResponseEntity<CommonResponse<QuestionResDto>> getQuestionById(@PathVariable("questionId") Long questionId) {
+        QuestionResDto dto = questionService.findById(questionId);
+        return ResponseEntity.ok(CommonResponse.success(dto));
     }
 }

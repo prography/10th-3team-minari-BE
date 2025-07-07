@@ -52,6 +52,9 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 
+  jackson:
+    default-property-inclusion: non_null
+
 oauth:
   kakao:
     REST_API_KEY: ${KAKAO_REST_API_KEY}
