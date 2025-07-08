@@ -1,5 +1,6 @@
 package com.prography.minari.admin.controller;
 
+import com.prography.minari.admin.controller.docs.AdminApiDocs;
 import com.prography.minari.admin.controller.dto.RewardForceRequest;
 import com.prography.minari.admin.controller.dto.RewardForceV2Request;
 import com.prography.minari.admin.service.AdminRewardService;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/admin/api/v1")
 @RequiredArgsConstructor
-public class AdminController {
+public class AdminController implements AdminApiDocs {
     private final AdminRewardService adminRewardService;
     private final UserService userService;
 
@@ -29,7 +30,7 @@ public class AdminController {
     }
 
     @PostMapping("/payment/force/v2")
-    public ResponseEntity forceChargeV2(@RequestBody RewardForceV2Request request) {
+    public ResponseEntity<CommonResponse<String>> forceChargeV2(@RequestBody RewardForceV2Request request) {
         adminRewardService.giveSeedForceV2(request.getUserUUID(),
                 request.getSeeds(),
                 request.getRole(),
