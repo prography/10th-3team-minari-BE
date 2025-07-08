@@ -1,6 +1,7 @@
 package com.prography.minari.payment.controller;
 
 import com.prography.minari.common.response.CommonResponse;
+import com.prography.minari.payment.controller.docs.CreditApiDocs;
 import com.prography.minari.payment.service.CreditService;
 import com.prography.minari.payment.service.dto.SellingProductResponseDto;
 import com.prography.minari.user.entity.User;
@@ -15,11 +16,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-public class CreditController {
+public class CreditController implements CreditApiDocs {
     private final CreditService creditService;
 
     @GetMapping("/users/credits/left")
-    public CommonResponse<Long> getSellingProducts(@AuthenticationPrincipal User user) {
+    public CommonResponse<Long> getLeftCredits(@AuthenticationPrincipal User user) {
         Long left= creditService.leftCredits(user.getId());
         return CommonResponse.success(left);
     }
