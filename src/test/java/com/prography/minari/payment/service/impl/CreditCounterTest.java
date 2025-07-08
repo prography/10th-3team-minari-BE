@@ -66,9 +66,9 @@ class CreditCounterTest {
          totalAmountOfNotRefund: 100 + 200 = 300
          totalAmountOfUserUsage: 30 + 50 = 80
 
-         return = 350 - 50 - (300 - 80) = 80
+         return = 350 - 50  - 80 = 80
          */
-        assertThat(80L).isEqualTo(result);
+        assertThat(220L).isEqualTo(result);
     }
 
 }

@@ -29,11 +29,6 @@ public class CreditCounter {
                 .mapToLong(Credit::getAmount)
                 .sum();
 
-        long totalAmountOfNotRefund = creditsOfUser.stream()
-                .filter(credit -> !credit.isRefund())
-                .mapToLong(Credit::getAmount)
-                .sum();
-
         List<Long> usingCreditIds = creditsOfUser.stream()
                 .filter(credit -> !credit.isRefund())
                 .map(Credit::getId)
@@ -44,6 +39,6 @@ public class CreditCounter {
                 .mapToLong(CreditUsage::getUsedAmount)
                 .sum();
 
-        return totalCreditAmount - refundedCreditAmount - (totalAmountOfNotRefund - totalAmountOfUserUsage);
+        return totalCreditAmount - refundedCreditAmount -  totalAmountOfUserUsage;
     }
 }
