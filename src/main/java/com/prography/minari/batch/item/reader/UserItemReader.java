@@ -18,4 +18,17 @@ public class UserItemReader {
                 .pageSize(100)                              // chunk 크기와 일치시킴
                 .build();
     }
+
+    @Bean
+    public JpaPagingItemReader<User> inactiveUserReader(EntityManagerFactory emf) {
+        return new JpaPagingItemReaderBuilder<User>()
+                .name("inactiveUserReader")
+                .entityManagerFactory(emf)
+                .queryString(
+                        "SELECT u FROM User u " +
+                                "WHERE u.isDeleted = true AND u.deletedAt <= CURRENT_DATE - 7"
+                )
+                .pageSize(100)
+                .build();
+    }
 }
