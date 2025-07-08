@@ -36,7 +36,7 @@ public class AdminController implements AdminApiDocs {
                 request.getRole(),
                 request.getReason(),
                 request.getMemo(),
-                null);
+                request.getProductId());
         return ResponseEntity.ok(CommonResponse.ok());
     }
 
