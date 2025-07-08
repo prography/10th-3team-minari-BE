@@ -2,6 +2,8 @@ package com.prography.minari.answer.service;
 
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector;
+import com.prography.minari.answer.dto.res.AnswerHistoryResDto;
+import com.prography.minari.answer.dto.res.AnswerResDto;
 import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.answer.repository.AnswerRepository;
 import com.prography.minari.answer.service.dto.SttConvertAudioFileInfo;
@@ -11,6 +13,7 @@ import com.prography.minari.answer.service.dto.response.InterviewContentResponse
 import com.prography.minari.answer.service.impl.AudioFileFormatConverter;
 import com.prography.minari.answer.service.impl.SttProcessor;
 import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.util.AnalyticsUtil;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.repository.QuestionRepository;
 import com.prography.minari.user.entity.User;
@@ -22,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -233,6 +237,53 @@ class AnswerServiceTest {
                 () -> assertThat(answerOpt.getLast().getUser().getId()).isEqualTo(saveUser.getId()),
                 () -> assertThat(answerOpt.getLast().getQuestion().getId()).isEqualTo(saveQuestion.getId())
         );*/
+    }
+
+    @Test
+    void 사용자_리허설_조회_테스트() {
+
+        User saveUser = userRepository.saveAndFlush(fixtureMonkey.giveMeBuilder(User.class)
+                .setNull("email")
+                .setNotNull("domain")
+                .sample());
+
+        Question saveQuestion1 = questionRepository.saveAndFlush(fixtureMonkey.giveMeOne(Question.class));
+        Question saveQuestion2 = questionRepository.saveAndFlush(fixtureMonkey.giveMeOne(Question.class));
+        Question saveQuestion3 = questionRepository.saveAndFlush(fixtureMonkey.giveMeOne(Question.class));
+
+        answerRepository.saveAndFlush(Answer.builder()
+                .memo("memo")
+                .user(saveUser)
+                .reply("reply")
+                .question(saveQuestion1)
+                .answeredDate(LocalDate.now().minusDays(2))
+                .build());
+
+        answerRepository.saveAndFlush(Answer.builder()
+                .memo("memo")
+                .user(saveUser)
+                .reply("reply")
+                .question(saveQuestion2)
+                .answeredDate(LocalDate.now())
+                .build());
+
+        answerRepository.saveAndFlush(Answer.builder()
+                .memo("memo")
+                .user(saveUser)
+                .reply("reply")
+                .question(saveQuestion3)
+                .answeredDate(LocalDate.now().plusDays(2))
+                .build());
+
+        AnswerHistoryResDto answerHistoryList = answerService.getAnswerHistoryList(LocalDate.now().minusDays(3), LocalDate.now().plusDays(3), saveUser);
+
+        assertAll(
+                () -> assertThat(answerHistoryList.achievementRate()).isEqualTo(43),
+                () -> assertThat(answerHistoryList.answerlist().stream()
+                        .filter(AnswerResDto::isExisted)
+                        .count()).isEqualTo(3)
+        );
+
     }
 
     /**
