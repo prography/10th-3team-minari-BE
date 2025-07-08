@@ -1,6 +1,7 @@
 package com.prography.minari.admin.controller;
 
 import com.prography.minari.admin.controller.dto.RewardForceRequest;
+import com.prography.minari.admin.controller.dto.RewardForceV2Request;
 import com.prography.minari.admin.service.AdminRewardService;
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.user.entity.User;
@@ -24,6 +25,17 @@ public class AdminController {
                 request.getRole(),
                 request.getReason(),
                 request.getMemo());
+        return ResponseEntity.ok(CommonResponse.ok());
+    }
+
+    @PostMapping("/payment/force/v2")
+    public ResponseEntity forceChargeV2(@RequestBody RewardForceV2Request request) {
+        adminRewardService.giveSeedForceV2(request.getUserUUID(),
+                request.getSeeds(),
+                request.getRole(),
+                request.getReason(),
+                request.getMemo(),
+                null);
         return ResponseEntity.ok(CommonResponse.ok());
     }
 
