@@ -5,6 +5,7 @@ import com.prography.minari.payment.entity.Credit;
 import com.prography.minari.payment.entity.PaymentLog;
 import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.payment.repository.CreditJpaRepository;
+import com.prography.minari.payment.service.impl.CreditWriter;
 import com.prography.minari.payment.service.impl.PaymentWriter;
 import com.prography.minari.payment.service.impl.SeedReader;
 import com.prography.minari.payment.service.impl.SeedWriter;
@@ -12,6 +13,8 @@ import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.impl.UserReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static com.prography.minari.payment.entity.CreditStatus.PAID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class AdminRewardService {
     private final SeedWriter seedWriter;
     private final PaymentWriter paymentWriter;
     private final CreditJpaRepository creditJpaRepository;
+    private final CreditWriter creditWriter;
 
     public void giveSeedForce(String userUUID, int seeds, String role, String reason, String memo) {
         User user = userReader.readByUUID(userUUID);
@@ -53,15 +57,14 @@ public class AdminRewardService {
                 .amount(seeds)
                 .build();
 */
-        AccountPayment accountPayment = new AccountPayment(user.getId(), productId, seeds, memo, reason, role);
+        AccountPayment accountPayment = AccountPayment.create(user.getId(), productId, seeds, memo, reason, role);
         paymentWriter.write(accountPayment);
-
-        creditJpaRepository.save(Credit.builder()
+        creditWriter.write(Credit.builder()
                 .paymentId(accountPayment.getId())
                 .userId(user.getId())
                 .amount(seeds)
                 .productId(productId)
-                .status("PAID")
+                .status(PAID)
                 .build());
     }
 }

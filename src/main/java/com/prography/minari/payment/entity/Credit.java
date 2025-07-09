@@ -22,9 +22,9 @@ public class Credit extends BaseTimeEntity {
     private Long userId; // 사용자 번호
     private Long paymentId; // 결제 번호
     private Long productId; // 구매한 상품번호
-    private String status; // 사용, 환불
+    private CreditStatus status; // 사용, 환불
 
     public boolean isRefund(){
-        return status.equals("REFUNDED");
+        return status.equals(CreditStatus.REFUND);
     }
 }

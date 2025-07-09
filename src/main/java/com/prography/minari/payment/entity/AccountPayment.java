@@ -13,6 +13,11 @@ public class AccountPayment extends Payment {
     private String reason;
     private String role;
 
+    public static AccountPayment create(Long userId, Long productId, Long amount,
+                                 String memo, String reason, String role){
+        return new AccountPayment(userId, productId, amount, memo, reason, role);
+    }
+
     public AccountPayment(Long userId, Long productId, Long amount,
                           String memo, String reason, String role) {
         super(userId, productId, amount); // 부모 필드 설정
