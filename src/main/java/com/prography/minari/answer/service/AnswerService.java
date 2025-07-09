@@ -3,6 +3,7 @@ package com.prography.minari.answer.service;
 import com.prography.minari.answer.dto.res.AnswerHistoryResDto;
 import com.prography.minari.answer.dto.res.AnswerResDto;
 import com.prography.minari.answer.entity.Answer;
+import com.prography.minari.answer.service.dto.InterviewAccessStatus;
 import com.prography.minari.answer.service.dto.SttConvertAudioFileInfo;
 import com.prography.minari.answer.service.dto.SttStatus;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
@@ -15,6 +16,7 @@ import com.prography.minari.aws.impl.FileUploader;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.util.AnalyticsUtil;
+import com.prography.minari.payment.service.impl.CreditCounter;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
@@ -29,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,6 +47,7 @@ public class AnswerService {
     private final QuestionReader questionReader;
     private final FileUploader fileUploader;
     private final AudioFileFormatConverter audioFileFormatConverter;
+    private final CreditCounter creditCounter;
 
     /**
      * Processes a user's uploaded speech audio file for a specific question, converts it to text, saves the answer, and uploads the audio file.
@@ -148,5 +152,33 @@ public class AnswerService {
         int achievementRate = AnalyticsUtil.calculateAchievementRate(answerResList, startDate, endDate);
 
         return AnswerHistoryResDto.create(achievementRate, answerResList);
+    }
+
+    public InterviewAccessStatus determineInterviewAccess(User user) {
+        Long daysSinceJoined = user.getDaysSinceJoined();
+
+        Question question = questionReader.readDaily(user, user.getPreferDomains(), daysSinceJoined)
+                .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
+
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(user.getId(), question.getId());
+        Long leftCredit = creditCounter.countNotUsedCredit(user.getId());
+
+        // 아직 면접을 한 번도 진행하지 않은 경우
+        if (answers.isEmpty()) {
+            return InterviewAccessStatus.FIRST;
+        }
+
+        // 면접을 이미 봤고, 씨앗이 남아 있지 않음
+        if (leftCredit == 0) {
+            return InterviewAccessStatus.LIMIT_REACHED;
+        }
+
+        // 면접을 이미 봤지만, 씨앗이 있어 다시 응시 가능
+        if (leftCredit > 0) {
+            return InterviewAccessStatus.SEED_REQUIRED;
+        }
+
+        // 위 모든 조건에 해당하지 않을 경우
+        return InterviewAccessStatus.UNKNOWN;
     }
 }

@@ -4,6 +4,7 @@ import com.prography.minari.answer.controller.docs.AnswerApiDocs;
 import com.prography.minari.answer.dto.req.InterviewSttConvertReq;
 import com.prography.minari.answer.dto.res.AnswerHistoryResDto;
 import com.prography.minari.answer.service.AnswerService;
+import com.prography.minari.answer.service.dto.InterviewAccessStatus;
 import com.prography.minari.answer.service.dto.UserAnswerStatusResponse;
 import com.prography.minari.answer.service.dto.response.InterviewContentResponse;
 import com.prography.minari.common.execption.ApiException;
@@ -65,5 +66,11 @@ public class AnswerController implements AnswerApiDocs {
 
         AnswerHistoryResDto dto = answerService.getAnswerHistoryList(startDate, endDate, user);
         return ResponseEntity.ok(CommonResponse.success(dto));
+    }
+
+    @GetMapping("/answer/eligibility")
+    public ResponseEntity<CommonResponse<InterviewAccessStatus>> checkInterviewEligibility(@AuthenticationPrincipal User user) {
+        InterviewAccessStatus interviewAccessStatus = answerService.determineInterviewAccess(user);
+        return ResponseEntity.ok(CommonResponse.success(interviewAccessStatus));
     }
 }
