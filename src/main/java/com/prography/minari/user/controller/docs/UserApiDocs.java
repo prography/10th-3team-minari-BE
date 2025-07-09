@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,8 @@ public interface UserApiDocs {
                     content = @Content(schema = @Schema(implementation = com.prography.minari.user.dto.UserLoginReqDto.class))
             )
             @RequestParam("code") String code,
-            @RequestParam("redirect-uri") String redirectUri
+            @RequestParam("redirect-uri") String redirectUri,
+            @Parameter(hidden = true) HttpServletResponse response
     );
 
     @Operation(
@@ -105,26 +107,6 @@ public interface UserApiDocs {
             )
             @RequestBody com.prography.minari.user.dto.MailVerificationCheckReqDto req,
             @Parameter(hidden = true) @AuthenticationPrincipal User user
-    );
-
-    @Operation(
-            summary = "토큰 재발급",
-            description = "Refresh Token을 받아 새로운 Access Token과 Refresh Token을 재발급합니다."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", 
-                    content = @Content(schema = @Schema(implementation = UserRefreshTokenResDto.class))),
-            @ApiResponse(responseCode = "401", description = "인증 실패"),
-            @ApiResponse(responseCode = "400", description = "유효하지 않은 Refresh Token")
-    })
-    @PostMapping("/users/token/refresh")
-    ResponseEntity<CommonResponse<UserRefreshTokenResDto>> refreshToken(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "토큰 재발급 요청 정보",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = UserRefreshTokenReqDto.class))
-            )
-            @RequestBody UserRefreshTokenReqDto userRefreshTokenReqDto
     );
 
     @Operation(

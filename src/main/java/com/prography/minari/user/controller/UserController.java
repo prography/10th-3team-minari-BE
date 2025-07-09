@@ -1,6 +1,8 @@
 package com.prography.minari.user.controller;
 
 import com.prography.minari.common.response.CommonResponse;
+import com.prography.minari.common.service.impl.RedisProcessor;
+import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.mail.dto.MailVerificationReqDto;
 import com.prography.minari.mail.service.MailService;
 import com.prography.minari.social.dto.enums.SocialType;
@@ -9,12 +11,20 @@ import com.prography.minari.user.controller.docs.UserApiDocs;
 import com.prography.minari.user.dto.*;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
+
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -23,12 +33,16 @@ public class UserController implements UserApiDocs {
     private final UserService userService;
     private final SocialService socialService;
     private final MailService mailService;
+    private final RedisProcessor redisProcessor;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/users/oauth/{social}")
     public ResponseEntity oauth(@PathVariable("social") String socialType,
                                 @RequestParam("code") String code,
-                                @RequestParam("redirect-uri") String redirectUri) {
-        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri);
+                                @RequestParam("redirect-uri") String redirectUri,
+                                HttpServletResponse response) {
+        UserLoginResDto userLoginResDto = socialService.login(SocialType.from(socialType), code, redirectUri, response);
+
         return ResponseEntity.ok(CommonResponse.success(userLoginResDto));
     }
 
@@ -46,6 +60,7 @@ public class UserController implements UserApiDocs {
 
     @PostMapping("/users/join")
     public ResponseEntity join(@RequestBody @Validated UserJoinReqDto userJoinReqDto, @AuthenticationPrincipal User user) {
+        log.info("controller join");
         UserJoinResDto dto = userService.join(userJoinReqDto, user.getId());
         return ResponseEntity.ok(CommonResponse.success(dto));
     }
@@ -62,16 +77,18 @@ public class UserController implements UserApiDocs {
         return ResponseEntity.ok(CommonResponse.success("계정삭제"));
     }
 
-    @PostMapping("/users/token/refresh")
-    public ResponseEntity refreshToken(@RequestBody UserRefreshTokenReqDto userRefreshTokenReqDto) {
-        UserRefreshTokenResDto dto = userService.refreshToken(userRefreshTokenReqDto);
-        return ResponseEntity.ok(CommonResponse.success(dto));
-    }
-
     @PostMapping("/users/logout")
     public ResponseEntity logout(@AuthenticationPrincipal User user) {
         userService.logout(user);
-        return ResponseEntity.ok(CommonResponse.success("로그아웃되었습니다."));
+
+        // JWT 쿠키 삭제 (Set-Cookie with Max-Age=0)
+        ResponseCookie accessTokenExpiredCookie = jwtUtil.deleteAccessTokenCookie();
+        ResponseCookie refreshTokenExpiredCookie = jwtUtil.deleteRefreshTokenCookie();
+
+        return ResponseEntity.ok()
+                .header(SET_COOKIE, accessTokenExpiredCookie.toString())
+                .header(SET_COOKIE, refreshTokenExpiredCookie.toString())
+                .body(CommonResponse.success("로그아웃되었습니다."));
     }
 
 }

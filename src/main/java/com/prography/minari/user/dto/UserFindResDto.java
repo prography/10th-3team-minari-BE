@@ -14,10 +14,11 @@ public record UserFindResDto(
         String image,
         Long seed,
         String uuid,
-        Domain domain
+        Domain domain,
+        Long dayCount
 )
 {
-    public static UserFindResDto from(User user, Seed seed) {
+    public static UserFindResDto from(User user, Seed seed, Long dayCount) {
         return new UserFindResDto(
                 user.getId(),
                 user.getEmail(),
@@ -27,7 +28,8 @@ public record UserFindResDto(
                 user.getImage(),
                 seed.getTotal(),
                 user.getUuid(),
-                user.getDomain()
+                user.getDomain(),
+                dayCount
         );
     }
 }
