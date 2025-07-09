@@ -5,28 +5,28 @@ import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.entity.User;
 
 public record UserLoginResDto(
-        String accessToken,
-        String refreshToken,
         Long id,
         String email,
         SocialType socialType,
         String socialId,
         String name,
         String image,
-        boolean registered)
+        boolean registered,
+        String accessToken,
+        String refreshToken)
 {
 
     public static UserLoginResDto from(User user, String accessToken, String refreshToken) {
         return new UserLoginResDto(
-                accessToken,
-                refreshToken,
                 user.getId(),
                 user.getEmail(),
                 user.getSocialType(),
                 String.valueOf(user.getSocialId()), // socialId가 String이면 그대로, Long이면 변환
                 user.getName(),
                 user.getImage(),
-                user.isRegistered()
+                user.isRegistered(),
+                accessToken,
+                refreshToken
         );
     }
 

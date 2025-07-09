@@ -22,4 +22,8 @@ public class AnswerReader {
     public List<Answer> readAnswersByDateRange(Long userId, LocalDate startDate, LocalDate endDate) {
         return answerRepository.findByUserIdAndAnsweredDateBetween(userId, startDate, endDate);
     }
+
+    public Long countByUserId(Long userId) {
+        return answerRepository.countByUserId(userId);
+    }
 }

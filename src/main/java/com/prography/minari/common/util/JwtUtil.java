@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.SignatureException;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -17,6 +18,9 @@ import static com.prography.minari.common.execption.ErrorCode.*;
 @Component
 @Slf4j
 public class JwtUtil {
+
+    public static final String ACCESS_TOKEN = "access-token";
+    public static final String REFRESH_TOKEN = "refresh-token";
 
     private final Key key;
     private final Long expiration;
@@ -31,9 +35,26 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))//expiration))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public ResponseCookie createAccessTokenCookie(String accessToken) {
+        return ResponseCookie.from(ACCESS_TOKEN, accessToken)
+                .httpOnly(false) // TODO true로 해야함
+                //.secure(true)
+                //.domain(".minari-official.com")
+                .secure(false)
+                .domain(null)
+                .path("/")
+                .maxAge(Duration.ofMillis(expiration))
+                .sameSite("None")
+                .build();
+    }
+
+    public ResponseCookie deleteAccessTokenCookie() {
+        return createAccessTokenCookie(null);
     }
 
     public String createRefreshToken(String userId) {
@@ -43,6 +64,23 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 2))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
+        return ResponseCookie.from(REFRESH_TOKEN, refreshToken)
+                .httpOnly(false) // TODO true로 해야함
+                //.secure(true)
+                //.domain(".minari-official.com")
+                .secure(false)
+                .domain(null)
+                .path("/")
+                .maxAge(Duration.ofMillis(expiration * 2))
+                .sameSite("None")
+                .build();
+    }
+
+    public ResponseCookie deleteRefreshTokenCookie() {
+        return createRefreshTokenCookie(null);
     }
 
     public String getUserId(String token) {
@@ -65,15 +103,12 @@ public class JwtUtil {
         return Duration.ofMillis(tokenExpiration.getTime() - System.currentTimeMillis());
     }
 
-    public void isValidateToken(String token) {
+    public void isValidateToken(String token) throws ExpiredJwtException {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
-        } catch(ExpiredJwtException e) {
-            log.info("토큰이 만료되었습니다. JWT: {}", token);
-            throw new ApiException(JWT_EXPIRED_EXCEPTION);
         } catch(SignatureException e) {
             log.info("유효하지 않은 서명입니다. JWT: {}", token);
             throw new ApiException(JWT_INVALID_SIGNATURE_EXCEPTION);
