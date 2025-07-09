@@ -17,7 +17,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     List<Answer> findByUserIdAndAnsweredDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 
-    @Query(value = "SELECT COUNT(DISTINCT DATE(answered_date)) FROM answer WHERE user_id = :userId")
+    @Query("SELECT COUNT(DISTINCT a.answeredDate) FROM Answer a WHERE a.user.id = :userId")
     Long countDistinctAnswerDateByUserId(Long userId);
 
     long countByUserIdAndQuestionId(Long userId, Long questionId);
