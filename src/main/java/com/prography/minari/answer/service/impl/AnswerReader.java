@@ -23,8 +23,8 @@ public class AnswerReader {
         return answerRepository.findByUserIdAndAnsweredDateBetween(userId, startDate, endDate);
     }
 
-    public Long countByUserId(Long userId) {
-        return answerRepository.countByUserId(userId);
+    public Long countDistinctAnswerDateByUserId(Long userId) {
+        return answerRepository.countDistinctAnswerDateByUserId(userId);
     }
 
     public Long countByUserIdAndQuestionId(Long userId, Long questionId) {
