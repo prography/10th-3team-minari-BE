@@ -19,7 +19,7 @@ import java.util.List;
 public class CreditController implements CreditApiDocs {
     private final CreditService creditService;
 
-    @GetMapping("/users/credits/left")
+    @GetMapping("/credits/users/left")
     public CommonResponse<Long> getLeftCredits(@AuthenticationPrincipal User user) {
         Long left= creditService.leftCredits(user.getId());
         return CommonResponse.success(left);
