@@ -26,4 +26,8 @@ public class AnswerReader {
     public Long countByUserId(Long userId) {
         return answerRepository.countByUserId(userId);
     }
+
+    public Long countByUserIdAndQuestionId(Long userId, Long questionId) {
+        return answerRepository.countByUserIdAndQuestionId(userId, questionId);
+    }
 }
