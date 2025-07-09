@@ -19,6 +19,9 @@ public class Answer extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "sequence")
+    private Integer sequence;
+
     @Column(name = "reply", length = 1000)
     private String reply;
 
