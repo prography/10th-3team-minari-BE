@@ -20,7 +20,7 @@ public class Answer extends BaseTimeEntity {
     private Long id;
 
     @Column(name = "sequence")
-    private Integer sequence;
+    private Long sequence;
 
     @Column(name = "reply", length = 1000)
     private String reply;
