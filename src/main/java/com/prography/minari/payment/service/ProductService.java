@@ -25,6 +25,7 @@ public class ProductService {
                                     .message(p.getMessage())
                                     .quantity(p.getQuantity())
                                     .dicount(p.getDiscountRate())
+                                    .productId(p.getId())
                                     .build();
                         }
                 ).sorted(Comparator.comparing(SellingProductResponseDto::getQuantity))
