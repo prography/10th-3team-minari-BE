@@ -1,6 +1,7 @@
 package com.prography.minari.payment.entity;
 
 import com.prography.minari.common.entity.BaseTimeEntity;
+import com.prography.minari.payment.service.impl.CreditUsageTarget;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,5 +24,6 @@ public class CreditUsage extends BaseTimeEntity {
     private Credit credit;
 
     private Long usedAmount;
-    private Long usedTarget;//어디에 사용했는지
+    @Enumerated(EnumType.STRING)
+    private CreditUsageTarget usedTarget; //어디에 사용했는지
 }

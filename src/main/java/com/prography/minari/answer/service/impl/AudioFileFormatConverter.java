@@ -125,7 +125,7 @@ public class AudioFileFormatConverter {
     }
 
     private boolean isLocalProfile() {
-        return "local".equalsIgnoreCase(activeProfile);
+        return "local".equalsIgnoreCase(activeProfile)||"ssh".equalsIgnoreCase(activeProfile);
     }
 
     private boolean isLiveProfile() {

@@ -17,6 +17,8 @@ import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.util.AnalyticsUtil;
 import com.prography.minari.payment.service.impl.CreditCounter;
+import com.prography.minari.payment.service.impl.CreditUsageTarget;
+import com.prography.minari.payment.service.impl.CreditUseProcessor;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
@@ -48,32 +50,50 @@ public class AnswerService {
     private final FileUploader fileUploader;
     private final AudioFileFormatConverter audioFileFormatConverter;
     private final CreditCounter creditCounter;
+    private final CreditUseProcessor creditUseProcessor;
 
     /**
      * Processes a user's uploaded speech audio file for a specific question, converts it to text, saves the answer, and uploads the audio file.
-     *
+     * <p>
      * Retrieves the user and question, checks for existing answers to prevent duplicates, converts the audio to WAV format, performs speech-to-text processing, saves the resulting answer, uploads the original audio file to storage, and returns a response containing answer details.
      *
-     * @param file      the uploaded audio file containing the user's speech
-     * @param userId    the ID of the user submitting the answer
+     * @param file       the uploaded audio file containing the user's speech
+     * @param userId     the ID of the user submitting the answer
      * @param questionId the ID of the question being answered
-     * @param memo      an optional memo to associate with the answer
+     * @param memo       an optional memo to associate with the answer
      * @return an InterviewContentResponse containing the answer's details, including running time, question content, reply, and creation date
      * @throws ApiException if the question is not found or if an answer already exists for the user and question
      */
     public InterviewContentResponse writeUserSpeech(MultipartFile file, Long userId, Long questionId, String memo) {
+        final long INTEGERVIEW_COST = 1L;
+
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
         List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
-
+        Long leftCredit = creditCounter.countNotUsedCredit(user.getId());
         /**
          * Todo
          * 프론트 개발 완료후 주석 제거
-         */
+         *//*
         if (!answers.isEmpty()) {
             throw new ApiException(ErrorCode.FREE_ANSWER_ALREADY_DONE);
+        }*/
+
+        // 무료안했다면 스킵
+
+        if (!answers.isEmpty()) {
+            if (leftCredit > 0) {
+                // 돈 차감로직
+                creditUseProcessor.use(userId, INTEGERVIEW_COST, CreditUsageTarget.INTERVIEW);
+            } else {
+                throw new ApiException(ErrorCode.FREE_ANSWER_ALREADY_DONE);
+            }
         }
+        // 무료 한경우
+        // 돈이 있다면 돈 차감
+        // 돈이 없다면 돈 차감
+
 
         byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
         SttConvertAudioFileInfo convertResult = sttProcessor.convertToText(inputStream);
@@ -92,7 +112,9 @@ public class AnswerService {
                         .minusSeconds(Math.round(convertResult.getRunningTime()))
                         .toLocalDate())
                 .build());
-        fileUploader.upload(file, "/voice");
+
+        // 배포누락으로 잠시 주석
+//        fileUploader.upload(file, "/voice");
         return InterviewContentResponse.builder()
                 .runningTime(convertResult.getRunningTime())
                 .answer(question.getAnswer())
