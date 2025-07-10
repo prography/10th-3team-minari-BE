@@ -121,4 +121,19 @@ public interface UserApiDocs {
     ResponseEntity<CommonResponse<String>> logout(
             @Parameter(hidden = true) @AuthenticationPrincipal User user
     );
+
+    @Operation(
+            summary = "계정 휴면 상태 해제",
+            description = "로그인된 사용자의 계정이 휴면 상태인 경우, 이를 해제합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "휴면 해제 성공",
+                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증 실패")
+    })
+    @PostMapping("/users/activate")
+    ResponseEntity<CommonResponse<String>> activate(
+            @Parameter(hidden = true) @AuthenticationPrincipal User user
+    );
+
 }

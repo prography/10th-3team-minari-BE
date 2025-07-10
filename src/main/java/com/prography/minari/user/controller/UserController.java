@@ -91,4 +91,10 @@ public class UserController implements UserApiDocs {
                 .body(CommonResponse.success("로그아웃되었습니다."));
     }
 
+    @PostMapping("/users/activate")
+    public ResponseEntity<CommonResponse<String>> activate(@AuthenticationPrincipal User user) {
+        userService.activate(user);
+        return ResponseEntity.ok(CommonResponse.success("계정 휴면 상태 해제"));
+    }
+
 }

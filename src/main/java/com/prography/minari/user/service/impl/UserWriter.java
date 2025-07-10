@@ -40,4 +40,9 @@ public class UserWriter {
         mailAuthLogRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }
+
+    public void activate(User user) {
+        user.activate();
+        userRepository.save(user);
+    }
 }
