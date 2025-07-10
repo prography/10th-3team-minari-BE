@@ -41,8 +41,8 @@ public class UserWriter {
         userRepository.deleteById(userId);
     }
 
-    public void reactivate(User user) {
-        user.reactivate();
+    public void activate(User user) {
+        user.activate();
         userRepository.save(user);
     }
 }

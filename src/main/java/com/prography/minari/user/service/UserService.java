@@ -67,7 +67,7 @@ public class UserService {
         redisProcessor.deleteValue(user.getId().toString());
     }
 
-    public void reactivate(User user) {
-        userWriter.reactivate(user);
+    public void activate(User user) {
+        userWriter.activate(user);
     }
 }

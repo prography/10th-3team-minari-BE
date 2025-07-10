@@ -117,7 +117,7 @@ public class User extends BaseTimeEntity {
         this.deletedAt = LocalDateTime.now().plusDays(7);
     }
 
-    public void reactivate() {
+    public void activate() {
 
         if(!this.isDeleted) throw new ApiException(ACCOUNT_NOT_DELETED);
 
