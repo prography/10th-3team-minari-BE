@@ -23,4 +23,7 @@ public class SellingProductResponseDto {
     @Schema(description = "할인률", example = "")
     @Column(name = "message")
     private int dicount;
+    @Schema(description = "상품id", example = "")
+    @Column(name = "productId")
+    private Long productId;
 }
