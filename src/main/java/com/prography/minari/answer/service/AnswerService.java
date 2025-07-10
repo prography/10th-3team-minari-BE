@@ -78,7 +78,11 @@ public class AnswerService {
         byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
         SttConvertAudioFileInfo convertResult = sttProcessor.convertToText(inputStream);
 
+        // 같은 날짜에 리허설 진행 내역 존재할 경우, sequence + 1
+        Long sequence = answerReader.countByUserIdAndQuestionId(userId, questionId);
+
         Answer answer = answerWriter.write(Answer.builder()
+                .sequence(sequence)
                 .runningTime(convertResult.getRunningTime())
                 .reply(convertResult.getSpeech())
                 .user(user)

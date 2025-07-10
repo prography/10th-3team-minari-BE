@@ -31,7 +31,7 @@ public class UserService {
     public UserFindResDto findById(Long id) {
         User user = userReader.read(id);
         Seed seed = seedReader.readByUserId(id).orElse(new Seed(0L,user));
-        Long dayCount = answerReader.countByUserId(id);
+        Long dayCount = answerReader.countDistinctAnswerDateByUserId(id);
         return UserFindResDto.from(user, seed, dayCount);
     }
 
