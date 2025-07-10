@@ -4,74 +4,86 @@
   <meta charset="UTF-8">
   <title>MINARI 인증번호</title>
   <style>
-    body {
-      background: #f5f5f5;
-      font-family: 'Noto Sans KR', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    html, body {
+      padding: 0;
       margin: 0;
+      width: 100%;
+      background: #f5f5f5;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
     }
 
     .card {
       background: white;
       border-radius: 20px;
       width: 360px;
+      margin: 40px auto;
       padding: 30px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      text-align: center;
+      text-align: left;
+      box-sizing: border-box;
+    }
+
+    .logo, .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      font-weight: bold;
     }
 
     .logo {
       font-size: 24px;
-      font-weight: bold;
       margin-bottom: 20px;
     }
 
     .section-title {
       font-size: 18px;
-      font-weight: 600;
       margin-bottom: 15px;
     }
 
     .code-box {
       background: #1b1b1b;
-      color: #ccff00;
-      font-size: 32px;
+      color: #b4dd2b;
+      font-size: 28px;
+      font-weight: 600;
       padding: 20px;
       border-radius: 10px;
       margin-bottom: 20px;
+      text-align: center;
     }
 
     .description {
-      font-size: 14px;
+      font-size: 12px;
       color: #444;
-      line-height: 1.4;
+      line-height: 1.2;
+      font-weight: 400;
     }
 
-    .icons {
-      margin-top: 30px;
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-    }
-
-    .icon {
-      width: 32px;
-      height: 32px;
-      opacity: 0.4;
+    .description div {
+      margin-bottom: 4px;
+      white-space: normal;
+      word-break: keep-all;
     }
   </style>
 </head>
 <body>
 <div class="card">
-  <div class="logo"><img src="icon.png" width="32" height="32"> MINARI</div>
-  <div class="section-title"><img src="icon.png" width="24" height="24"> 인증번호</div>
+  <div class="logo">
+    <img src="https://minari-img.s3.ap-northeast-2.amazonaws.com/icon.png" width="32" height="32">
+    MINARI
+  </div>
+  <div class="section-title">
+    <img src="https://minari-img.s3.ap-northeast-2.amazonaws.com/icon.png" width="24" height="24">
+    인증번호
+  </div>
   <div class="code-box" th:text="${authCode}">123456</div>
   <div class="description">
-    미나리 알림을 위한 인증번호입니다.<br>
-    상단의 인증번호를 입력하여 이메일 주소 인증을 완료해 주세요.
+    <div>미나리 알림을 위한 인증번호에요.</div>
+    <div>상단의 인증번호를 입력하여 이메일 주소 인증을 완료해 주세요.</div>
+    <div>한 번 받은 인증번호는 3분간 사용할 수 있어요.</div>
   </div>
 </div>
 </body>
