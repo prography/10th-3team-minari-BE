@@ -131,8 +131,8 @@ public interface UserApiDocs {
                     content = @Content(schema = @Schema(implementation = CommonResponse.class))),
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
-    @PostMapping("/users/reactivate")
-    ResponseEntity<CommonResponse<String>> reactivate(
+    @PostMapping("/users/activate")
+    ResponseEntity<CommonResponse<String>> activate(
             @Parameter(hidden = true) @AuthenticationPrincipal User user
     );
 
