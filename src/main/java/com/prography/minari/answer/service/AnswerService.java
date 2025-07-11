@@ -30,10 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -70,7 +68,7 @@ public class AnswerService {
         User user = userReader.read(userId);
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
-        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionIdASC(userId, questionId);
         Long leftCredit = creditCounter.countNotUsedCredit(user.getId());
         /**
          * Todo
@@ -126,7 +124,7 @@ public class AnswerService {
     }
 
     public UserAnswerStatusResponse getSttProcessStatus(Long userId, Long questionId) {
-        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionIdASC(userId, questionId);
         if (answers.isEmpty()) {
             return UserAnswerStatusResponse.builder()
                     .status(SttStatus.NOT_FOUND)
@@ -140,7 +138,7 @@ public class AnswerService {
     public InterviewContentResponse getAnswer(Long questionId, Long userId) {
         Question question = questionReader.read(questionId)
                 .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
-        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(userId, questionId);
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionIdASC(userId, questionId);
         if (answers.isEmpty()) {
             throw new ApiException(ErrorCode.ENTITY_NOT_FOUND);
         }
@@ -186,7 +184,7 @@ public class AnswerService {
         Question question = questionReader.readDaily(user, user.getPreferDomains(), daysSinceJoined)
                 .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
 
-        List<Answer> answers = answerReader.readAllByUserIdAndQuestionId(user.getId(), question.getId());
+        List<Answer> answers = answerReader.readAllByUserIdAndQuestionIdASC(user.getId(), question.getId());
         Long leftCredit = creditCounter.countNotUsedCredit(user.getId());
 
         // 아직 면접을 한 번도 진행하지 않은 경우
