@@ -34,6 +34,8 @@ public class Question extends BaseTimeEntity {
     @NotNull
     @Column(nullable = false, name = "tag")
     private String tag;
+    @Column(nullable = false, name = "tag_detail")
+    private String tagDetail;
     @NotNull
     @Enumerated(EnumType.STRING)
     private Level level;

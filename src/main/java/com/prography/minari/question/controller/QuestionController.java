@@ -34,6 +34,11 @@ public class QuestionController implements QuestionApiDocs {
         return ResponseEntity.ok(CommonResponse.success(questionService.readTags(questionId)));
     }
 
+    @GetMapping("/questions/{questionId}/tag/detail")
+    public ResponseEntity<CommonResponse<String>> getTagDetail(@PathVariable("questionId") Long questionId) {
+        return ResponseEntity.ok(CommonResponse.success(questionService.readTagDetail(questionId)));
+    }
+
     @GetMapping("/questions/{questionId}")
     public ResponseEntity<CommonResponse<QuestionResDto>> getQuestionById(@PathVariable("questionId") Long questionId) {
         QuestionResDto dto = questionService.findById(questionId);
