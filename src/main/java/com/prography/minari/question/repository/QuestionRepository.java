@@ -20,7 +20,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     FROM Question q
     LEFT JOIN Answer a ON a.question = q AND a.user.id = :userId
     WHERE (:domains IS NULL OR q.domain IN :domains)
-      AND a.id IS NULL
     ORDER BY q.orderNum ASC
     """)
     Page<Question> findDailyUnsolvedQuestionByDomains(
