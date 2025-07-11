@@ -5,7 +5,6 @@ import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntr
 import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.answer.service.dto.InterviewAccessStatus;
 import com.prography.minari.answer.service.impl.AnswerReader;
-import com.prography.minari.common.entity.Domain;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.payment.service.impl.CreditCounter;
 import com.prography.minari.question.entity.Question;
@@ -13,7 +12,6 @@ import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -61,7 +59,7 @@ class AnswerServiceUnitTest {
         Question question = fixtureMonkey.giveMeOne(Question.class);
         given(questionReader.readDaily(user, user.getPreferDomains(), user.getDaysSinceJoined()))
                 .willReturn(Optional.of(question));
-        given(answerReader.readAllByUserIdAndQuestionId(user.getId(), question.getId()))
+        given(answerReader.readAllByUserIdAndQuestionIdASC(user.getId(), question.getId()))
                 .willReturn(Collections.emptyList());
 
         // when
@@ -82,7 +80,7 @@ class AnswerServiceUnitTest {
         Answer answer = mock(Answer.class);
         given(questionReader.readDaily(user, user.getPreferDomains(), user.getDaysSinceJoined()))
                 .willReturn(Optional.of(question));
-        given(answerReader.readAllByUserIdAndQuestionId(user.getId(), question.getId()))
+        given(answerReader.readAllByUserIdAndQuestionIdASC(user.getId(), question.getId()))
                 .willReturn(List.of(answer));
         given(creditCounter.countNotUsedCredit(user.getId()))
                 .willReturn(0L);
@@ -105,7 +103,7 @@ class AnswerServiceUnitTest {
         Answer answer = mock(Answer.class);
         given(questionReader.readDaily(user, user.getPreferDomains(), user.getDaysSinceJoined()))
                 .willReturn(Optional.of(question));
-        given(answerReader.readAllByUserIdAndQuestionId(user.getId(), question.getId()))
+        given(answerReader.readAllByUserIdAndQuestionIdASC(user.getId(), question.getId()))
                 .willReturn(List.of(answer));
         given(creditCounter.countNotUsedCredit(user.getId()))
                 .willReturn(2L);

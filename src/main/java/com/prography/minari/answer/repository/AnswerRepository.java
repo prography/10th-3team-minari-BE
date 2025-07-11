@@ -1,7 +1,6 @@
 package com.prography.minari.answer.repository;
 
 import com.prography.minari.answer.entity.Answer;
-import com.prography.minari.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
-    @Query("select A from Answer A where A.user.id = :userId and A.question.id = :questionId")
-    List<Answer> findAllByUserIdAndQuestionId(@Param("userId") Long userId, @Param("questionId") Long questionId);
+    @Query("select A from Answer A where A.user.id = :userId and A.question.id = :questionId order by A.createdDateTime asc")
+    List<Answer> findAllByUserIdAndQuestionIdAsc(@Param("userId") Long userId, @Param("questionId") Long questionId);
 
     @Query(value = """
     SELECT *

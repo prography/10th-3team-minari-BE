@@ -15,8 +15,8 @@ import java.util.List;
 public class AnswerReader {
     private final AnswerRepository answerRepository;
 
-    public List<Answer> readAllByUserIdAndQuestionId(Long userId, Long questionId) {
-        return answerRepository.findAllByUserIdAndQuestionId(userId, questionId);
+    public List<Answer> readAllByUserIdAndQuestionIdASC(Long userId, Long questionId) {
+        return answerRepository.findAllByUserIdAndQuestionIdAsc(userId, questionId);
     }
 
     public List<Answer> readAnswersByDateRange(Long userId, LocalDate startDate, LocalDate endDate) {

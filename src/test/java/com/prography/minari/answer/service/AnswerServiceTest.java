@@ -23,7 +23,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -142,7 +141,7 @@ class AnswerServiceTest {
         answerService.writeUserSpeech(mockFile, saveUser.getId(), saveQuestion.getId(), memo);
 
         // then
-        List<Answer> answerOpt = answerRepository.findAllByUserIdAndQuestionId(saveUser.getId(), saveQuestion.getId());
+        List<Answer> answerOpt = answerRepository.findAllByUserIdAndQuestionIdAsc(saveUser.getId(), saveQuestion.getId());
         assertAll(
                 () -> assertThat(answerOpt).isNotEmpty(),
                 () -> assertThat(answerOpt.getLast().getMemo()).isEqualTo(memo),
@@ -180,7 +179,7 @@ class AnswerServiceTest {
 
         // then
         assertThrows(ApiException.class, () -> answerService.writeUserSpeech(mockFile, saveUser.getId(), saveQuestion.getId(), memo));
-        List<Answer> answerOpt = answerRepository.findAllByUserIdAndQuestionId(saveUser.getId(), saveQuestion.getId());
+        List<Answer> answerOpt = answerRepository.findAllByUserIdAndQuestionIdAsc(saveUser.getId(), saveQuestion.getId());
         assertThat(answerOpt).isEmpty();
        /* assertAll(
                 () -> assertThat(answerOpt).isNotEmpty(),
@@ -223,7 +222,7 @@ class AnswerServiceTest {
 
         // then
         assertThrows(ApiException.class, () -> answerService.writeUserSpeech(mockFile, saveUser.getId(), saveQuestion.getId(), memo));
-        List<Answer> answerOpt = answerRepository.findAllByUserIdAndQuestionId(saveUser.getId(), saveQuestion.getId());
+        List<Answer> answerOpt = answerRepository.findAllByUserIdAndQuestionIdAsc(saveUser.getId(), saveQuestion.getId());
         assertThat(answerOpt).isEmpty();
         /*assertAll(
                 () -> assertThat(answerOpt).isNotEmpty(),
