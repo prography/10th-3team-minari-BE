@@ -20,7 +20,7 @@ public class CreditUseProcessor {
 
     public void use(Long userId, Long used, CreditUsageTarget target) {
         List<Credit> credits = creditJpaRepository.findAllByUserId(userId).stream()
-                .sorted(Comparator.comparing(BaseTimeEntity::getCreatedDateTime,Comparator.nullsLast(Comparator.naturalOrder())))
+                .sorted(Comparator.comparing(BaseTimeEntity::getCreatedDateTime, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
 
         List<Long> creditIds = credits.stream()
@@ -67,5 +67,31 @@ public class CreditUseProcessor {
         }
 
         creditUsageJpaRepository.saveAll(usedList);
+    }
+
+
+    public Map<Credit, Long> getHistory(Long userId) {
+        List<Credit> credits = creditJpaRepository.findAllByUserId(userId);
+
+        List<Long> creditIds = credits.stream()
+                .map(Credit::getId)
+                .toList();
+
+        List<CreditUsage> creditUsages = creditUsageJpaRepository.findAllByCreditIdIn(creditIds);
+
+        Map<Long, Long> usages = new HashMap<>();
+
+        for (CreditUsage creditUsage : creditUsages) {
+            Long creditId = creditUsage.getCredit().getId();
+            usages.put(creditId, usages.getOrDefault(creditId, 0L) + creditUsage.getUsedAmount());
+        }
+
+        Map<Credit, Long> creditMap = new HashMap<>();
+        for (Credit credit : credits) {
+            creditMap.putIfAbsent(credit, 0L);
+            creditMap.put(credit, usages.getOrDefault(credit.getId(), 0L));
+        }
+
+        return creditMap;
     }
 }

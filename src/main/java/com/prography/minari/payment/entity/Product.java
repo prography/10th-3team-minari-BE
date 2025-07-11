@@ -29,4 +29,7 @@ public class Product {
     private LocalDate discountStartDate;
     @Column(name = "active")
     private boolean active;
+    @Column(name = "pay_category")
+    @Enumerated(EnumType.STRING)
+    private PayCategory payCategory;
 }
