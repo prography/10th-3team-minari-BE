@@ -30,7 +30,7 @@ public class ProductController implements ProductApiDocs {
     }
 
     @GetMapping("/products/history")
-    public CommonResponse<List<CreditUsageHistoryResponseDto>> getSellingProductHistory(@RequestParam("userId") Long userId) {
-        return CommonResponse.success(creditHistoryService.getCreditUsageHistory(userId));
+    public CommonResponse<List<CreditUsageHistoryResponseDto>> getSellingProductHistory(@AuthenticationPrincipal User user) {
+        return CommonResponse.success(creditHistoryService.getCreditUsageHistory(user.getId()));
     }
 }
