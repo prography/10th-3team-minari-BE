@@ -31,6 +31,12 @@ public class QuestionService {
         return question.getShuffledTags(3);
     }
 
+    public String readTagDetail(Long questionId) {
+        Question question = questionReader.read(questionId)
+                .orElseThrow(()->new ApiException(ErrorCode.QUESTION_NOT_FOUND));
+        return question.getTagDetail();
+    }
+
     public Long readDaily(Long userId) {
         User user = userReader.read(userId);
         Long daysBetween = user.getDaysSinceJoined();
