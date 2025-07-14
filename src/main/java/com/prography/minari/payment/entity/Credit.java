@@ -27,10 +27,7 @@ public class Credit extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private CreditStatus status; // 사용, 환불
 
-    public LocalDateTime getExpiredAt() {
-        final int expiredTermYears = 5;
-        return getCreatedDateTime().plusYears(expiredTermYears);
-    }
+    private LocalDateTime expiredDateTime;
 
     public boolean isRefund() {
         return status.equals(CreditStatus.REFUND);
