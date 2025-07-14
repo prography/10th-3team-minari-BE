@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "CREDIT")
 @Getter
@@ -25,7 +27,12 @@ public class Credit extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private CreditStatus status; // 사용, 환불
 
-    public boolean isRefund(){
+    public LocalDateTime getExpiredAt() {
+        final int expiredTermYears = 5;
+        return getCreatedDateTime().plusYears(expiredTermYears);
+    }
+
+    public boolean isRefund() {
         return status.equals(CreditStatus.REFUND);
     }
 }
