@@ -62,15 +62,16 @@ public class UserService {
 
     public UserRefreshTokenResDto createToken(String refreshToken) {
 
-        // user id 추출
+        // user 정보 추출
         String userId = jwtUtil.getUserId(refreshToken);
+        String userRole = jwtUtil.getUserRole(refreshToken);
 
         // refresh token 검증
         redisProcessor.validateRefreshToken(userId, refreshToken);
 
         // JWT 발급
-        String newAccessToken = jwtUtil.createAccessToken(userId);
-        String newRefreshToken = jwtUtil.createRefreshToken(userId);
+        String newAccessToken = jwtUtil.createAccessToken(userId, userRole);
+        String newRefreshToken = jwtUtil.createRefreshToken(userId, userRole);
 
         // redis에 적재
         redisProcessor.setValue(userId, newRefreshToken);

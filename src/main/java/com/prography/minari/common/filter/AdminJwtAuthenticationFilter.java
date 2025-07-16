@@ -53,7 +53,11 @@ public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
+
             jwtUtil.isValidateToken(accessToken);
+
+            // ADMIN인지 검증
+            jwtUtil.isAdmin(accessToken);
 
             User user = userRepository.findById(Long.parseLong(jwtUtil.getUserId(accessToken)))
                     .orElseThrow(() -> new ApiException(USER_NOT_FOUND));

@@ -31,9 +31,10 @@ public class JwtUtil {
         this.expiration = expiration;
     }
 
-    public String createAccessToken(String userId) {
+    public String createAccessToken(String userId, String userRole) {
         return Jwts.builder()
                 .setSubject(userId)
+                .claim("role", userRole)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))//expiration))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -57,9 +58,10 @@ public class JwtUtil {
         return createAccessTokenCookie(null);
     }
 
-    public String createRefreshToken(String userId) {
+    public String createRefreshToken(String userId, String userRole) {
         return Jwts.builder()
                 .setSubject(userId)
+                .claim("role", userRole)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 2))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -101,6 +103,20 @@ public class JwtUtil {
                 .getExpiration();
 
         return Duration.ofMillis(tokenExpiration.getTime() - System.currentTimeMillis());
+    }
+
+    public String getUserRole(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class); // 커스텀 클레임 추출
+    }
+
+    public void isAdmin(String token) {
+        if(!"ROLE_ADMIN".equals(getUserRole(token)))
+            throw new ApiException(JWT_NOT_ADMIN);
     }
 
     public void isValidateToken(String token) {
