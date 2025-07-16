@@ -1,14 +1,16 @@
 package com.prography.minari.common.config;
 
+import com.prography.minari.common.filter.AdminJwtAuthenticationFilter;
+import com.prography.minari.common.filter.CommonJwtAuthenticationFilter;
 import com.prography.minari.common.filter.JwtAuthenticationFilter;
 
+import com.prography.minari.common.util.JwtUtil;
+import com.prography.minari.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,63 +18,65 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
-
-import static org.springframework.http.HttpMethod.OPTIONS;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final AdminJwtAuthenticationFilter adminJwtAuthenticationFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    public SecurityConfig(JwtUtil jwtUtil, UserRepository userRepository) {
+        this.adminJwtAuthenticationFilter = new AdminJwtAuthenticationFilter(userRepository, jwtUtil);
+        this.jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, userRepository);
+    }
+
+    /** 1. Swagger & 공개용 필터 */
     @Bean
-    public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain publicFilter(HttpSecurity http) throws Exception {
         return http
-                .cors(Customizer.withDefaults())
+                .securityMatcher(request -> {
+                    String uri = request.getRequestURI();
+                    return uri.startsWith("/swagger-ui") ||
+                            uri.startsWith("/v3/api-docs") ||
+                            uri.startsWith("/swagger-resources") ||
+                            uri.startsWith("/webjars") ||
+                            uri.startsWith("/favicon.ico") ||
+                            uri.startsWith("/api/v1/users/oauth") ||
+                            uri.startsWith("/api/v1/users/token/refresh") ||
+                            uri.startsWith("/api/v1/dev");
+                })
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(
-                                "/api/v1/users/oauth/**",
-                                "/api/v1/users/token/refresh",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/webjars/**",
-                                "/favicon.ico"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }
 
+    /** 2. Admin API 전용 필터 */
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "https://minari-staging.netlify.app",
-                "https://minari-official.com",
-                "http://localhost:8080",
-                "http://localhost:3000",
-                "https://minari-cookie.netlify.app"
-        ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
+    @Order(2)
+    public SecurityFilterChain adminFilter(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher(request -> request.getRequestURI().startsWith("/admin/"))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .addFilterBefore(adminJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
+    /** 3. 일반 API 필터 */
+    @Bean
+    @Order(3)
+    public SecurityFilterChain apiFilter(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher(request -> request.getRequestURI().startsWith("/api/v1/"))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
 }
 

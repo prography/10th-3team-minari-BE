@@ -103,12 +103,15 @@ public class JwtUtil {
         return Duration.ofMillis(tokenExpiration.getTime() - System.currentTimeMillis());
     }
 
-    public void isValidateToken(String token) throws ExpiredJwtException {
+    public void isValidateToken(String token) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
+        } catch(ExpiredJwtException e) {
+            log.info("만료된 토큰입니다. JWT: {}", token);
+            throw new ApiException(JWT_EXPIRED_EXCEPTION);
         } catch(SignatureException e) {
             log.info("유효하지 않은 서명입니다. JWT: {}", token);
             throw new ApiException(JWT_INVALID_SIGNATURE_EXCEPTION);
@@ -123,4 +126,17 @@ public class JwtUtil {
             throw new ApiException(JWT_EXCEPTION);
         }
     }
+
+    // TODO 차후에 삭제 예정. 테스트용
+    public String createExpiredToken(String userId) {
+        long oneDayMillis = 24 * 60 * 60 * 1000L; // 86400000 ms
+        return Jwts.builder()
+                .setSubject(userId)
+                .setIssuedAt(new Date(System.currentTimeMillis() - 2 * oneDayMillis))
+                .setExpiration(new Date(System.currentTimeMillis() - oneDayMillis)) // 하루 전
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+
 }

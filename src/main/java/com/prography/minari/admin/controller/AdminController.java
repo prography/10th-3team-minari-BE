@@ -40,10 +40,4 @@ public class AdminController implements AdminApiDocs {
         return ResponseEntity.ok(CommonResponse.ok());
     }
 
-    @DeleteMapping("/users/me")
-    public ResponseEntity deleteUser(@AuthenticationPrincipal User user) {
-        userService.deleteAdmin(user.getId());
-        return ResponseEntity.ok(CommonResponse.success("[ADMIN] 계정 즉시 삭제"));
-    }
-
 }

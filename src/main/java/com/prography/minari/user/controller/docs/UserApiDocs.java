@@ -6,8 +6,6 @@ import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.dto.UserJoinReqDto;
 import com.prography.minari.user.dto.UserJoinResDto;
 import com.prography.minari.user.dto.UserLoginResDto;
-import com.prography.minari.user.dto.UserRefreshTokenReqDto;
-import com.prography.minari.user.dto.UserRefreshTokenResDto;
 import com.prography.minari.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

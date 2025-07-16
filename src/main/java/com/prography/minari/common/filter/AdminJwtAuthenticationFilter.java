@@ -1,8 +1,6 @@
 package com.prography.minari.common.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prography.minari.common.execption.ApiException;
-import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.common.util.ResponseUtil;
 import com.prography.minari.user.entity.User;
@@ -27,24 +25,22 @@ import java.util.Optional;
 import static com.prography.minari.common.execption.ErrorCode.*;
 import static com.prography.minari.common.util.JwtUtil.ACCESS_TOKEN;
 import static com.prography.minari.user.enums.UserRole.USER;
-import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserRepository userRepository) {
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-    }
-
-    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
+
+    public AdminJwtAuthenticationFilter(UserRepository userRepository, JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("JwtAuthenticationFilter 인입! — URI: {}", request.getRequestURI());
+        log.info("AdminJwtAuthenticationFilter 인입! — URI: {}", request.getRequestURI());
 
         // Header에서 JWT 추출
         String accessToken = request.getHeader(AUTHORIZATION);
@@ -56,11 +52,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // JWT 검증
         try {
             jwtUtil.isValidateToken(accessToken);
-
-            log.info("통과핑~");
 
             User user = userRepository.findById(Long.parseLong(jwtUtil.getUserId(accessToken)))
                     .orElseThrow(() -> new ApiException(USER_NOT_FOUND));
