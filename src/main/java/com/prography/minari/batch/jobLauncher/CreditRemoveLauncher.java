@@ -1,6 +1,6 @@
 package com.prography.minari.batch.jobLauncher;
 
-import com.prography.minari.batch.job.MailJobConfiguration;
+import com.prography.minari.batch.job.CreditJobConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParameters;
@@ -15,35 +15,36 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
-public class MailSendLauncher {
+@Slf4j
+public class CreditRemoveLauncher {
     private final JobLauncher jobLauncher;
-    private final MailJobConfiguration mailJobConfiguration;
+    private final CreditJobConfiguration creditJobConfiguration;
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
+    private final DataSource dataSource;
 
-    @Scheduled(cron = "0 0 8 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void launch() throws Exception {
-        log.info("[{}] Starting mail send job",LocalDateTime.now());
+        log.info("[{}] Starting change expired credit status job", LocalDateTime.now());
         try {
             JobParameters params = new JobParametersBuilder()
-                    .addLocalDate("sendMailDate", LocalDate.now())
+                    .addLocalDate("changeStatusOfExpiredCredit", LocalDate.now())
                     .toJobParameters();
 
-            jobLauncher.run(mailJobConfiguration.start(jobRepository, transactionManager), params);
+            jobLauncher.run(creditJobConfiguration.remove(jobRepository, transactionManager,dataSource), params);
+            log.info("[{}] Finished change expired credit status job", LocalDateTime.now());
         } catch (JobInstanceAlreadyCompleteException e) {
-            log.info("Job already completed: {}", e.getMessage());
+            log.info("expired credit Job already completed: {}", e.getMessage());
         } catch (JobExecutionAlreadyRunningException |
                  JobRestartException |
                  JobParametersInvalidException e) {
-            log.error("Job failed to start", e);
-        }finally {
-            log.info("[{}] Finished mail send job",LocalDateTime.now());
+            log.error("expired credit Job failed to start", e);
         }
     }
 }
