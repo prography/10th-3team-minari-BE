@@ -32,4 +32,8 @@ public class Credit extends BaseTimeEntity {
     public boolean isRefund() {
         return status.equals(CreditStatus.REFUND);
     }
+
+    public void changeStatusOfExpiredCredit() {
+        this.status = CreditStatus.EXPIRED;
+    }
 }
