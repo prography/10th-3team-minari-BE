@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static com.prography.minari.common.execption.ErrorCode.*;
 import static com.prography.minari.common.util.JwtUtil.ACCESS_TOKEN;
+import static com.prography.minari.user.enums.UserRole.ADMIN;
 import static com.prography.minari.user.enums.UserRole.USER;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -61,7 +62,7 @@ public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
 
             User user = userRepository.findById(Long.parseLong(jwtUtil.getUserId(accessToken)))
                     .orElseThrow(() -> new ApiException(USER_NOT_FOUND));
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority(USER.getRoleName())));
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority(ADMIN.getRoleName())));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);

@@ -1,12 +1,10 @@
 package com.prography.minari.common.config;
 
 import com.prography.minari.common.filter.AdminJwtAuthenticationFilter;
-import com.prography.minari.common.filter.CommonJwtAuthenticationFilter;
 import com.prography.minari.common.filter.JwtAuthenticationFilter;
 
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;

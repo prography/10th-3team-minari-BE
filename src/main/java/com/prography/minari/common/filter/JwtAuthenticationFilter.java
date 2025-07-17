@@ -60,11 +60,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             jwtUtil.isValidateToken(accessToken);
 
-            log.info("통과핑~");
-
             User user = userRepository.findById(Long.parseLong(jwtUtil.getUserId(accessToken)))
                     .orElseThrow(() -> new ApiException(USER_NOT_FOUND));
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority(USER.getRoleName())));
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    user,
+                    null,
+                    List.of(new SimpleGrantedAuthority(jwtUtil.getUserRole(accessToken)))
+            );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);

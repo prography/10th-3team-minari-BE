@@ -1,6 +1,7 @@
 package com.prography.minari.common.util;
 
 import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.user.enums.UserRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import io.jsonwebtoken.security.Keys;
@@ -14,6 +15,8 @@ import java.time.Duration;
 import java.util.Date;
 
 import static com.prography.minari.common.execption.ErrorCode.*;
+import static com.prography.minari.user.enums.UserRole.ADMIN;
+import static com.prography.minari.user.enums.UserRole.USER;
 
 @Component
 @Slf4j
@@ -115,7 +118,7 @@ public class JwtUtil {
     }
 
     public void isAdmin(String token) {
-        if(!"ROLE_ADMIN".equals(getUserRole(token)))
+        if(!ADMIN.getRoleName().equals(getUserRole(token)))
             throw new ApiException(JWT_NOT_ADMIN);
     }
 
@@ -148,6 +151,7 @@ public class JwtUtil {
         long oneDayMillis = 24 * 60 * 60 * 1000L; // 86400000 ms
         return Jwts.builder()
                 .setSubject(userId)
+                .claim("role", USER)
                 .setIssuedAt(new Date(System.currentTimeMillis() - 2 * oneDayMillis))
                 .setExpiration(new Date(System.currentTimeMillis() - oneDayMillis)) // 하루 전
                 .signWith(key, SignatureAlgorithm.HS256)

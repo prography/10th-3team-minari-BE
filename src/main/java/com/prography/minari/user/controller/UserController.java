@@ -96,7 +96,7 @@ public class UserController implements UserApiDocs {
         return ResponseEntity.ok(CommonResponse.success("계정 휴면 상태 해제"));
     }
 
-    @GetMapping("/users/token/refresh")
+    @PostMapping("/users/token/refresh")
     public ResponseEntity<CommonResponse<UserRefreshTokenResDto>> refreshToken(@RequestBody UserRefreshTokenReqDto reqDto) {
         UserRefreshTokenResDto resDto = userService.createToken(reqDto.refreshToken());
         return ResponseEntity.ok(CommonResponse.success(resDto));
