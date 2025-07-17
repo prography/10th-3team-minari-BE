@@ -16,9 +16,7 @@ import com.prography.minari.aws.impl.FileUploader;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.util.AnalyticsUtil;
-import com.prography.minari.payment.service.impl.CreditCounter;
-import com.prography.minari.payment.service.impl.CreditUsageTarget;
-import com.prography.minari.payment.service.impl.CreditUseProcessor;
+import com.prography.minari.payment.service.impl.*;
 import com.prography.minari.question.entity.Question;
 import com.prography.minari.question.service.impl.QuestionReader;
 import com.prography.minari.user.entity.User;
@@ -49,6 +47,7 @@ public class AnswerService {
     private final AudioFileFormatConverter audioFileFormatConverter;
     private final CreditCounter creditCounter;
     private final CreditUseProcessor creditUseProcessor;
+    private final EventExecutor eventExecutor;
 
     /**
      * Processes a user's uploaded speech audio file for a specific question, converts it to text, saves the answer, and uploads the audio file.
@@ -113,6 +112,8 @@ public class AnswerService {
 
         // 배포누락으로 잠시 주석
 //        fileUploader.upload(file, "/voice");
+        eventExecutor.trigger(EventTrigger.DAILY_INTERVIEW_EVENT, user);
+
         return InterviewContentResponse.builder()
                 .runningTime(convertResult.getRunningTime())
                 .answer(question.getAnswer())

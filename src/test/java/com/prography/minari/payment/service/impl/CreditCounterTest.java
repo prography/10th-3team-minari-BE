@@ -1,6 +1,7 @@
 package com.prography.minari.payment.service.impl;
 
 import com.prography.minari.payment.entity.Credit;
+import com.prography.minari.payment.entity.CreditStatus;
 import com.prography.minari.payment.entity.CreditUsage;
 import com.prography.minari.payment.repository.CreditJpaRepository;
 import com.prography.minari.payment.repository.CreditUsageJpaRepository;
@@ -35,15 +36,18 @@ class CreditCounterTest {
         when(credit1.getId()).thenReturn(1L);
         when(credit1.getAmount()).thenReturn(100L);
         when(credit1.isRefund()).thenReturn(false);
+        when(credit1.getStatus()).thenReturn(CreditStatus.PAID);
 
         Credit credit2 = mock(Credit.class);
         when(credit2.getAmount()).thenReturn(50L);
         when(credit2.isRefund()).thenReturn(true); // 환불됨
+        when(credit2.getStatus()).thenReturn(CreditStatus.REFUND);
 
         Credit credit3 = mock(Credit.class);
-        when(credit3.getId()).thenReturn(3L);
         when(credit3.getAmount()).thenReturn(200L);
         when(credit3.isRefund()).thenReturn(false);
+        when(credit3.getStatus()).thenReturn(CreditStatus.EXPIRED);
+
 
         List<Credit> creditsOfUser = List.of(credit1, credit2, credit3);
         when(creditJpaRepository.findAllByUserId(userId)).thenReturn(creditsOfUser);
@@ -55,7 +59,7 @@ class CreditCounterTest {
         when(usage2.getUsedAmount()).thenReturn(50L);
 
         List<CreditUsage> usages = List.of(usage1, usage2);
-        when(creditUsageJpaRepository.findAllByCreditIdIn(List.of(1L, 3L))).thenReturn(usages);
+        when(creditUsageJpaRepository.findAllByCreditIdIn(List.of(1L))).thenReturn(usages);
 
         // 실행
         Long result = creditService.countNotUsedCredit(userId);
@@ -68,7 +72,7 @@ class CreditCounterTest {
 
          return = 350 - 50  - 80 = 80
          */
-        assertThat(220L).isEqualTo(result);
+        assertThat(20L).isEqualTo(result);
     }
 
 }
