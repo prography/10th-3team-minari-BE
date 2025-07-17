@@ -48,6 +48,9 @@ public class SocialService {
         User user = userRepository.findBySocialTypeAndSocialId(socialType, userInfoDto.socialId())
                 .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), uuid)));
 
+        // 회원탈퇴한 계정의 경우 예외처리
+        user.validateDeleted();
+
         // jwt 생성
         String serverAccessToken = jwtUtil.createAccessToken(user.getId().toString());
         String serverRefreshToken = jwtUtil.createRefreshToken(user.getId().toString());
