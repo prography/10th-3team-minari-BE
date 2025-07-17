@@ -1,5 +1,6 @@
 package com.prography.minari.social.service;
 
+import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.common.util.UuidUtil;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Map;
 
+import static com.prography.minari.common.execption.ErrorCode.ACCOUNT_SOFT_DELETED;
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 @Service
@@ -47,6 +49,11 @@ public class SocialService {
         // 사용자 정보로 기존 회원 조회, 없으면 새 User 객체 생성
         User user = userRepository.findBySocialTypeAndSocialId(socialType, userInfoDto.socialId())
                 .orElseGet(() -> userRepository.save(User.create("", socialType, userInfoDto.socialId(), userInfoDto.nickname(), userInfoDto.image(), uuid)));
+
+        // 회원탈퇴한 계정의 경우 예외처리
+        if(user.isDeleted()) {
+            throw new ApiException(ACCOUNT_SOFT_DELETED);
+        }
 
         // jwt 생성
         String serverAccessToken = jwtUtil.createAccessToken(user.getId().toString());
