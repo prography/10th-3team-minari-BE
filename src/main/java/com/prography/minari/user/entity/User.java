@@ -127,7 +127,4 @@ public class User extends BaseTimeEntity {
         this.deletedAt = null;
     }
 
-    public void validateDeleted() {
-        if(isDeleted) throw new ApiException(ACCOUNT_SOFT_DELETED);
-    }
 }
