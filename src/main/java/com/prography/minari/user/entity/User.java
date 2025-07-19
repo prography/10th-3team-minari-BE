@@ -107,8 +107,11 @@ public class User extends BaseTimeEntity {
         return ChronoUnit.DAYS.between(created, now);
     }
 
-    public List<Domain>getPreferDomains() {
-        return List.of(domain,Domain.CS);
+    public List<Domain> getPreferDomains() {
+        if (domain == null) {
+            return List.of(Domain.CS);
+        }
+        return List.of(domain, Domain.CS);
     }
 
     // 계정 7일후 삭제 처리를 위해 deletedAt 시간 적재
@@ -119,7 +122,7 @@ public class User extends BaseTimeEntity {
 
     public void activate() {
 
-        if(!this.isDeleted) throw new ApiException(ACCOUNT_NOT_DELETED);
+        if (!this.isDeleted) throw new ApiException(ACCOUNT_NOT_DELETED);
 
         this.isDeleted = false;
         this.deletedAt = null;
