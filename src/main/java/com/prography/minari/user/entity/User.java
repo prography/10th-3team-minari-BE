@@ -4,6 +4,7 @@ import com.prography.minari.answer.entity.Answer;
 import com.prography.minari.common.entity.BaseTimeEntity;
 import com.prography.minari.common.entity.Domain;
 import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.enums.EmailSendTime;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.prography.minari.common.execption.ErrorCode.ACCOUNT_NOT_DELETED;
+import static com.prography.minari.common.execption.ErrorCode.ACCOUNT_SOFT_DELETED;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -127,4 +129,5 @@ public class User extends BaseTimeEntity {
         this.isDeleted = false;
         this.deletedAt = null;
     }
+
 }
