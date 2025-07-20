@@ -26,7 +26,7 @@ public class MailContentCreateProcessor {
 
             Optional<Question> questionOpt = questionReader.readDaily(
                     user,
-                    List.of(Domain.CS, user.getDomain()),
+                    user.getPreferDomains(),
                     user.getDaysSinceJoined()
             );
 
