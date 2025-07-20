@@ -27,7 +27,7 @@ public class QuestionReader {
 
     public Optional<Question> readDaily(User user, List<Domain> domains, long day) {
         return questionRepository
-                .findDailyUnsolvedQuestionByDomains(user.getId(), domains, PageRequest.of((int) day, 1))
+                .findDailyUnsolvedQuestionByDomains(domains, PageRequest.of((int) day, 1))
                 .getContent().stream().findFirst();
     }
 
