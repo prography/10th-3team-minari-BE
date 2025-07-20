@@ -1,5 +1,6 @@
 package com.prography.minari.social.service;
 
+import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.common.util.UuidUtil;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Map;
 
+import static com.prography.minari.common.execption.ErrorCode.ACCOUNT_SOFT_DELETED;
 import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 @Service

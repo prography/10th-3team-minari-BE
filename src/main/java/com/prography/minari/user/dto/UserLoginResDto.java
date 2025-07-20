@@ -1,6 +1,5 @@
 package com.prography.minari.user.dto;
 
-import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.entity.User;
 
@@ -12,6 +11,7 @@ public record UserLoginResDto(
         String name,
         String image,
         boolean registered,
+        boolean deleted,
         String accessToken,
         String refreshToken)
 {
@@ -25,6 +25,7 @@ public record UserLoginResDto(
                 user.getName(),
                 user.getImage(),
                 user.isRegistered(),
+                user.isDeleted(),
                 accessToken,
                 refreshToken
         );
