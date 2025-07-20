@@ -3,6 +3,7 @@ package com.prography.minari.common.config;
 import com.prography.minari.common.filter.AdminJwtAuthenticationFilter;
 import com.prography.minari.common.filter.JwtAuthenticationFilter;
 
+import com.prography.minari.common.handler.ApiAccessDeniedHandler;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.user.repository.UserRepository;
 
@@ -16,6 +17,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static com.prography.minari.user.enums.UserRole.ADMIN;
 
 @Configuration
 @EnableWebSecurity
@@ -43,28 +46,31 @@ public class SecurityConfig {
                             uri.startsWith("/webjars") ||
                             uri.startsWith("/favicon.ico") ||
                             uri.startsWith("/api/v1/users/oauth") ||
-                            uri.startsWith("/api/v1/users/token/refresh") ||
-                            uri.startsWith("/api/v1/dev");
+                            uri.startsWith("/api/v1/users/token/refresh");
                 })
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }
 
-    /** 2. Admin API 전용 필터 */
     @Bean
     @Order(2)
-    public SecurityFilterChain adminFilter(HttpSecurity http) throws Exception {
+    public SecurityFilterChain adminFilter(HttpSecurity http,
+                                           ApiAccessDeniedHandler apiAccessDeniedHandler) throws Exception {
         return http
                 .securityMatcher(request -> request.getRequestURI().startsWith("/admin/"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().hasAuthority(ADMIN.getRoleName())
+                )
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(apiAccessDeniedHandler)   // 403
+                )
                 .addFilterBefore(adminJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    /** 3. 일반 API 필터 */
     @Bean
     @Order(3)
     public SecurityFilterChain apiFilter(HttpSecurity http) throws Exception {

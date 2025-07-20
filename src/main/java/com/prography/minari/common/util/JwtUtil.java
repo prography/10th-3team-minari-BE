@@ -117,11 +117,6 @@ public class JwtUtil {
                 .get("role", String.class); // 커스텀 클레임 추출
     }
 
-    public void isAdmin(String token) {
-        if(!ADMIN.getRoleName().equals(getUserRole(token)))
-            throw new ApiException(JWT_NOT_ADMIN);
-    }
-
     public void isValidateToken(String token) {
         try {
             Jwts.parserBuilder()

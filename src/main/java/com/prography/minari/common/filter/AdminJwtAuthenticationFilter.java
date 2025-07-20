@@ -57,12 +57,12 @@ public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
 
             jwtUtil.isValidateToken(accessToken);
 
-            // ADMIN인지 검증
-            jwtUtil.isAdmin(accessToken);
-
             User user = userRepository.findById(Long.parseLong(jwtUtil.getUserId(accessToken)))
                     .orElseThrow(() -> new ApiException(USER_NOT_FOUND));
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority(ADMIN.getRoleName())));
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    user,
+                    null,
+                    List.of(new SimpleGrantedAuthority(jwtUtil.getUserRole(accessToken))));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
