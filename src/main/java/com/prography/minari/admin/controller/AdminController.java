@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/admin/api/v1")
+@RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
 public class AdminController implements AdminApiDocs {
     private final AdminRewardService adminRewardService;
