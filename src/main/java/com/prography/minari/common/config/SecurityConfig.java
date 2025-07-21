@@ -1,9 +1,9 @@
 package com.prography.minari.common.config;
 
-import com.prography.minari.common.filter.AdminJwtAuthenticationFilter;
 import com.prography.minari.common.filter.JwtAuthenticationFilter;
 
-import com.prography.minari.common.handler.ApiAccessDeniedHandler;
+import com.prography.minari.common.handler.CustomAccessDeniedHandler;
+import com.prography.minari.common.handler.CustomAuthenticationEntryPoint;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.user.repository.UserRepository;
 
@@ -25,12 +25,17 @@ import static com.prography.minari.user.enums.UserRole.ADMIN;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final AdminJwtAuthenticationFilter adminJwtAuthenticationFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public SecurityConfig(JwtUtil jwtUtil, UserRepository userRepository) {
-        this.adminJwtAuthenticationFilter = new AdminJwtAuthenticationFilter(userRepository, jwtUtil);
-        this.jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, userRepository);
+    public SecurityConfig(JwtUtil jwtUtil,
+                          UserRepository userRepository,
+                          CustomAccessDeniedHandler customAccessDeniedHandler,
+                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+        this.jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, userRepository, customAuthenticationEntryPoint);
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     /** 1. Swagger & 공개용 필터 */
@@ -53,34 +58,24 @@ public class SecurityConfig {
                 .build();
     }
 
+    /** 2. JwtAuthentication 필터 **/
     @Bean
     @Order(2)
-    public SecurityFilterChain adminFilter(HttpSecurity http,
-                                           ApiAccessDeniedHandler apiAccessDeniedHandler) throws Exception {
-        return http
-                .securityMatcher(request -> request.getRequestURI().startsWith("/admin/"))
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().hasAuthority(ADMIN.getRoleName())
-                )
-                .exceptionHandling(ex -> ex
-                        .accessDeniedHandler(apiAccessDeniedHandler)   // 403
-                )
-                .addFilterBefore(adminJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
-
-    @Bean
-    @Order(3)
     public SecurityFilterChain apiFilter(HttpSecurity http) throws Exception {
         return http
                 .securityMatcher(request -> request.getRequestURI().startsWith("/api/v1/"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint) // 401
+                        .accessDeniedHandler(customAccessDeniedHandler)           // 403
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/admin/**").hasAuthority(ADMIN.getRoleName())
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
 }
 
