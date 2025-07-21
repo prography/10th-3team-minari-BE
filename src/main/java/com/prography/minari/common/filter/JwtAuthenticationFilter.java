@@ -2,6 +2,8 @@ package com.prography.minari.common.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.execption.CustomAuthenticationException;
+import com.prography.minari.common.handler.CustomAuthenticationEntryPoint;
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.common.util.ResponseUtil;
@@ -20,27 +22,24 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static com.prography.minari.common.execption.ErrorCode.*;
 import static com.prography.minari.common.util.JwtUtil.ACCESS_TOKEN;
-import static com.prography.minari.user.enums.UserRole.USER;
-import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserRepository userRepository) {
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-    }
-
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    public JwtAuthenticationFilter(JwtUtil jwtUtil, UserRepository userRepository, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -70,9 +69,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
-        } catch (ApiException e) {
-            ResponseUtil.writeUnauthorizedResponse(response, e.getErrorCode(), e.getErrorMessage());
-            return;
+        } catch (CustomAuthenticationException e) {
+            customAuthenticationEntryPoint.commence(request, response, e);
         }
 
     }
