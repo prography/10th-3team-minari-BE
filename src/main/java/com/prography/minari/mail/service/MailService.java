@@ -10,6 +10,7 @@ import com.prography.minari.mail.repository.MailAuthLogRepository;
 import com.prography.minari.mail.service.impl.MailTemplateCreater;
 import com.prography.minari.user.dto.MailVerificationCheckReqDto;
 import com.prography.minari.user.entity.User;
+import com.prography.minari.user.service.impl.UserReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import static com.prography.minari.common.execption.ErrorCode.EXISTS_EMAIL;
 import static com.prography.minari.mail.dto.MailSubject.AUTH_SUBJECT;
 
 @Service
@@ -27,8 +29,18 @@ public class MailService {
     private final MailTemplateCreater mailTemplateCreater;
     private final MailClient mailClient;
     private final MailAuthLogRepository mailAuthLogRepository;
+    private final UserReader userReader;
 
     public void sendAuthMail(MailVerificationReqDto mailVerificationReqDto, User user) {
+
+        String email       = mailVerificationReqDto.to();
+        String redirectUri = mailVerificationReqDto.redirectUri();
+
+        // 이미 등록된 이메일인 경우, [MAIL004] 이미 존재하는 이메일입니다.
+        if(userReader.existsByEmail(email)) {
+            log.info("[{}] : {}", EXISTS_EMAIL.getCode(), EXISTS_EMAIL.getMessage());
+            throw new ApiException(EXISTS_EMAIL);
+        }
 
         // 숫자로 구성된 6자리인증 코드 생성
         String authCode = AuthCodeUtil.generate6DigitCode();
@@ -41,8 +53,8 @@ public class MailService {
 
         // 인증 메일 양식 만들기
         MailRequest authMailRequest = mailTemplateCreater.create(AUTH_SUBJECT.getName(),
-                mailVerificationReqDto.to(),
-                Map.of("verificationLink", mailVerificationReqDto.redirectUri(),"authCode",authCode),
+                email,
+                Map.of("verificationLink", redirectUri,"authCode",authCode),
                 "auth-mail");
         // 인증 메일 전송
         mailClient.sendMail(authMailRequest);
