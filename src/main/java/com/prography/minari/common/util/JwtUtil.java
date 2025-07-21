@@ -1,6 +1,7 @@
 package com.prography.minari.common.util;
 
 import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.execption.CustomAuthenticationException;
 import com.prography.minari.user.enums.UserRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
@@ -125,19 +126,19 @@ public class JwtUtil {
                     .parseClaimsJws(token);
         } catch(ExpiredJwtException e) {
             log.info("만료된 토큰입니다. JWT: {}", token);
-            throw new ApiException(JWT_EXPIRED_EXCEPTION);
+            throw new CustomAuthenticationException(JWT_EXPIRED_EXCEPTION);
         } catch(SignatureException e) {
             log.info("유효하지 않은 서명입니다. JWT: {}", token);
-            throw new ApiException(JWT_INVALID_SIGNATURE_EXCEPTION);
+            throw new CustomAuthenticationException(JWT_INVALID_SIGNATURE_EXCEPTION);
         } catch(UnsupportedJwtException e) {
             log.info("지원하지 않는 JWT 포맷입니다. JWT: {}", token);
-            throw new ApiException(JWT_UNSUPPORT_FORMAT_EXCEPTION);
+            throw new CustomAuthenticationException(JWT_UNSUPPORT_FORMAT_EXCEPTION);
         } catch(MalformedJwtException e) {
             log.info("잘못된 JWT 형식입니다. JWT: {}", token);
-            throw new ApiException(JWT_WRONG_FORM_EXCEPTION);
+            throw new CustomAuthenticationException(JWT_WRONG_FORM_EXCEPTION);
         } catch(IllegalStateException e) {
             log.info("JWT 파싱 중 예상치 못한 상태 오류가 발생했습니다. 설정 또는 키 값이 올바른지 확인하세요. JWT: {}", token);
-            throw new ApiException(JWT_EXCEPTION);
+            throw new CustomAuthenticationException(JWT_EXCEPTION);
         }
     }
 
