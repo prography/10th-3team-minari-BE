@@ -1,18 +1,14 @@
 package com.prography.minari.common.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.CustomAuthenticationException;
 import com.prography.minari.common.handler.CustomAuthenticationEntryPoint;
-import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.common.util.JwtUtil;
-import com.prography.minari.common.util.ResponseUtil;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.repository.UserRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 헤더에 Authorization이 존재하지 않을 경우 예외 처리
         if(StringUtils.isBlank(accessToken)) {
             log.info("{} : {}", ACCESS_TOKEN, JWT_NOT_FOUND_EXCEPTION.getMessage());
-            ResponseUtil.writeUnauthorizedResponse(response, JWT_NOT_FOUND_EXCEPTION.getCode(), JWT_NOT_FOUND_EXCEPTION.getMessage());
+            customAuthenticationEntryPoint.commence(request, response, new CustomAuthenticationException(JWT_NOT_FOUND_EXCEPTION));
             return;
         }
 
