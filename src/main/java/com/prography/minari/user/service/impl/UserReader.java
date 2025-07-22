@@ -40,4 +40,8 @@ public class UserReader {
     public User readByUUID(String uuid) {
         return userRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 }
