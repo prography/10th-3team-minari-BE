@@ -60,7 +60,6 @@ public class UserController implements UserApiDocs {
 
     @PostMapping("/users/join")
     public ResponseEntity join(@RequestBody @Validated UserJoinReqDto userJoinReqDto, @AuthenticationPrincipal User user) {
-        log.info("controller join");
         UserJoinResDto dto = userService.join(userJoinReqDto, user.getId());
         return ResponseEntity.ok(CommonResponse.success(dto));
     }
@@ -95,6 +94,12 @@ public class UserController implements UserApiDocs {
     public ResponseEntity<CommonResponse<String>> activate(@AuthenticationPrincipal User user) {
         userService.activate(user);
         return ResponseEntity.ok(CommonResponse.success("계정 휴면 상태 해제"));
+    }
+
+    @PostMapping("/users/token/refresh")
+    public ResponseEntity<CommonResponse<UserRefreshTokenResDto>> refreshToken(@RequestBody UserRefreshTokenReqDto reqDto) {
+        UserRefreshTokenResDto resDto = userService.createToken(reqDto.refreshToken());
+        return ResponseEntity.ok(CommonResponse.success(resDto));
     }
 
 }

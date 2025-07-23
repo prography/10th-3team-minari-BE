@@ -21,6 +21,7 @@ public enum ErrorCode {
     JWT_EXCEPTION(HttpStatus.NOT_FOUND, "JWT 파싱 중 예상치 못한 상태 오류가 발생했습니다. 설정 또는 키 값이 올바른지 확인하세요.","JWT005"),
     JWT_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "헤더에 JWT가 존재하는지 확인하세요.","JWT006"),
     JWT_NOT_MATCHED(HttpStatus.BAD_REQUEST, "유효하지 않은 REFRESH TOKEN입니다.","JWT007"),
+    JWT_NOT_ADMIN(HttpStatus.BAD_REQUEST, "ADMIN 계정이 아닙니다.","JWT008"),
     EMAIL_INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "잘못된 이메일 주소입니다.", "MAIL001"),
     EMAIL_MESSAGE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 메시지 생성 중 오류가 발생했습니다.", "MAIL002"),
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다.", "MAIL003"),

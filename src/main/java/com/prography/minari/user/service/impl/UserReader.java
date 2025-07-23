@@ -38,7 +38,7 @@ public class UserReader {
     }
 
     public User readByUUID(String uuid) {
-        return userRepository.findByUuid(uuid).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findByUuid(uuid).orElseThrow(() -> new ApiException(USER_NOT_FOUND));
     }
 
     public boolean existsByEmail(String email) {

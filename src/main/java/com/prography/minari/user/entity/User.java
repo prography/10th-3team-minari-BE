@@ -9,6 +9,7 @@ import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.enums.EmailSendTime;
 import com.prography.minari.user.enums.ExperienceLevel;
+import com.prography.minari.user.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.prography.minari.common.execption.ErrorCode.ACCOUNT_NOT_DELETED;
+import static com.prography.minari.user.enums.UserRole.USER;
 import static com.prography.minari.common.execption.ErrorCode.ACCOUNT_SOFT_DELETED;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
@@ -80,6 +82,9 @@ public class User extends BaseTimeEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = LAZY)
     private Seed seed;
 
+    @Enumerated(value = STRING)
+    private UserRole userRole;
+
     public static User create(String email, SocialType socialType, Long socialId, String name, String image, String uuid) {
         User user = new User();
         user.email = email;
@@ -90,6 +95,7 @@ public class User extends BaseTimeEntity {
         user.isRegistered = false;
         user.uuid = uuid;
         user.isDeleted = false;
+        user.userRole = USER;
         return user;
     }
 
