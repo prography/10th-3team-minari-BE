@@ -24,4 +24,7 @@ public class InterviewContentResponse {
 
     @Schema(description = "답변 러닝 타임 (초)")
     private Double runningTime;
+
+    @Schema(description = "메모")
+    private String memo;
 }
