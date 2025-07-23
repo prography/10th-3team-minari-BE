@@ -120,6 +120,7 @@ public class AnswerService {
                 .reply(convertResult.getSpeech())
                 .question(question.getContent())
                 .createDate(answer.getCreatedDateTime().toLocalDate())
+                .memo(memo)
                 .build();
 
     }
@@ -151,6 +152,7 @@ public class AnswerService {
                 .question(question.getContent())
                 .answer(question.getAnswer())
                 .reply(answer.getReply())
+                .memo(answer.getMemo())
                 .build();
     }
 
