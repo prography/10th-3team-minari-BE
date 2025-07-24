@@ -4,6 +4,7 @@ import com.prography.minari.common.entity.Domain;
 import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.entity.User;
+import com.prography.minari.user.enums.UserRole;
 
 public record UserFindResDto(
         Long id,
@@ -15,6 +16,7 @@ public record UserFindResDto(
         Long seed,
         String uuid,
         Domain domain,
+        UserRole userRole,
         Long dayCount
 )
 {
@@ -29,6 +31,7 @@ public record UserFindResDto(
                 seed.getTotal(),
                 user.getUuid(),
                 user.getDomain(),
+                user.getUserRole(),
                 dayCount
         );
     }
