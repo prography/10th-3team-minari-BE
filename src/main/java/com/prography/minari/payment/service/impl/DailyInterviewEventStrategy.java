@@ -19,6 +19,7 @@ public class DailyInterviewEventStrategy implements EventStrategy {
     private final CreditWriter creditWriter;
     private final PaymentWriter paymentWriter;
     private final ProductReader productReader;
+    private final CreditReader creditReader;
 
     @Override
     public EventTrigger getSupportedTrigger() {
@@ -34,6 +35,10 @@ public class DailyInterviewEventStrategy implements EventStrategy {
     public void execute(EventContext context) {
         Long productId = Long.valueOf(context.getMetadata().get("productId").toString());
         User user = context.getUser();
+        Optional<Credit> todayGetPromotionCredit = creditReader.readGetTodayByProductId(productId);
+        if(todayGetPromotionCredit.isPresent()){
+            return;
+        }
         Optional<Product> productOpt = productReader.read(productId);
         productOpt.ifPresentOrElse(product -> {
             AccountPayment accountPayment = AccountPayment.create(user.getId(),
