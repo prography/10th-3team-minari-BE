@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.prography.minari.payment.entity.CreditStatus.EXPIRED;
+import static com.prography.minari.payment.entity.CreditStatus.REFUND;
+
 @Service
 @RequiredArgsConstructor
 public class CreditHistoryService {
@@ -29,12 +32,15 @@ public class CreditHistoryService {
         List<CreditUsageHistoryResponseDto> results = new ArrayList<>();
         for (Map.Entry<Credit, Long> entry : history.entrySet()) {
             Credit credit = entry.getKey();
-            PayCategory payCategory = PayCategory.BUY;
+            String category = "BUY";
+//            PayCategory payCategory = PayCategory.BUY;
 
             Optional<Product> productOpt = productReader.read(credit.getProductId());
-            if (productOpt.isPresent()) {
+            if (credit.getStatus().equals(EXPIRED)) {
+                category = EXPIRED.toString();
+            } else if (productOpt.isPresent()) {
                 Product product = productOpt.get();
-                payCategory = product.getPayCategory();
+                category = product.getPayCategory().toString();
             }
 
             Long amount = entry.getValue();
@@ -43,7 +49,7 @@ public class CreditHistoryService {
             CreditUsageHistoryResponseDto dto = CreditUsageHistoryResponseDto.builder()
                     .refund(status.equals(CreditStatus.REFUND))
                     .date(credit.getCreatedDateTime().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")))
-                    .category(payCategory)
+                    .category(category)
                     .quantity(credit.getAmount())
                     .remain(credit.getAmount() - amount)
                     .build();

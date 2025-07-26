@@ -9,7 +9,7 @@ import lombok.Getter;
 public class CreditUsageHistoryResponseDto {
     private String date;
     private Long quantity;
-    private PayCategory category;
+    private String category;
     private boolean refund;
     private Long remain;
 }

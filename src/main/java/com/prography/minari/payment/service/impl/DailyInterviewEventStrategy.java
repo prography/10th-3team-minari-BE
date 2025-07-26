@@ -35,7 +35,7 @@ public class DailyInterviewEventStrategy implements EventStrategy {
     public void execute(EventContext context) {
         Long productId = Long.valueOf(context.getMetadata().get("productId").toString());
         User user = context.getUser();
-        Optional<Credit> todayGetPromotionCredit = creditReader.readGetTodayByProductId(productId);
+        Optional<Credit> todayGetPromotionCredit = creditReader.readGetTodayByProductId(productId,user.getId());
         if(todayGetPromotionCredit.isPresent()){
             return;
         }

@@ -2,8 +2,10 @@ package com.prography.minari.payment.service.impl;
 
 import com.prography.minari.common.aop.ImplService;
 import com.prography.minari.common.entity.BaseTimeEntity;
+import com.prography.minari.payment.dto.CreditProductDto;
 import com.prography.minari.payment.entity.Credit;
 import com.prography.minari.payment.entity.CreditUsage;
+import com.prography.minari.payment.entity.PayCategory;
 import com.prography.minari.payment.repository.CreditJpaRepository;
 import com.prography.minari.payment.repository.CreditUsageJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +21,18 @@ public class CreditUseProcessor {
     private final CreditUsageJpaRepository creditUsageJpaRepository;
 
     public void use(Long userId, Long used, CreditUsageTarget target) {
-        List<Credit> credits = creditJpaRepository.findAllByUserId(userId).stream()
-                .sorted(Comparator.comparing(BaseTimeEntity::getCreatedDateTime, Comparator.nullsLast(Comparator.naturalOrder())))
+
+        List<CreditProductDto> creditProductDtos = creditJpaRepository.findAllByUserId(userId).stream()
+                .sorted(
+                        Comparator.<CreditProductDto, Integer>comparing(dto ->
+                                        dto.product().getPayCategory().equals(PayCategory.EVENT) ? 0 : 1
+                                )
+                                .thenComparing(dto -> dto.credit().getCreatedDateTime())
+                )
                 .toList();
 
-        List<Long> creditIds = credits.stream()
-                .map(Credit::getId)
+        List<Long> creditIds = creditProductDtos.stream()
+                .map(cp->cp.credit().getId())
                 .toList();
 
         List<CreditUsage> creditUsages = creditUsageJpaRepository.findAllByCreditIdIn(creditIds);
@@ -36,6 +44,9 @@ public class CreditUseProcessor {
         }
 
         List<CreditUsage> usedList = new ArrayList<>();
+        List<Credit> credits = creditProductDtos.stream()
+                .map(CreditProductDto::credit)
+                .toList();
         for (Credit credit : credits) {
             if (used <= 0) break;
 
@@ -71,7 +82,10 @@ public class CreditUseProcessor {
 
 
     public Map<Credit, Long> getHistory(Long userId) {
-        List<Credit> credits = creditJpaRepository.findAllByUserId(userId);
+        List<Credit> credits = creditJpaRepository.findAllByUserId(userId).stream()
+                .map(c -> c.credit())
+                .sorted(Comparator.comparing(Credit::getCreatedDateTime))
+                .toList();
 
         List<Long> creditIds = credits.stream()
                 .map(Credit::getId)
