@@ -13,9 +13,10 @@ import java.util.Optional;
 public class CreditReader {
     private final CreditJpaRepository creditJpaRepository;
 
-    public Optional<Credit> readGetTodayByProductId(Long productId) {
+    public Optional<Credit> readGetTodayByProductId(Long productId,Long userId) {
         return creditJpaRepository.findByProductIdAndCreatedAtToday(
                 productId,
+                userId,
                 LocalDateTime.now().toLocalDate().atStartOfDay(),
                 LocalDateTime.now().plusDays(1L).toLocalDate().atStartOfDay());
     }
