@@ -13,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.prography.minari.payment.entity.CreditStatus.EXPIRED;
 import static com.prography.minari.payment.entity.CreditStatus.REFUND;
@@ -56,6 +53,8 @@ public class CreditHistoryService {
 
             results.add(dto);
         }
-        return results;
+        return results.stream()
+                .sorted(Comparator.comparing(CreditUsageHistoryResponseDto::getDate))
+                .toList();
     }
 }
