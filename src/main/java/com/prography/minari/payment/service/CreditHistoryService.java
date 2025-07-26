@@ -54,7 +54,7 @@ public class CreditHistoryService {
             results.add(dto);
         }
         return results.stream()
-                .sorted(Comparator.comparing(CreditUsageHistoryResponseDto::getDate))
+                .sorted(Comparator.comparing(CreditUsageHistoryResponseDto::getDate).reversed())
                 .toList();
     }
 }
