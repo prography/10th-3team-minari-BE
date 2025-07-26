@@ -6,6 +6,7 @@ import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
 import com.prography.minari.payment.entity.Seed;
+import com.prography.minari.payment.service.impl.CreditCounter;
 import com.prography.minari.payment.service.impl.SeedReader;
 import com.prography.minari.user.dto.UserFindResDto;
 import com.prography.minari.user.dto.UserJoinReqDto;
@@ -27,14 +28,14 @@ public class UserService {
     private final UserWriter userWriter;
     private final AnswerReader answerReader;
     private final RedisProcessor redisProcessor;
-    private final SeedReader seedReader;
     private final JwtUtil jwtUtil;
+    private final CreditCounter creditCounter;
 
     public UserFindResDto findById(Long id) {
         User user = userReader.read(id);
-        Seed seed = seedReader.readByUserId(id).orElse(new Seed(0L,user));
+        Long creditTotal = creditCounter.countNotUsedCredit(id);
         Long dayCount = answerReader.countDistinctAnswerDateByUserId(id);
-        return UserFindResDto.from(user, seed, dayCount);
+        return UserFindResDto.from(user, creditTotal, dayCount);
     }
 
     public UserJoinResDto join(UserJoinReqDto userJoinReqDto, Long userId) {
