@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 
+import static com.prography.minari.payment.entity.CreditStatus.PAID;
 import static com.prography.minari.payment.service.impl.CreditUsageTarget.INTERVIEW;
 
 @ImplService
@@ -23,6 +24,7 @@ public class CreditUseProcessor {
     public void use(Long userId, Long used, CreditUsageTarget target) {
 
         List<CreditProductDto> creditProductDtos = creditJpaRepository.findAllByUserId(userId).stream()
+                .filter(c->c.credit().equals(PAID))
                 .sorted(
                         Comparator.<CreditProductDto, Integer>comparing(dto ->
                                         dto.product().getPayCategory().equals(PayCategory.EVENT) ? 0 : 1
