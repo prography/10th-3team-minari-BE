@@ -20,7 +20,7 @@ public record UserFindResDto(
         Long dayCount
 )
 {
-    public static UserFindResDto from(User user, Seed seed, Long dayCount) {
+    public static UserFindResDto from(User user, Long seed, Long dayCount) {
         return new UserFindResDto(
                 user.getId(),
                 user.getEmail(),
@@ -28,7 +28,7 @@ public record UserFindResDto(
                 String.valueOf(user.getSocialId()), // socialId가 String이면 그대로, Long이면 변환
                 user.getName(),
                 user.getImage(),
-                seed.getTotal(),
+                seed,
                 user.getUuid(),
                 user.getDomain(),
                 user.getUserRole(),
