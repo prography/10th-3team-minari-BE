@@ -9,8 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static com.prography.minari.common.execption.ErrorCode.ENTITY_NOT_FOUND;
 import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_MATCHED;
 
 @Slf4j
@@ -29,18 +31,26 @@ public class RedisProcessor {
         log.info("refresh token 저장 : {}", value);
     }
 
+    public void setValue(String key, Object value, Duration duration) {
+        redisTemplate.opsForValue().set(key, value, duration);
+        log.info("[REDIS] {} : {}", key, value);
+    }
+
     /**
      * Redis에서 데이터 조회
      */
-    public Object getValue(String key) {
-        return redisTemplate.opsForValue().get(key);
+    public Optional<Object> getValue(String key) {
+        return Optional.ofNullable(redisTemplate.opsForValue().get(key));
     }
 
     /**
      * Redis에서 데이터 삭제
      */
     public Boolean deleteValue(String key) {
-        log.info("refresh token 삭제 : {}", getValue(key));
+        // Redis에 key 값과 매칭되는 객체가 존재하지 않으면, 예외처리
+        Object value = getValue(key).orElseThrow(() -> new ApiException(ENTITY_NOT_FOUND));
+
+        log.info("refresh token 삭제 : {}", value);
         return redisTemplate.delete(key);
     }
 
@@ -63,18 +73,6 @@ public class RedisProcessor {
      */
     public Long getExpire(String key) {
         return redisTemplate.getExpire(key);
-    }
-
-    /**
-     * 토큰 일치 검증 메소드
-     */
-    public void validateRefreshToken(String key, String refreshToken) {
-        String targetRefreshToken = redisTemplate.opsForValue().get(key).toString();
-        // redis에 저장된 토큰과 사용자가 제공한 토큰일 일치하지 않을 경우, 예외처리
-        if(!targetRefreshToken.equals(refreshToken)) {
-            log.info("저장된 refreshToken : {} \n제공한 refreshToken : {}", targetRefreshToken, refreshToken);
-            throw new ApiException(JWT_NOT_MATCHED);
-        }
     }
 
 }

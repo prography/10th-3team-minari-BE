@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_MATCHED;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -67,8 +69,14 @@ public class UserService {
         String userId = jwtUtil.getUserId(refreshToken);
         String userRole = jwtUtil.getUserRole(refreshToken);
 
+        // refresh token 조회
+        String storedRefreshToken = redisProcessor.getValue(userId)
+                .orElseThrow(() -> new ApiException(JWT_NOT_MATCHED))
+                .toString();
+
         // refresh token 검증
-        redisProcessor.validateRefreshToken(userId, refreshToken);
+        if(!storedRefreshToken.equals(refreshToken))
+            throw new ApiException(JWT_NOT_MATCHED);
 
         // JWT 발급
         String newAccessToken = jwtUtil.createAccessToken(userId, userRole);
