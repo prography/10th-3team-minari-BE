@@ -32,17 +32,23 @@ public class AnalyticsUtil {
 
         LocalDate today = LocalDate.now();
 
-        return Math.toIntExact(
+        // 오늘 리허설을 진행했다면, 1 추가
+        int consecutiveDays = answers.stream()
+                .anyMatch(dto -> dto.answerDate().isEqual(today) && dto.isExisted()) ? 1 : 0;
+
+        consecutiveDays += Math.toIntExact(
                 answers.stream()
                         .filter(dto -> {
                             LocalDate date = dto.answerDate();
-                            return !date.isBefore(startDate) && !date.isAfter(today);
+                            return !date.isBefore(startDate) && !date.isAfter(today.minusDays(1));
                         })
                         .sorted(Comparator.comparing(AnswerResDto::answerDate).reversed())
                         .map(AnswerResDto::isExisted)
                         .takeWhile(Boolean.TRUE::equals)
                         .count()
         );
+
+        return consecutiveDays;
     }
 
 }
