@@ -47,10 +47,7 @@ public class RedisProcessor {
      * Redis에서 데이터 삭제
      */
     public Boolean deleteValue(String key) {
-        // Redis에 key 값과 매칭되는 객체가 존재하지 않으면, 예외처리
-        Object value = getValue(key).orElseThrow(() -> new ApiException(ENTITY_NOT_FOUND));
-
-        log.info("refresh token 삭제 : {}", value);
+        log.info("refresh token 삭제 : {}", key);
         return redisTemplate.delete(key);
     }
 
