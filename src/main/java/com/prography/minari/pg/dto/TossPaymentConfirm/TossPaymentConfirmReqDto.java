@@ -1,8 +1,8 @@
-package com.prography.minari.pg.dto;
+package com.prography.minari.pg.dto.TossPaymentConfirm;
 
 import java.math.BigDecimal;
 
-public record TossPaymentConfirmReqtDto(
+public record TossPaymentConfirmReqDto(
         String paymentKey,
         BigDecimal amount,
         Long productId

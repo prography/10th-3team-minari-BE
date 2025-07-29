@@ -1,11 +1,9 @@
 package com.prography.minari.pg.service;
 
-import com.prography.minari.common.execption.ApiException;
-import com.prography.minari.common.execption.ErrorCode;
-import com.prography.minari.payment.entity.Product;
 import com.prography.minari.payment.service.impl.ProductReader;
-import com.prography.minari.pg.dto.PaymentResponse;
-import com.prography.minari.pg.dto.TossPaymentConfirmReqtDto;
+import com.prography.minari.pg.dto.common.PaymentResponse;
+import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
+import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
 import com.prography.minari.pg.repository.TossPaymentRepository;
 import com.prography.minari.pg.service.impl.TossClient;
 import com.prography.minari.user.entity.User;
@@ -14,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-
-import static com.prography.minari.common.execption.ErrorCode.INVALID_PRICE_MISMATCH;
+import java.time.ZonedDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +25,7 @@ public class TossService {
     private final ProductReader productReader;
 
     @Transactional
-    public void confirm(TossPaymentConfirmReqtDto reqDto, User user) {
+    public void confirm(TossPaymentConfirmReqDto reqDto, User user) {
 
         String paymentKey = reqDto.paymentKey();
         BigDecimal amount = reqDto.amount();
@@ -56,4 +53,19 @@ public class TossService {
         */
     }
 
+    public void getPaymentByPaymentKey(String paymentKey) {
+        tossClient.getPaymentByPaymentKey(paymentKey);
+    }
+
+    public void getPaymentByOrderId(String orderId) {
+        tossClient.getPaymentByOrderId(orderId);
+    }
+
+    public void cancelPayment(String paymentKey, TossPaymentCancelReqDto reqDto) {
+        tossClient.cancelPayment(paymentKey, reqDto);
+    }
+
+    public void getTransactionList(ZonedDateTime startDate, ZonedDateTime endDate, String startingAfter, int limit) {
+        tossClient.getTransactionList(startDate, endDate, startingAfter, limit);
+    }
 }

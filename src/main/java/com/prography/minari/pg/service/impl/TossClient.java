@@ -1,24 +1,22 @@
 package com.prography.minari.pg.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prography.minari.common.aop.ImplService;
-import com.prography.minari.common.execption.ApiException;
-import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.execption.TossApiException;
 import com.prography.minari.common.util.TossUtil;
-import com.prography.minari.pg.dto.PaymentErrorResponse;
-import com.prography.minari.pg.dto.PaymentResponse;
+import com.prography.minari.pg.dto.TossErrorResponse;
+import com.prography.minari.pg.dto.common.PaymentResponse;
+import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmRequest;
+import com.prography.minari.pg.dto.common.TransactionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 @Slf4j
 @ImplService
@@ -33,20 +31,45 @@ public class TossClient {
     public PaymentResponse confirmPayment(String paymentKey, BigDecimal amount, Long userId, Long productId) {
         String orderId = TossUtil.generateUUID(userId, productId);
 
-        return generateBasicWebClient()
-                .post()
-                .uri("/v1/payments/confirm")
-                .bodyValue(TossPaymentConfirmRequest.from(paymentKey, orderId, amount))
+        return retirevePostRequest(
+                "/v1/payments/confirm",
+                TossPaymentConfirmRequest.from(paymentKey, orderId, amount),
+                PaymentResponse.class
+        );
+    }
+
+    public void getPaymentByPaymentKey(String paymentKey) {
+        retireveGetRequest(
+                "/v1/payments/{paymentKey}",
+                paymentKey,
+                PaymentResponse.class
+        );
+    }
+
+    public void getPaymentByOrderId(String orderId) {
+        retireveGetRequest(
+                "/v1/payments/orders/{orderId}",
+                orderId,
+                PaymentResponse.class
+        );
+    }
+
+    public void cancelPayment(String paymentKey, TossPaymentCancelReqDto reqDto) {
+        retirevePostRequest(
+                "/v1/payments/{paymentKey}/cancel",
+                paymentKey,
+                reqDto,
+                PaymentResponse.class
+        );
+    }
+
+    public void getTransactionList(ZonedDateTime startDate, ZonedDateTime endDate, String startingAfter, int limit) {
+        generateBasicWebClient()
+                .get()
+                .uri("/v1/transactions")
                 .retrieve()
-                .onStatus(status -> status.isError(), clientResponse ->
-                        clientResponse.bodyToMono(PaymentErrorResponse.class)
-                                .flatMap(errorBody -> {
-                                    log.info("Toss Error Response: {}", errorBody);
-                                    return Mono.error(new TossApiException(errorBody.code(), errorBody.message()));
-                                })
-                )
-                .bodyToMono(PaymentResponse.class)
-                .block();
+                .bodyToFlux(TransactionResponse.class)
+                .collectList();
     }
 
     private WebClient generateBasicWebClient() {
@@ -55,6 +78,76 @@ public class TossClient {
                 .defaultHeader(HttpHeaders.AUTHORIZATION, TossUtil.encodedSecret(SECRET))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
+    }
+
+    private <T>T retireveGetRequest(String uri, Class<T> classType) {
+        return generateBasicWebClient()
+                .get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(status -> status.isError(), clientResponse ->
+                        clientResponse.bodyToMono(TossErrorResponse.class)
+                                .flatMap(errorBody -> {
+                                    log.info("Toss Error Response: {}", errorBody);
+                                    return Mono.error(new TossApiException(errorBody.code(), errorBody.message()));
+                                })
+                )
+                .bodyToMono(classType)
+                .block();
+
+    }
+
+    private <T>T retireveGetRequest(String uri, Object pathVar, Class<T> classType) {
+        return generateBasicWebClient()
+                .get()
+                .uri(uri, pathVar)
+                .retrieve()
+                .onStatus(status -> status.isError(), clientResponse ->
+                        clientResponse.bodyToMono(TossErrorResponse.class)
+                                .flatMap(errorBody -> {
+                                    log.info("Toss Error Response: {}", errorBody);
+                                    return Mono.error(new TossApiException(errorBody.code(), errorBody.message()));
+                                })
+                )
+                .bodyToMono(classType)
+                .block();
+
+    }
+
+    private <T>T retirevePostRequest(String uri, Object body, Class<T> classType) {
+        return generateBasicWebClient()
+                .post()
+                .uri(uri)
+                .bodyValue(body)
+                .retrieve()
+                .onStatus(status -> status.isError(), clientResponse ->
+                        clientResponse.bodyToMono(TossErrorResponse.class)
+                                .flatMap(errorBody -> {
+                                    log.info("Toss Error Response: {}", errorBody);
+                                    return Mono.error(new TossApiException(errorBody.code(), errorBody.message()));
+                                })
+                )
+                .bodyToMono(classType)
+                .block();
+
+    }
+
+    private <T>T retirevePostRequest(String uri, Object pathVar, Object body, Class<T> classType) {
+        return generateBasicWebClient()
+                .post()
+                .uri(uri, pathVar)
+                .bodyValue(body)
+                .retrieve()
+                .onStatus(status -> status.isError(), clientResponse ->
+                        clientResponse.bodyToMono(TossErrorResponse.class)
+                                .flatMap(errorBody -> {
+                                    log.info("Toss Error Response: {}", errorBody);
+                                    return Mono.error(new TossApiException(errorBody.code(), errorBody.message()));
+                                })
+                )
+                .bodyToMono(classType)
+                .block();
+
     }
 
 }

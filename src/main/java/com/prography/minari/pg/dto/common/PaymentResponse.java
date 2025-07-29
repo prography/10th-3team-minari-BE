@@ -1,4 +1,4 @@
-package com.prography.minari.pg.dto;
+package com.prography.minari.pg.dto.common;
 
 import com.prography.minari.pg.entity.TossPayment;
 
