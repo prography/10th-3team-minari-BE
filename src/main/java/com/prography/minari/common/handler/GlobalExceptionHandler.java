@@ -12,6 +12,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.net.ConnectException;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -38,6 +40,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(CommonResponse.fail(ErrorCode.REQUEST_BODY_IS_MISSING.getCode(), ErrorCode.REQUEST_BODY_IS_MISSING.getMessage()));
+    }
+
+    @ExceptionHandler(ConnectException.class)
+    public ResponseEntity<?> handleConnectException(HttpMessageNotReadableException e) {
+        return ResponseEntity
+                .badRequest()
+                .body(CommonResponse.fail(ErrorCode.DB_CONNECTION_ERROR.getCode(), ErrorCode.DB_CONNECTION_ERROR.getMessage()));
     }
 
 }

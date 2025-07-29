@@ -34,6 +34,7 @@ public enum ErrorCode {
     EXPIRED_AUTH_CODE(HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다.", "AUTH002"),
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작일은 종료일보다 이후일 수 없습니다.", "DATE001"),
     INVALID_PRICE_MISMATCH(HttpStatus.BAD_REQUEST, "요청하신 금액이 실제 상품 가격과 일치하지 않습니다.", "TOSS001"),
+    DB_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 연결에 실패했습니다. 연결 설정을 확인해주세요.", "DB001"),
     ;
 
     private final HttpStatus status;
