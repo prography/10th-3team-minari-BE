@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConnectException.class)
-    public ResponseEntity<?> handleConnectException(HttpMessageNotReadableException e) {
+    public ResponseEntity<?> handleConnectException(ConnectException e) {
         return ResponseEntity
                 .badRequest()
                 .body(CommonResponse.fail(ErrorCode.DB_CONNECTION_ERROR.getCode(), ErrorCode.DB_CONNECTION_ERROR.getMessage()));
