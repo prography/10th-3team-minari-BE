@@ -2,6 +2,7 @@ package com.prography.minari.common.handler;
 
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
+import com.prography.minari.common.execption.TossApiException;
 import com.prography.minari.common.response.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,13 @@ public class GlobalExceptionHandler {
         log.info(e.getErrorMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(CommonResponse.fail(e.getErrorCode(), e.getErrorMessage()));
+    }
+
+    @ExceptionHandler(TossApiException.class)
+    public ResponseEntity handleTossApiException(TossApiException e) {
+        log.info(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(CommonResponse.fail(e.getCode(), e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

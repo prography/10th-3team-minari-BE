@@ -6,22 +6,16 @@ import com.prography.minari.payment.entity.Product;
 import com.prography.minari.payment.service.impl.ProductReader;
 import com.prography.minari.pg.dto.PaymentResponse;
 import com.prography.minari.pg.dto.TossPaymentConfirmReqtDto;
-import com.prography.minari.pg.entity.TossPayment;
 import com.prography.minari.pg.repository.TossPaymentRepository;
 import com.prography.minari.pg.service.impl.TossClient;
 import com.prography.minari.user.entity.User;
-import io.swagger.v3.oas.models.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Map;
 
 import static com.prography.minari.common.execption.ErrorCode.INVALID_PRICE_MISMATCH;
-import static com.prography.minari.common.util.TossUtil.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,20 +30,30 @@ public class TossService {
     @Transactional
     public void confirm(TossPaymentConfirmReqtDto reqDto, User user) {
 
+        String paymentKey = reqDto.paymentKey();
+        BigDecimal amount = reqDto.amount();
+        Long productId    = reqDto.productId();
+        Long userId       = 1L;
+
+        /*
+
         // 상품 ID와 일치하는 상품이 존재하지 않을 경우, 예외처리
         Product product = productReader.read(reqDto.productId())
-                .orElseThrow(() -> new ApiException(ErrorCode.ENTITY_NOT_FOUND));
+                .orElseThrow(() -> new ApiException(ErrorCode.PRODUCTION_NOT_FOUND));
 
         // 상품의 가격과 사용자가 지불하는 비용이 일치하지 않을 경우, 예외처리
         if (BigDecimal.valueOf(product.getRealPrice()).compareTo(reqDto.amount()) != 0)
             throw new ApiException(INVALID_PRICE_MISMATCH);
 
-        // TOSS 결제 승인 API 호출
-        PaymentResponse paymentResponse = tossClient.confirmPayment(reqDto.paymentKey(), reqDto.amount(), user.getId(), reqDto.productId());
+        */
 
+        // TOSS 결제 승인 API 호출 -  https://api.tosspayments.com/v1/payments/confirm
+        PaymentResponse paymentResponse = tossClient.confirmPayment(paymentKey, amount, userId, productId);
+
+        /*
         // TOSS 결제 승인 Response 저장
         tossPaymentRepository.save(PaymentResponse.from(paymentResponse));
-
+        */
     }
 
 }
