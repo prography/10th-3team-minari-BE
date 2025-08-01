@@ -176,7 +176,7 @@ public class AnswerService {
                 .collect(Collectors.toList());
 
         // 미나리 N일 연속
-        int consecutiveDays = AnalyticsUtil.calculateConsecutiveDaysCount(answerResList, startDate, endDate);
+        int consecutiveDays = AnalyticsUtil.calculateConsecutiveDaysCount(answerMap);
 
         return AnswerHistoryResDto.create(consecutiveDays, answerResList);
     }

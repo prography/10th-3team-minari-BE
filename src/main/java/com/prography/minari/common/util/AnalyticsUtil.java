@@ -1,6 +1,7 @@
 package com.prography.minari.common.util;
 
 import com.prography.minari.answer.dto.res.AnswerResDto;
+import com.prography.minari.answer.entity.Answer;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -28,25 +29,18 @@ public class AnalyticsUtil {
         return Math.toIntExact(Math.round(numerator * 100.0 / denominator));
     }
 
-    public static int calculateConsecutiveDaysCount(List<AnswerResDto> answers, LocalDate startDate, LocalDate endDate) {
+    public static int calculateConsecutiveDaysCount(Map<LocalDate, Answer> answers) {
 
+        // 기준값(today) 선언
         LocalDate today = LocalDate.now();
 
-        // 오늘 리허설을 진행했다면, 1 추가
-        int consecutiveDays = answers.stream()
-                .anyMatch(dto -> dto.answerDate().isEqual(today) && dto.isExisted()) ? 1 : 0;
+        // 오늘 문제를 풀었다면 1일, 풀지 않았다면 0일부터 시작!
+        int consecutiveDays = answers.containsKey(today) ? 1 : 0;
 
-        consecutiveDays += Math.toIntExact(
-                answers.stream()
-                        .filter(dto -> {
-                            LocalDate date = dto.answerDate();
-                            return !date.isBefore(startDate) && !date.isAfter(today.minusDays(1));
-                        })
-                        .sorted(Comparator.comparing(AnswerResDto::answerDate).reversed())
-                        .map(AnswerResDto::isExisted)
-                        .takeWhile(Boolean.TRUE::equals)
-                        .count()
-        );
+        // 오늘을 기준으로 1일전, 2일전, 3일전, ... 문제를 풀었다면 연속일수 값을 1 증가!
+        for(LocalDate date = today.minusDays(1); answers.containsKey(date); date = date.minusDays(1)) {
+            consecutiveDays++;
+        }
 
         return consecutiveDays;
     }
