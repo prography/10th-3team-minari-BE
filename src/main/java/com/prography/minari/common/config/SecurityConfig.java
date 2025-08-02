@@ -60,7 +60,7 @@ public class SecurityConfig {
                             uri.startsWith("/api/v1/users/token/refresh");
                 })
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }
@@ -71,7 +71,7 @@ public class SecurityConfig {
     public SecurityFilterChain apiFilter(HttpSecurity http) throws Exception {
         return http
                 .securityMatcher(request -> request.getRequestURI().startsWith("/api/v1/"))
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
