@@ -20,18 +20,18 @@ import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_MATCHED;
 @RequiredArgsConstructor
 public class RedisProcessor {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final JwtUtil jwtUtil;
 
     /**
      * Redis에 데이터 저장 (만료시간 설정)
      */
-    public void setValue(String key, Object value) {
-        redisTemplate.opsForValue().set(key, value, jwtUtil.getDuration(value.toString()));
+    public void setValue(String key, String value) {
+        redisTemplate.opsForValue().set(key, value, jwtUtil.getDuration(value));
         log.info("refresh token 저장 : {}", value);
     }
 
-    public void setValue(String key, Object value, Duration duration) {
+    public void setValue(String key, String value, Duration duration) {
         redisTemplate.opsForValue().set(key, value, duration);
         log.info("[REDIS] {} : {}", key, value);
     }
