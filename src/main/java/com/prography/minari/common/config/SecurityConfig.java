@@ -92,7 +92,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "https://minari-official.com",
-                "https://minari-stg.netlify.app",
+                "https://minari-staging.netlify.app",
                 "http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
