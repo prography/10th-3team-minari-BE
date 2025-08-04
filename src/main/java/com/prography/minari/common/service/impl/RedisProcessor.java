@@ -9,8 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static com.prography.minari.common.execption.ErrorCode.ENTITY_NOT_FOUND;
 import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_MATCHED;
 
 @Slf4j
@@ -18,29 +20,34 @@ import static com.prography.minari.common.execption.ErrorCode.JWT_NOT_MATCHED;
 @RequiredArgsConstructor
 public class RedisProcessor {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final JwtUtil jwtUtil;
 
     /**
      * Redis에 데이터 저장 (만료시간 설정)
      */
-    public void setValue(String key, Object value) {
-        redisTemplate.opsForValue().set(key, value, jwtUtil.getDuration(value.toString()));
+    public void setValue(String key, String value) {
+        redisTemplate.opsForValue().set(key, value, jwtUtil.getDuration(value));
         log.info("refresh token 저장 : {}", value);
+    }
+
+    public void setValue(String key, String value, Duration duration) {
+        redisTemplate.opsForValue().set(key, value, duration);
+        log.info("[REDIS] {} : {}", key, value);
     }
 
     /**
      * Redis에서 데이터 조회
      */
-    public Object getValue(String key) {
-        return redisTemplate.opsForValue().get(key);
+    public Optional<Object> getValue(String key) {
+        return Optional.ofNullable(redisTemplate.opsForValue().get(key));
     }
 
     /**
      * Redis에서 데이터 삭제
      */
     public Boolean deleteValue(String key) {
-        log.info("refresh token 삭제 : {}", getValue(key));
+        log.info("refresh token 삭제 : {}", key);
         return redisTemplate.delete(key);
     }
 
@@ -63,18 +70,6 @@ public class RedisProcessor {
      */
     public Long getExpire(String key) {
         return redisTemplate.getExpire(key);
-    }
-
-    /**
-     * 토큰 일치 검증 메소드
-     */
-    public void validateRefreshToken(String key, String refreshToken) {
-        String targetRefreshToken = redisTemplate.opsForValue().get(key).toString();
-        // redis에 저장된 토큰과 사용자가 제공한 토큰일 일치하지 않을 경우, 예외처리
-        if(!targetRefreshToken.equals(refreshToken)) {
-            log.info("저장된 refreshToken : {} \n제공한 refreshToken : {}", targetRefreshToken, refreshToken);
-            throw new ApiException(JWT_NOT_MATCHED);
-        }
     }
 
 }
