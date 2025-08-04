@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @RestController
@@ -20,8 +21,13 @@ public class TossController {
     private final TossService tossService;
 
     @PostMapping("/toss/payments/confirm")
-    public ResponseEntity<CommonResponse> confirmPayment(@AuthenticationPrincipal User user, @RequestBody TossPaymentConfirmReqDto reqDto) {
-        tossService.confirm(reqDto, user);
+    public ResponseEntity<CommonResponse> confirmPayment(
+            @AuthenticationPrincipal User user,
+            @RequestParam("paymentKey") String paymentKey,
+            @RequestParam("orderId") String orderId,
+            @RequestParam("amount") BigDecimal amount) {
+
+        tossService.confirm(paymentKey, orderId, amount, user);
         return ResponseEntity.ok(CommonResponse.ok());
     }
 

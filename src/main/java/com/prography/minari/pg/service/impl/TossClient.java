@@ -28,9 +28,7 @@ public class TossClient {
     @Value("${toss.secret:default}")
     private String SECRET;
 
-    public PaymentResponse confirmPayment(String paymentKey, BigDecimal amount, Long userId, Long productId) {
-        String orderId = TossUtil.generateUUID(userId, productId);
-
+    public PaymentResponse confirmPayment(String paymentKey, String orderId, BigDecimal amount) {
         return retirevePostRequest(
                 "/v1/payments/confirm",
                 TossPaymentConfirmRequest.from(paymentKey, orderId, amount),
@@ -75,7 +73,7 @@ public class TossClient {
     private WebClient generateBasicWebClient() {
         return WebClient.builder()
                 .baseUrl(BASE_URL)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, TossUtil.encodedSecret(SECRET))
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic dGVzdF9za19BTG5RdkRkMlZKbE9BUHdMUHFPYThNajdYNDFtOg==")//TossUtil.encodedSecret(SECRET))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }

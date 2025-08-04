@@ -25,12 +25,7 @@ public class TossService {
     private final ProductReader productReader;
 
     @Transactional
-    public void confirm(TossPaymentConfirmReqDto reqDto, User user) {
-
-        String paymentKey = reqDto.paymentKey();
-        BigDecimal amount = reqDto.amount();
-        Long productId    = reqDto.productId();
-        Long userId       = 1L;
+    public void confirm(String paymentKey, String orderId, BigDecimal amount, User user) {
 
         /*
 
@@ -45,7 +40,7 @@ public class TossService {
         */
 
         // TOSS 결제 승인 API 호출 -  https://api.tosspayments.com/v1/payments/confirm
-        PaymentResponse paymentResponse = tossClient.confirmPayment(paymentKey, amount, userId, productId);
+        PaymentResponse paymentResponse = tossClient.confirmPayment(paymentKey, orderId, amount);
 
         /*
         // TOSS 결제 승인 Response 저장
