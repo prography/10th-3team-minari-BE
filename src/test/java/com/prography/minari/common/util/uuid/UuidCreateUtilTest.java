@@ -12,8 +12,8 @@ class UuidCreateUtilTest {
     @RepeatedTest(10)
     void sameInputShouldReturnSameOutput() {
         long value = 123456789L;
-        String first = createTossUUIDKeyLongToString(value);
-        String second = createTossUUIDKeyLongToString(value);
+        String first = createTossUUIDKeyLongToString(value,50);
+        String second = createTossUUIDKeyLongToString(value,50);
         System.out.println(first);
         assertEquals(first, second, "같은 값은 같은 문자열을 반환해야 합니다.");
     }
@@ -22,8 +22,8 @@ class UuidCreateUtilTest {
     void differentInputShouldReturnDifferentOutput() {
         long value1 = 123456789L;
         long value2 = 987654321L;
-        String first = createTossUUIDKeyLongToString(value1);
-        String second = createTossUUIDKeyLongToString(value2);
+        String first = createTossUUIDKeyLongToString(value1,50);
+        String second = createTossUUIDKeyLongToString(value2,50);
 
         assertNotEquals(first, second, "다른 값은 다른 문자열을 반환해야 합니다.");
     }
@@ -31,15 +31,16 @@ class UuidCreateUtilTest {
     @Test
     void outputShouldBe64CharactersLong() {
         long value = 42L;
-        String output = createTossUUIDKeyLongToString(value);
+        int len = 50;
+        String output = createTossUUIDKeyLongToString(value, len);
 
-        assertEquals(64, output.length(), "출력 문자열 길이는 항상 64자여야 합니다.");
+        assertEquals(len, output.length(), "출력 문자열 길이는 항상 64자여야 합니다.");
     }
 
     @Test
     void outputShouldContainOnlyAllowedCharacters() {
         long value = 123456789L;
-        String output = createTossUUIDKeyLongToString(value);
+        String output = createTossUUIDKeyLongToString(value,50);
 
         for (char c : output.toCharArray()) {
             assertTrue(ALLOWED_CHARS.indexOf(c) >= 0,
