@@ -5,6 +5,7 @@ import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.JwtUtil;
+import com.prography.minari.common.util.uuid.UuidCreateUtil;
 import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.payment.service.impl.CreditCounter;
 import com.prography.minari.payment.service.impl.SeedReader;
@@ -37,7 +38,8 @@ public class UserService {
         User user = userReader.read(id);
         Long creditTotal = creditCounter.countNotUsedCredit(id);
         Long dayCount = answerReader.countDistinctAnswerDateByUserId(id);
-        return UserFindResDto.from(user, creditTotal, dayCount);
+        String tossUUIDKeyLongToString = UuidCreateUtil.createTossUUIDKeyLongToString(user.getId());
+        return UserFindResDto.from(user, creditTotal, dayCount,tossUUIDKeyLongToString);
     }
 
     public UserJoinResDto join(UserJoinReqDto userJoinReqDto, Long userId) {
