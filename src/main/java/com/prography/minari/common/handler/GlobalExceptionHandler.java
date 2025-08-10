@@ -2,6 +2,7 @@ package com.prography.minari.common.handler;
 
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.execption.ErrorCode;
+import com.prography.minari.common.execption.TossApiException;
 import com.prography.minari.common.response.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.net.ConnectException;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -21,6 +24,13 @@ public class GlobalExceptionHandler {
         log.info(e.getErrorMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(CommonResponse.fail(e.getErrorCode(), e.getErrorMessage()));
+    }
+
+    @ExceptionHandler(TossApiException.class)
+    public ResponseEntity handleTossApiException(TossApiException e) {
+        log.info(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(CommonResponse.fail(e.getCode(), e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -38,6 +48,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(CommonResponse.fail(ErrorCode.REQUEST_BODY_IS_MISSING.getCode(), ErrorCode.REQUEST_BODY_IS_MISSING.getMessage()));
+    }
+
+    @ExceptionHandler(ConnectException.class)
+    public ResponseEntity<?> handleConnectException(ConnectException e) {
+        return ResponseEntity
+                .badRequest()
+                .body(CommonResponse.fail(ErrorCode.DB_CONNECTION_ERROR.getCode(), ErrorCode.DB_CONNECTION_ERROR.getMessage()));
     }
 
 }

@@ -1,0 +1,89 @@
+package com.prography.minari.pg.service;
+
+import com.prography.minari.common.execption.ApiException;
+import com.prography.minari.common.execption.ErrorCode;
+import com.prography.minari.common.service.impl.RedisProcessor;
+import com.prography.minari.payment.entity.Product;
+import com.prography.minari.payment.service.impl.ProductReader;
+import com.prography.minari.pg.dto.common.PaymentResponse;
+import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
+import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
+import com.prography.minari.pg.repository.TossPaymentRepository;
+import com.prography.minari.pg.service.impl.TossClient;
+import com.prography.minari.user.entity.User;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+
+import static com.prography.minari.common.execption.ErrorCode.INVALID_PRICE_MISMATCH;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class TossService {
+
+    private final TossClient tossClient;
+    private final RedisProcessor redisProcessor;
+    private final TossPaymentRepository tossPaymentRepository;
+
+    private final ProductReader productReader;
+
+    @Transactional
+    public PaymentResponse confirm(String paymentKey, String orderId, BigDecimal amount, User user) {
+
+        // orderId에 해당하는 amount가 존재하지 않거나 amount가 일치하지 않을 경우, 예외처리
+        redisProcessor.getValue(orderId)
+                .map(Object::toString)
+                .map(BigDecimal::new)
+                .filter(prepareAmount -> prepareAmount.compareTo(amount) == 0) // 금액 동일할 때만 통과
+                .orElseThrow(() -> new ApiException(INVALID_PRICE_MISMATCH));
+
+        // TOSS 결제 승인 API 호출 -  https://api.tosspayments.com/v1/payments/confirm
+        PaymentResponse paymentResponse = tossClient.confirmPayment(paymentKey, orderId, amount);
+        log.info("paymentResponse : {}", paymentResponse);
+
+        /*
+        // TOSS 결제 승인 Response 저장
+        tossPaymentRepository.save(PaymentResponse.from(paymentResponse));
+        */
+
+        return paymentResponse;
+    }
+
+    public void getPaymentByPaymentKey(String paymentKey) {
+        tossClient.getPaymentByPaymentKey(paymentKey);
+    }
+
+    public void getPaymentByOrderId(String orderId) {
+        tossClient.getPaymentByOrderId(orderId);
+    }
+
+    public void cancelPayment(String paymentKey, TossPaymentCancelReqDto reqDto) {
+        tossClient.cancelPayment(paymentKey, reqDto);
+    }
+
+    public void getTransactionList(ZonedDateTime startDate, ZonedDateTime endDate, String startingAfter, int limit) {
+        tossClient.getTransactionList(startDate, endDate, startingAfter, limit);
+    }
+
+    public void prepare(Long productId, String orderId, BigDecimal amount) {
+
+        // [TODO] 테스트 종류 후 주석 제거
+        // 상품 ID와 일치하는 상품이 존재하지 않을 경우, 예외처리
+        // Product product = productReader.read(productId)
+        //         .orElseThrow(() -> new ApiException(ErrorCode.PRODUCTION_NOT_FOUND));
+
+        // 상품의 가격과 사용자가 지불하는 비용이 일치하지 않을 경우, 예외처리
+        // if (BigDecimal.valueOf(product.getRealPrice()).compareTo(amount) != 0)
+        //     throw new ApiException(INVALID_PRICE_MISMATCH);
+
+        redisProcessor.setValue(orderId, String.valueOf(amount), Duration.ofMinutes(10));
+    }
+
+}

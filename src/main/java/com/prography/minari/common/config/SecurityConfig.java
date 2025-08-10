@@ -57,7 +57,8 @@ public class SecurityConfig {
                             uri.startsWith("/webjars") ||
                             uri.startsWith("/favicon.ico") ||
                             uri.startsWith("/api/v1/users/oauth") ||
-                            uri.startsWith("/api/v1/users/token/refresh");
+                            uri.startsWith("/api/v1/users/token/refresh") ||
+                            uri.startsWith("/api/v1/toss");
                 })
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
