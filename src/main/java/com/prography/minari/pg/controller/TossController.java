@@ -3,6 +3,7 @@ package com.prography.minari.pg.controller;
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
+import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.service.TossService;
 import com.prography.minari.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +23,11 @@ public class TossController {
 
     @PostMapping("/toss/payments/prepare")
     public ResponseEntity<CommonResponse> preparePayment(
+            @RequestParam("productId") Long productId,
             @RequestParam("orderId") String orderId,
-            @RequestParam("amout") BigDecimal amount
+            @RequestParam("amount") BigDecimal amount
     ) {
-        tossService.prepare(orderId, amount);
+        tossService.prepare(productId, orderId, amount);
         return ResponseEntity.ok(CommonResponse.ok());
     }
 
@@ -36,8 +38,8 @@ public class TossController {
             @RequestParam("orderId") String orderId,
             @RequestParam("amount") BigDecimal amount) {
 
-        tossService.confirm(paymentKey, orderId, amount, user);
-        return ResponseEntity.ok(CommonResponse.ok());
+        PaymentResponse paymentResponse = tossService.confirm(paymentKey, orderId, amount, user);
+        return ResponseEntity.ok(CommonResponse.success(paymentResponse));
     }
 
     @GetMapping("/toss/payments/{paymentKey}")

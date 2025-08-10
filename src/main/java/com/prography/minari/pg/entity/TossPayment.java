@@ -19,6 +19,8 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class TossPayment {
 
+    // orderId=RjX-D49-287_weWqsbtrzkXArUwCuKuW&paymentKey=tgen_20250810150558v3nD7&amount=100
+
     @Id
     @Column(length = 64)
     private String paymentKey;

@@ -73,7 +73,7 @@ public class TossClient {
     private WebClient generateBasicWebClient() {
         return WebClient.builder()
                 .baseUrl(BASE_URL)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, SECRET)//TossUtil.encodedSecret(SECRET))
+                .defaultHeader(HttpHeaders.AUTHORIZATION, TossUtil.encodedSecret(SECRET))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
