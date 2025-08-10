@@ -1,5 +1,6 @@
 package com.prography.minari.pg.service;
 
+import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.payment.service.impl.ProductReader;
 import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
@@ -20,6 +21,7 @@ import java.time.ZonedDateTime;
 public class TossService {
 
     private final TossClient tossClient;
+    private final RedisProcessor redisProcessor;
     private final TossPaymentRepository tossPaymentRepository;
 
     private final ProductReader productReader;
@@ -63,4 +65,9 @@ public class TossService {
     public void getTransactionList(ZonedDateTime startDate, ZonedDateTime endDate, String startingAfter, int limit) {
         tossClient.getTransactionList(startDate, endDate, startingAfter, limit);
     }
+
+    public void prepare(String orderId, BigDecimal amount) {
+        redisProcessor.
+    }
+
 }

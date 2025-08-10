@@ -20,6 +20,15 @@ public class TossController {
 
     private final TossService tossService;
 
+    @PostMapping("/toss/payments/prepare")
+    public ResponseEntity<CommonResponse> preparePayment(
+            @RequestParam("orderId") String orderId,
+            @RequestParam("amout") BigDecimal amount
+    ) {
+        tossService.prepare(orderId, amount);
+        return ResponseEntity.ok(CommonResponse.ok());
+    }
+
     @PostMapping("/toss/payments/confirm")
     public ResponseEntity<CommonResponse> confirmPayment(
             @AuthenticationPrincipal User user,
