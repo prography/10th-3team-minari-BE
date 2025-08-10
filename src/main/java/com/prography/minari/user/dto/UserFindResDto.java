@@ -1,7 +1,6 @@
 package com.prography.minari.user.dto;
 
 import com.prography.minari.common.entity.Domain;
-import com.prography.minari.payment.entity.Seed;
 import com.prography.minari.social.dto.enums.SocialType;
 import com.prography.minari.user.entity.User;
 import com.prography.minari.user.enums.UserRole;
@@ -17,10 +16,11 @@ public record UserFindResDto(
         String uuid,
         Domain domain,
         UserRole userRole,
-        Long dayCount
+        Long dayCount,
+        String customerKeyForPG
 )
 {
-    public static UserFindResDto from(User user, Long seed, Long dayCount) {
+    public static UserFindResDto from(User user, Long seed, Long dayCount,String customerKeyForToss) {
         return new UserFindResDto(
                 user.getId(),
                 user.getEmail(),
@@ -32,7 +32,8 @@ public record UserFindResDto(
                 user.getUuid(),
                 user.getDomain(),
                 user.getUserRole(),
-                dayCount
+                dayCount,
+                customerKeyForToss
         );
     }
 }
