@@ -35,10 +35,11 @@ public class UserService {
     private final CreditCounter creditCounter;
 
     public UserFindResDto findById(Long id) {
+        final int customerKeyLen = 50;
         User user = userReader.read(id);
         Long creditTotal = creditCounter.countNotUsedCredit(id);
         Long dayCount = answerReader.countDistinctAnswerDateByUserId(id);
-        String tossUUIDKeyLongToString = UuidCreateUtil.createTossUUIDKeyLongToString(user.getId());
+        String tossUUIDKeyLongToString = UuidCreateUtil.createTossUUIDKeyLongToString(user.getId(), customerKeyLen);
         return UserFindResDto.from(user, creditTotal, dayCount,tossUUIDKeyLongToString);
     }
 

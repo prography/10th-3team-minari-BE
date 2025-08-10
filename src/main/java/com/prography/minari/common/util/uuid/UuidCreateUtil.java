@@ -9,7 +9,7 @@ public class UuidCreateUtil {
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".toCharArray();
     private static final int FIXED_LEN = 64;
 
-    public static String createTossUUIDKeyLongToString(long value) {
+    public static String createTossUUIDKeyLongToString(long value,int len) {
         try {
             // 1. long -> byte[]
             byte[] inputBytes = ByteBuffer.allocate(Long.BYTES).putLong(value).array();
@@ -26,10 +26,10 @@ public class UuidCreateUtil {
             }
 
             // 4. 64자 만들기 (32바이트 해시 -> 32문자이므로, 2번 반복)
-            while (sb.length() < FIXED_LEN) {
+            while (sb.length() < len) {
                 sb.append(sb);
             }
-            return sb.substring(0, FIXED_LEN);
+            return sb.substring(0, len);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
