@@ -72,3 +72,7 @@ jwt:
 
 server:
   use-forward-headers: true
+
+toss:
+  secret: ${TOSS_SECRET}
+  base-url: ${TOSS_BASE_URL}
