@@ -3,6 +3,7 @@ package com.prography.minari.pg.controller;
 import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
+import com.prography.minari.pg.dto.TossPaymentPrepare.TossPaymentPrepareReqDto;
 import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.service.TossService;
 import com.prography.minari.user.entity.User;
@@ -22,23 +23,17 @@ public class TossController {
     private final TossService tossService;
 
     @PostMapping("/toss/payments/prepare")
-    public ResponseEntity<CommonResponse> preparePayment(
-            @RequestParam("productId") Long productId,
-            @RequestParam("orderId") String orderId,
-            @RequestParam("amount") BigDecimal amount
-    ) {
-        tossService.prepare(productId, orderId, amount);
+    public ResponseEntity<CommonResponse> preparePayment(@RequestBody TossPaymentPrepareReqDto reqDto) {
+        tossService.prepare(reqDto);
         return ResponseEntity.ok(CommonResponse.ok());
     }
 
     @PostMapping("/toss/payments/confirm")
     public ResponseEntity<CommonResponse> confirmPayment(
             @AuthenticationPrincipal User user,
-            @RequestParam("paymentKey") String paymentKey,
-            @RequestParam("orderId") String orderId,
-            @RequestParam("amount") BigDecimal amount) {
+            @RequestBody TossPaymentConfirmReqDto reqDto) {
 
-        PaymentResponse paymentResponse = tossService.confirm(paymentKey, orderId, amount, user);
+        PaymentResponse paymentResponse = tossService.confirm(reqDto, user);
         return ResponseEntity.ok(CommonResponse.success(paymentResponse));
     }
 
