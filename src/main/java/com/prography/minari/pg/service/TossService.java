@@ -47,7 +47,8 @@ public class TossService {
 
         // TOSS 결제 승인 API 호출 -  https://api.tosspayments.com/v1/payments/confirm
         PaymentResponse paymentResponse = tossClient.confirmPayment(reqDto.paymentKey(), reqDto.orderId(), reqDto.amount());
-        log.info("paymentResponse : {}", paymentResponse);
+        log.info("payment confirm request  : {}", reqDto);
+        log.info("payment confirm response : {}", paymentResponse);
 
         return paymentResponse;
     }
