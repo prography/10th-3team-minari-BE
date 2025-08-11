@@ -49,11 +49,6 @@ public class TossService {
         PaymentResponse paymentResponse = tossClient.confirmPayment(reqDto.paymentKey(), reqDto.orderId(), reqDto.amount());
         log.info("paymentResponse : {}", paymentResponse);
 
-        /*
-        // TOSS 결제 승인 Response 저장
-        tossPaymentRepository.save(PaymentResponse.from(paymentResponse));
-        */
-
         return paymentResponse;
     }
 

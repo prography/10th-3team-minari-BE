@@ -1,10 +1,13 @@
 package com.prography.minari.pg.dto.TossPaymentPrepare;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 
 public record TossPaymentPrepareReqDto(
-        Long productId,
-        String orderId,
-        BigDecimal amount
+        @NotNull Long productId,
+        @NotBlank String orderId,
+        @NotNull BigDecimal amount
 ) {
 }
