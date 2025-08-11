@@ -4,6 +4,7 @@ import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
 import com.prography.minari.pg.dto.TossPaymentPrepare.TossPaymentPrepareReqDto;
+import com.prography.minari.pg.dto.common.Payment;
 import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.service.TossService;
 import com.prography.minari.user.entity.User;
@@ -37,8 +38,8 @@ public class TossController {
             @AuthenticationPrincipal User user,
             @RequestBody @Validated TossPaymentConfirmReqDto reqDto) {
 
-        PaymentResponse paymentResponse = tossService.confirm(reqDto, user);
-        return ResponseEntity.ok(CommonResponse.success(paymentResponse));
+        Payment payment = tossService.confirm(reqDto, user);
+        return ResponseEntity.ok(CommonResponse.success(payment));
     }
 
     @GetMapping("/toss/payments/{paymentKey}")

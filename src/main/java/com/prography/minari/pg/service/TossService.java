@@ -5,6 +5,7 @@ import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.payment.entity.Product;
 import com.prography.minari.payment.service.impl.ProductReader;
 import com.prography.minari.pg.dto.TossPaymentPrepare.TossPaymentPrepareReqDto;
+import com.prography.minari.pg.dto.common.Payment;
 import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
@@ -31,12 +32,11 @@ public class TossService {
 
     private final TossClient tossClient;
     private final RedisProcessor redisProcessor;
-    private final TossPaymentRepository tossPaymentRepository;
 
     private final ProductReader productReader;
 
     @Transactional
-    public PaymentResponse confirm(TossPaymentConfirmReqDto reqDto, User user) {
+    public Payment confirm(TossPaymentConfirmReqDto reqDto, User user) {
 
         // orderId에 해당하는 amount가 존재하지 않거나 amount가 일치하지 않을 경우, 예외처리
         redisProcessor.getValue(reqDto.orderId())
@@ -46,11 +46,11 @@ public class TossService {
                 .orElseThrow(() -> new ApiException(INVALID_PRICE_MISMATCH));
 
         // TOSS 결제 승인 API 호출 -  https://api.tosspayments.com/v1/payments/confirm
-        PaymentResponse paymentResponse = tossClient.confirmPayment(reqDto.paymentKey(), reqDto.orderId(), reqDto.amount());
+        Payment payment = tossClient.confirmPayment(reqDto.paymentKey(), reqDto.orderId(), reqDto.amount());
         log.info("payment confirm request  : {}", reqDto);
-        log.info("payment confirm response : {}", paymentResponse);
+        log.info("payment confirm response : {}", payment);
 
-        return paymentResponse;
+        return payment;
     }
 
     public void getPaymentByPaymentKey(String paymentKey) {
