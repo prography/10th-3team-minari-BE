@@ -1,7 +1,6 @@
 package com.prography.minari.pg.service;
 
 import com.prography.minari.common.execption.ApiException;
-import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.payment.entity.Product;
 import com.prography.minari.payment.service.impl.ProductReader;
@@ -22,6 +21,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import static com.prography.minari.common.execption.ErrorCode.INVALID_PRICE_MISMATCH;
+import static com.prography.minari.common.execption.ErrorCode.PRODUCTION_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -70,14 +70,13 @@ public class TossService {
 
     public void prepare(TossPaymentPrepareReqDto reqDto) {
 
-        // [TODO] 테스트 종류 후 주석 제거
-        // 상품 ID와 일치하는 상품이 존재하지 않을 경우, 예외처리
-        // Product product = productReader.read(productId)
-        //         .orElseThrow(() -> new ApiException(ErrorCode.PRODUCTION_NOT_FOUND));
+         // 상품 ID와 일치하는 상품이 존재하지 않을 경우, 예외처리
+         Product product = productReader.read(reqDto.productId())
+                 .orElseThrow(() -> new ApiException(PRODUCTION_NOT_FOUND));
 
         // 상품의 가격과 사용자가 지불하는 비용이 일치하지 않을 경우, 예외처리
-        // if (BigDecimal.valueOf(product.getRealPrice()).compareTo(amount) != 0)
-        //     throw new ApiException(INVALID_PRICE_MISMATCH);
+         if (BigDecimal.valueOf(product.getRealPrice()).compareTo(reqDto.amount()) != 0)
+             throw new ApiException(INVALID_PRICE_MISMATCH);
 
         redisProcessor.setValue(reqDto.orderId(), String.valueOf(reqDto.amount()), Duration.ofMinutes(10));
     }
