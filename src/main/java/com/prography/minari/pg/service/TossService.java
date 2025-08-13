@@ -2,7 +2,9 @@ package com.prography.minari.pg.service;
 
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.service.impl.RedisProcessor;
+import com.prography.minari.payment.entity.Credit;
 import com.prography.minari.payment.entity.Product;
+import com.prography.minari.payment.service.impl.CreditWriter;
 import com.prography.minari.payment.service.impl.ProductReader;
 import com.prography.minari.pg.dto.TossPaymentPrepare.TossPaymentPrepareReqDto;
 import com.prography.minari.pg.dto.common.Payment;
@@ -34,21 +36,31 @@ public class TossService {
     private final RedisProcessor redisProcessor;
 
     private final ProductReader productReader;
+    private final CreditWriter creditWriter;
 
     @Transactional
     public Payment confirm(TossPaymentConfirmReqDto reqDto, User user) {
+
+        BigDecimal amount  = reqDto.amount();
+        String paymentKey  = reqDto.paymentKey();
+        String orderId     = reqDto.orderId();
+        Long productId     = reqDto.productId();
+        Long userId        = user.getId();
 
         // orderId에 해당하는 amount가 존재하지 않거나 amount가 일치하지 않을 경우, 예외처리
         redisProcessor.getValue(reqDto.orderId())
                 .map(Object::toString)
                 .map(BigDecimal::new)
-                .filter(prepareAmount -> prepareAmount.compareTo(reqDto.amount()) == 0) // 금액 동일할 때만 통과
+                .filter(prepareAmount -> prepareAmount.compareTo(amount) == 0) // 금액 동일할 때만 통과
                 .orElseThrow(() -> new ApiException(INVALID_PRICE_MISMATCH));
 
         // TOSS 결제 승인 API 호출 -  https://api.tosspayments.com/v1/payments/confirm
-        Payment payment = tossClient.confirmPayment(reqDto.paymentKey(), reqDto.orderId(), reqDto.amount());
+        Payment payment = tossClient.confirmPayment(paymentKey, orderId, amount);
         log.info("payment confirm request  : {}", reqDto);
         log.info("payment confirm response : {}", payment);
+
+        // Credit 저장
+        creditWriter.write(Credit.create(amount.longValue(), userId, Long.valueOf(paymentKey), productId));
 
         return payment;
     }

@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public record TossPaymentConfirmReqDto(
         @NotBlank String paymentKey,
         @NotBlank String orderId,
-        @NotNull BigDecimal amount
+        @NotNull BigDecimal amount,
+        @NotNull Long productId
 ) {
 }
