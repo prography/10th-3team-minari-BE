@@ -1,5 +1,6 @@
 package com.prography.minari.common.util;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +26,10 @@ public class TossUtil {
     public static String encodedSecret(String secret) {
         return AUTHORIZATION_PREFIX + Base64.getEncoder()
                 .encodeToString((secret + ":").getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static boolean isGreaterThan(BigDecimal amount) {
+        return amount.compareTo(BigDecimal.valueOf(100_000)) > 0;
     }
 
 }

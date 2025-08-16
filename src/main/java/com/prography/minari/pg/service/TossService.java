@@ -2,6 +2,7 @@ package com.prography.minari.pg.service;
 
 import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.service.impl.RedisProcessor;
+import com.prography.minari.common.util.TossUtil;
 import com.prography.minari.payment.entity.Credit;
 import com.prography.minari.payment.entity.Product;
 import com.prography.minari.payment.service.impl.CreditWriter;
@@ -23,8 +24,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 
-import static com.prography.minari.common.execption.ErrorCode.INVALID_PRICE_MISMATCH;
-import static com.prography.minari.common.execption.ErrorCode.PRODUCTION_NOT_FOUND;
+import static com.prography.minari.common.execption.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -90,6 +90,11 @@ public class TossService {
         // 상품의 가격과 사용자가 지불하는 비용이 일치하지 않을 경우, 예외처리
          if (BigDecimal.valueOf(product.getRealPrice()).compareTo(reqDto.amount()) != 0)
              throw new ApiException(INVALID_PRICE_MISMATCH);
+
+         // 결제 금액이 100,000원을 초과할 경우, 예외처리
+         if(TossUtil.isGreaterThan(reqDto.amount())) {
+             throw new ApiException(INVALID_AMOUNT);
+         }
 
         redisProcessor.setValue(reqDto.orderId(), String.valueOf(reqDto.amount()), Duration.ofMinutes(10));
     }
