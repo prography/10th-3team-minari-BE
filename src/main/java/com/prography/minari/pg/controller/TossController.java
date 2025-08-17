@@ -4,6 +4,7 @@ import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
 import com.prography.minari.pg.dto.TossPaymentPrepare.TossPaymentPrepareReqDto;
+import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.dto.common.TossPayment;
 import com.prography.minari.pg.service.TossService;
 import com.prography.minari.user.entity.User;
@@ -41,8 +42,8 @@ public class TossController {
 
     @GetMapping("/toss/payments/{paymentKey}")
     public ResponseEntity<CommonResponse> findPayment(@PathVariable("paymentKey") String paymentKey) {
-        tossService.getPaymentByPaymentKey(paymentKey);
-        return ResponseEntity.ok(CommonResponse.ok());
+        PaymentResponse paymentResponse = tossService.getPaymentByPaymentKey(paymentKey);
+        return ResponseEntity.ok(CommonResponse.success(paymentResponse));
     }
 
     @GetMapping("/toss/payments/orders/{orderId}")

@@ -37,8 +37,8 @@ public class TossClient {
         );
     }
 
-    public void getPaymentByPaymentKey(String paymentKey) {
-        retireveGetRequest(
+    public PaymentResponse getPaymentByPaymentKey(String paymentKey) {
+        return retireveGetRequest(
                 "/v1/payments/{paymentKey}",
                 paymentKey,
                 PaymentResponse.class

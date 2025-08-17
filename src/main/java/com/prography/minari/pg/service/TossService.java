@@ -12,6 +12,7 @@ import com.prography.minari.payment.service.impl.ProductReader;
 import com.prography.minari.pg.dto.TossPaymentPrepare.TossPaymentPrepareReqDto;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
+import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.dto.common.TossPayment;
 import com.prography.minari.pg.service.impl.TossClient;
 import com.prography.minari.user.entity.User;
@@ -70,8 +71,8 @@ public class TossService {
         return payment;
     }
 
-    public void getPaymentByPaymentKey(String paymentKey) {
-        tossClient.getPaymentByPaymentKey(paymentKey);
+    public PaymentResponse getPaymentByPaymentKey(String paymentKey) {
+        return tossClient.getPaymentByPaymentKey(paymentKey);
     }
 
     public void getPaymentByOrderId(String orderId) {
