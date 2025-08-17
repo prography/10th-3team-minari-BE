@@ -4,15 +4,15 @@ import com.prography.minari.common.execption.ApiException;
 import com.prography.minari.common.service.impl.RedisProcessor;
 import com.prography.minari.common.util.TossUtil;
 import com.prography.minari.payment.entity.Credit;
+import com.prography.minari.payment.entity.PGPayment;
 import com.prography.minari.payment.entity.Product;
 import com.prography.minari.payment.service.impl.CreditWriter;
+import com.prography.minari.payment.service.impl.PgPaymentWriter;
 import com.prography.minari.payment.service.impl.ProductReader;
 import com.prography.minari.pg.dto.TossPaymentPrepare.TossPaymentPrepareReqDto;
-import com.prography.minari.pg.dto.common.Payment;
-import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
-import com.prography.minari.pg.repository.TossPaymentRepository;
+import com.prography.minari.pg.dto.common.TossPayment;
 import com.prography.minari.pg.service.impl.TossClient;
 import com.prography.minari.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +38,10 @@ public class TossService {
     private final ProductReader productReader;
     private final CreditWriter creditWriter;
 
+    private final PgPaymentWriter pgPaymentWriter;
+
     @Transactional
-    public Payment confirm(TossPaymentConfirmReqDto reqDto, User user) {
+    public TossPayment confirm(TossPaymentConfirmReqDto reqDto, User user) {
 
         BigDecimal amount  = reqDto.amount();
         String paymentKey  = reqDto.paymentKey();
@@ -55,12 +57,15 @@ public class TossService {
                 .orElseThrow(() -> new ApiException(INVALID_PRICE_MISMATCH));
 
         // TOSS 결제 승인 API 호출 -  https://api.tosspayments.com/v1/payments/confirm
-        Payment payment = tossClient.confirmPayment(paymentKey, orderId, amount);
+        TossPayment payment = tossClient.confirmPayment(paymentKey, orderId, amount);
         log.info("payment confirm request  : {}", reqDto);
         log.info("payment confirm response : {}", payment);
 
+        // TOSS 결제 내역 저장
+        PGPayment pgPayment = pgPaymentWriter.write(PGPayment.create(userId, productId, amount.longValue(), paymentKey));
+
         // Credit 저장
-        creditWriter.write(Credit.create(amount.longValue(), userId, Long.valueOf(paymentKey), productId));
+        creditWriter.write(Credit.create(amount.longValue(), userId, pgPayment.getId(), productId));
 
         return payment;
     }

@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-public record Payment(
+public record TossPayment(
         String version,    //
         String paymentKey, // 결제의 키값
         PaymentType type,  //

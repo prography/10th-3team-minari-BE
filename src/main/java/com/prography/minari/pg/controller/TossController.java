@@ -4,8 +4,7 @@ import com.prography.minari.common.response.CommonResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
 import com.prography.minari.pg.dto.TossPaymentPrepare.TossPaymentPrepareReqDto;
-import com.prography.minari.pg.dto.common.Payment;
-import com.prography.minari.pg.dto.common.PaymentResponse;
+import com.prography.minari.pg.dto.common.TossPayment;
 import com.prography.minari.pg.service.TossService;
 import com.prography.minari.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @RestController
@@ -26,7 +24,6 @@ public class TossController {
 
     @PostMapping("/toss/payments/prepare")
     public ResponseEntity<CommonResponse> preparePayment(
-            @AuthenticationPrincipal User user,
             @RequestBody @Validated TossPaymentPrepareReqDto reqDto
     ) {
         tossService.prepare(reqDto);
@@ -38,7 +35,7 @@ public class TossController {
             @AuthenticationPrincipal User user,
             @RequestBody @Validated TossPaymentConfirmReqDto reqDto) {
 
-        Payment payment = tossService.confirm(reqDto, user);
+        TossPayment payment = tossService.confirm(reqDto, user);
         return ResponseEntity.ok(CommonResponse.success(payment));
     }
 
