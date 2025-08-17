@@ -1,5 +1,7 @@
 package com.prography.minari.pg.entity;
 
+import com.prography.minari.pg.dto.common.Payment;
+import com.prography.minari.pg.enums.payment.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -7,75 +9,74 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "toss_payments")
 @Getter
-@Setter
 @NoArgsConstructor
 public class TossPayment {
 
-    // orderId=RjX-D49-287_weWqsbtrzkXArUwCuKuW&paymentKey=tgen_20250810150558v3nD7&amount=100
+    private String userId;     //
+    private String paymentKey; // 결제의 키값
 
-    @Id
-    @Column(length = 64)
-    private String paymentKey;
+    private String version;    //
 
-    private String mId;
-    private String lastTransactionKey;
+    private PaymentType type;  //
     private String orderId;
     private String orderName;
-
-    private BigDecimal taxExemptionAmount;
-    private String status;
-
+    private String mId;
+    private String currency;
+    private PaymentMethod method;
+    private BigDecimal totalAmount;
+    private BigDecimal balanceAmount;
+    private PaymentStatus status;
     private OffsetDateTime requestedAt;
     private OffsetDateTime approvedAt;
-
     private boolean useEscrow;
+    private String lastTransactionKey;
+    private BigDecimal suppliedAmount;
+    private BigDecimal vat;
     private boolean cultureExpense;
+    private BigDecimal taxFreeAmount;
+    private BigDecimal taxExemptionAmount;
+    private List<TossPaymentCancel> cancels;
+    private boolean isPartialCancelable;
+    private TossPaymentCard card;
+    private TossPaymentVirtualAccount virtualAccount;
+    private String secret;
 
-    // Card (중첩)
-    private String cardIssuerCode;
-    private String cardAcquirerCode;
-    private String cardNumber;
-    private Integer cardInstallmentPlanMonths;
-    private Boolean cardInterestFree;
-    private String cardInterestPayer;
-    private String cardApproveNo;
-    private Boolean cardUseCardPoint;
-    private String cardType;
-    private String cardOwnerType;
-    private String cardAcquireStatus;
-    private BigDecimal cardAmount;
+    private String customerMobilePhone;
+    private PaymentSettlementStatus mobilePhoneSettlementStatus;
+    private String mobilePhoneReceiptUrl;
 
-    // EasyPay (중첩)
+    private String giftCertificateApproveNo;
+    private PaymentSettlementStatus giftCertificateSettlementStatus;
+
+    private String transferBankCode;
+    private PaymentSettlementStatus transferSettlementStatus;
+
+    private List<TossPaymentMetadata> metadata;
+
+    private String receiptUrl;
+
+    private String checkoutUrl;
+
     private String easyPayProvider;
     private BigDecimal easyPayAmount;
     private BigDecimal easyPayDiscountAmount;
 
-    // Receipt
-    private String receiptUrl;
-
-    // Checkout
-    private String checkoutUrl;
-
     private String country;
-    private Boolean isPartialCancelable;
 
-    private String type;
-    private String currency;
-    private BigDecimal totalAmount;
-    private BigDecimal balanceAmount;
-    private BigDecimal suppliedAmount;
-    private BigDecimal vat;
-    private BigDecimal taxFreeAmount;
+    private String failureCode;
+    private String failureMessage;
 
-    private String method;
-    private String version;
+    private TossPaymentCashReceipt cashReceipt;
+    private List<TossPaymentCashReceipts> cashReceipts;
 
+    private BigDecimal discountAmount;
 }

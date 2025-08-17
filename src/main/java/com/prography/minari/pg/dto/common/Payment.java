@@ -43,7 +43,7 @@ public record Payment(
         String country,
         Failure failure,
         CashReceipt cashReceipt,
-        CashReceipts cashReceipts,
+        List<CashReceipts> cashReceipts,
         Discount discount
 ) {
     public record Cancel(
