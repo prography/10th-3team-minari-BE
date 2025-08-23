@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import static com.prography.minari.payment.entity.CreditStatus.PAID;
+
 @Entity
 @Table(name = "CREDIT")
 @Getter
@@ -35,5 +37,15 @@ public class Credit extends BaseTimeEntity {
 
     public void changeStatusOfExpiredCredit() {
         this.status = CreditStatus.EXPIRED;
+    }
+
+    public static Credit create(Long amount, Long userId, Long paymentId, Long productId) {
+        Credit credit = new Credit();
+        credit.amount = amount;
+        credit.userId = userId;
+        credit.paymentId = paymentId;
+        credit.productId = productId;
+        credit.expiredDateTime = LocalDateTime.now().plusYears(1); // 충전된 포인트의 이용기간과 환불가능 기간은 결제시점으로부터 1년 이내로 제한
+        return credit;
     }
 }

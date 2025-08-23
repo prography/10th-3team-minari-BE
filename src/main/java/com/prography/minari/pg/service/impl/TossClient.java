@@ -7,6 +7,7 @@ import com.prography.minari.pg.dto.TossErrorResponse;
 import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmRequest;
+import com.prography.minari.pg.dto.common.TossPayment;
 import com.prography.minari.pg.dto.common.TransactionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,16 +29,16 @@ public class TossClient {
     @Value("${toss.secret:default}")
     private String SECRET;
 
-    public PaymentResponse confirmPayment(String paymentKey, String orderId, BigDecimal amount) {
+    public TossPayment confirmPayment(String paymentKey, String orderId, BigDecimal amount) {
         return retirevePostRequest(
                 "/v1/payments/confirm",
                 TossPaymentConfirmRequest.from(paymentKey, orderId, amount),
-                PaymentResponse.class
+                TossPayment.class
         );
     }
 
-    public void getPaymentByPaymentKey(String paymentKey) {
-        retireveGetRequest(
+    public PaymentResponse getPaymentByPaymentKey(String paymentKey) {
+        return retireveGetRequest(
                 "/v1/payments/{paymentKey}",
                 paymentKey,
                 PaymentResponse.class

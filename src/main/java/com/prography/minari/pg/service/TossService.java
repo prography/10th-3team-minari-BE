@@ -1,15 +1,19 @@
 package com.prography.minari.pg.service;
 
 import com.prography.minari.common.execption.ApiException;
-import com.prography.minari.common.execption.ErrorCode;
 import com.prography.minari.common.service.impl.RedisProcessor;
+import com.prography.minari.common.util.TossUtil;
+import com.prography.minari.payment.entity.Credit;
+import com.prography.minari.payment.entity.PGPayment;
 import com.prography.minari.payment.entity.Product;
+import com.prography.minari.payment.service.impl.CreditWriter;
+import com.prography.minari.payment.service.impl.PgPaymentWriter;
 import com.prography.minari.payment.service.impl.ProductReader;
 import com.prography.minari.pg.dto.TossPaymentPrepare.TossPaymentPrepareReqDto;
-import com.prography.minari.pg.dto.common.PaymentResponse;
 import com.prography.minari.pg.dto.TossPaymentCancel.TossPaymentCancelReqDto;
 import com.prography.minari.pg.dto.TossPaymentConfirm.TossPaymentConfirmReqDto;
-import com.prography.minari.pg.repository.TossPaymentRepository;
+import com.prography.minari.pg.dto.common.PaymentResponse;
+import com.prography.minari.pg.dto.common.TossPayment;
 import com.prography.minari.pg.service.impl.TossClient;
 import com.prography.minari.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +25,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 
-import static com.prography.minari.common.execption.ErrorCode.INVALID_PRICE_MISMATCH;
+import static com.prography.minari.common.execption.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -31,34 +35,44 @@ public class TossService {
 
     private final TossClient tossClient;
     private final RedisProcessor redisProcessor;
-    private final TossPaymentRepository tossPaymentRepository;
 
     private final ProductReader productReader;
+    private final CreditWriter creditWriter;
+
+    private final PgPaymentWriter pgPaymentWriter;
 
     @Transactional
-    public PaymentResponse confirm(TossPaymentConfirmReqDto reqDto, User user) {
+    public TossPayment confirm(TossPaymentConfirmReqDto reqDto, User user) {
+
+        BigDecimal amount  = reqDto.amount();
+        String paymentKey  = reqDto.paymentKey();
+        String orderId     = reqDto.orderId();
+        Long productId     = reqDto.productId();
+        Long userId        = user.getId();
 
         // orderId에 해당하는 amount가 존재하지 않거나 amount가 일치하지 않을 경우, 예외처리
         redisProcessor.getValue(reqDto.orderId())
                 .map(Object::toString)
                 .map(BigDecimal::new)
-                .filter(prepareAmount -> prepareAmount.compareTo(reqDto.amount()) == 0) // 금액 동일할 때만 통과
+                .filter(prepareAmount -> prepareAmount.compareTo(amount) == 0) // 금액 동일할 때만 통과
                 .orElseThrow(() -> new ApiException(INVALID_PRICE_MISMATCH));
 
         // TOSS 결제 승인 API 호출 -  https://api.tosspayments.com/v1/payments/confirm
-        PaymentResponse paymentResponse = tossClient.confirmPayment(reqDto.paymentKey(), reqDto.orderId(), reqDto.amount());
-        log.info("paymentResponse : {}", paymentResponse);
+        TossPayment payment = tossClient.confirmPayment(paymentKey, orderId, amount);
+        log.info("payment confirm request  : {}", reqDto);
+        log.info("payment confirm response : {}", payment);
 
-        /*
-        // TOSS 결제 승인 Response 저장
-        tossPaymentRepository.save(PaymentResponse.from(paymentResponse));
-        */
+        // TOSS 결제 내역 저장
+        PGPayment pgPayment = pgPaymentWriter.write(PGPayment.create(userId, productId, amount.longValue(), paymentKey));
 
-        return paymentResponse;
+        // Credit 저장
+        creditWriter.write(Credit.create(amount.longValue(), userId, pgPayment.getId(), productId));
+
+        return payment;
     }
 
-    public void getPaymentByPaymentKey(String paymentKey) {
-        tossClient.getPaymentByPaymentKey(paymentKey);
+    public PaymentResponse getPaymentByPaymentKey(String paymentKey) {
+        return tossClient.getPaymentByPaymentKey(paymentKey);
     }
 
     public void getPaymentByOrderId(String orderId) {
@@ -75,14 +89,18 @@ public class TossService {
 
     public void prepare(TossPaymentPrepareReqDto reqDto) {
 
-        // [TODO] 테스트 종류 후 주석 제거
-        // 상품 ID와 일치하는 상품이 존재하지 않을 경우, 예외처리
-        // Product product = productReader.read(productId)
-        //         .orElseThrow(() -> new ApiException(ErrorCode.PRODUCTION_NOT_FOUND));
+         // 상품 ID와 일치하는 상품이 존재하지 않을 경우, 예외처리
+         Product product = productReader.read(reqDto.productId())
+                 .orElseThrow(() -> new ApiException(PRODUCTION_NOT_FOUND));
 
         // 상품의 가격과 사용자가 지불하는 비용이 일치하지 않을 경우, 예외처리
-        // if (BigDecimal.valueOf(product.getRealPrice()).compareTo(amount) != 0)
-        //     throw new ApiException(INVALID_PRICE_MISMATCH);
+         if (BigDecimal.valueOf(product.getRealPrice()).compareTo(reqDto.amount()) != 0)
+             throw new ApiException(INVALID_PRICE_MISMATCH);
+
+         // 결제 금액이 100,000원을 초과할 경우, 예외처리
+         if(TossUtil.isGreaterThan(reqDto.amount())) {
+             throw new ApiException(INVALID_AMOUNT);
+         }
 
         redisProcessor.setValue(reqDto.orderId(), String.valueOf(reqDto.amount()), Duration.ofMinutes(10));
     }

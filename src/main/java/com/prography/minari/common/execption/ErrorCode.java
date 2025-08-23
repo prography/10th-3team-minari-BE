@@ -30,11 +30,13 @@ public enum ErrorCode {
     METHOD_ARGUMENT_NOT_VALIDATION_EXCEPTION(HttpStatus.BAD_REQUEST, "", "VALIDATION"),
     AUDIO_UNSUPPORT_FORMAT_EXCEPTION(HttpStatus.NOT_FOUND, "지원하지 않는 오디오 포맷입니다.","AU003"),
     REQUEST_BODY_IS_MISSING(HttpStatus.NOT_FOUND, "Request Body가 존재하지 않습니다.", "VALIDATION"),
+    REQUEST_PARAM_IS_MISSING(HttpStatus.NOT_FOUND, "Request Param이 존재하지 않습니다.", "VALIDATION"),
     FREE_ANSWER_ALREADY_DONE(HttpStatus.BAD_REQUEST, "이미 오늘의 미나리에 답변하였습니다.", "A001"),
     INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "유효햐지 않은 인증번호입니다.", "AUTH001"),
     EXPIRED_AUTH_CODE(HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다.", "AUTH002"),
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작일은 종료일보다 이후일 수 없습니다.", "DATE001"),
     INVALID_PRICE_MISMATCH(HttpStatus.BAD_REQUEST, "요청하신 금액이 실제 상품 가격과 일치하지 않습니다.", "TOSS001"),
+    INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액은 100,000원을 초과할 수 없습니다.", "TOSS002"),
     DB_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 연결에 실패했습니다. 연결 설정을 확인해주세요.", "DB001"),
     ;
 
