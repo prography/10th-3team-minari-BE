@@ -24,12 +24,16 @@ public class CreditUseProcessor {
     public void use(Long userId, Long used, CreditUsageTarget target) {
 
         List<CreditProductDto> creditProductDtos = creditJpaRepository.findAllByUserId(userId).stream()
-                .filter(c->c.credit().equals(PAID))
+                .filter(c -> c.credit().getStatus().equals(PAID))
                 .sorted(
-                        Comparator.<CreditProductDto, Integer>comparing(dto ->
-                                        dto.product().getPayCategory().equals(PayCategory.EVENT) ? 0 : 1
+                        Comparator.comparing(
+                                CreditProductDto::product,  // product() 기준
+                                Comparator.nullsLast(
+                                        Comparator.comparing(p ->
+                                                p.getPayCategory().equals(PayCategory.EVENT) ? 0 : 1
+                                        )
                                 )
-                                .thenComparing(dto -> dto.credit().getCreatedDateTime())
+                        ).thenComparing(dto -> dto.credit().getCreatedDateTime())
                 )
                 .toList();
 
@@ -85,7 +89,7 @@ public class CreditUseProcessor {
 
     public Map<Credit, Long> getHistory(Long userId) {
         List<Credit> credits = creditJpaRepository.findAllByUserId(userId).stream()
-                .map(c -> c.credit())
+                .map(CreditProductDto::credit)
                 .sorted(Comparator.comparing(Credit::getCreatedDateTime))
                 .toList();
 
