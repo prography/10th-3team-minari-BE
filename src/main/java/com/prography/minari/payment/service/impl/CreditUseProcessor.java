@@ -89,7 +89,7 @@ public class CreditUseProcessor {
 
     public Map<Credit, Long> getHistory(Long userId) {
         List<Credit> credits = creditJpaRepository.findAllByUserId(userId).stream()
-                .map(c -> c.credit())
+                .map(CreditProductDto::credit)
                 .sorted(Comparator.comparing(Credit::getCreatedDateTime))
                 .toList();
 
