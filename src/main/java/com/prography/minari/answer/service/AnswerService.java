@@ -69,15 +69,6 @@ public class AnswerService {
                 .orElseThrow(() -> new ApiException(ErrorCode.QUESTION_NOT_FOUND));
         List<Answer> answers = answerReader.readAllByUserIdAndQuestionIdASC(userId, questionId);
         Long leftCredit = creditCounter.countNotUsedCredit(user.getId());
-        /**
-         * Todo
-         * 프론트 개발 완료후 주석 제거
-         *//*
-        if (!answers.isEmpty()) {
-            throw new ApiException(ErrorCode.FREE_ANSWER_ALREADY_DONE);
-        }*/
-
-        // 무료안했다면 스킵
 
         if (!answers.isEmpty()) {
             if (leftCredit > 0) {
@@ -87,9 +78,6 @@ public class AnswerService {
                 throw new ApiException(ErrorCode.FREE_ANSWER_ALREADY_DONE);
             }
         }
-        // 무료 한경우
-        // 돈이 있다면 돈 차감
-        // 돈이 없다면 돈 차감
 
 
         byte[] inputStream = audioFileFormatConverter.convertToWavAsByte(file);
